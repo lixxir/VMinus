@@ -25,23 +25,30 @@ import net.minecraftforge.registries.ForgeRegistries;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class VisionHandler {
     // json caches
-    private static final Map<String, JsonObject> itemVisionKey = new ConcurrentHashMap<String, JsonObject>();
-    private static final Map<String, JsonObject> blockVisionKey = new ConcurrentHashMap<String, JsonObject>();
-    private static final Map<String, JsonObject> entityVisionKey = new ConcurrentHashMap<String, JsonObject>();
-    private static final Map<String, JsonObject> effectVisionKey = new ConcurrentHashMap<String, JsonObject>();
-    private static final Map<String, JsonObject> enchantmentVisionKey = new ConcurrentHashMap<String, JsonObject>();
+    private static final ConcurrentHashMap<String, Integer> ITEM_VISION_KEY = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<JsonObject> ITEM_VISION_CACHE = new CopyOnWriteArrayList<>();
+    private static final ConcurrentHashMap<String, JsonObject> BLOCK_VISION_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, JsonObject> ENTITY_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
+    private static final ConcurrentHashMap<String, JsonObject> EFFECT_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
+    private static final ConcurrentHashMap<String, JsonObject> ENCHANTMENT_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
     // tag & resource location caches
-    private static final Map<String, ResourceLocation> resourceLocationCache = new ConcurrentHashMap<>();
-    private static final Map<String, TagKey<EntityType<?>>> entityTagCache = new ConcurrentHashMap<>();
-    private static final Map<String, TagKey<Block>> blockTagCache = new ConcurrentHashMap<>();
-    private static final Map<String, TagKey<Item>> itemTagCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ResourceLocation> resourceLocationCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<EntityType<?>>> entityTagCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<Block>> blockTagCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<Item>> itemTagCache = new ConcurrentHashMap<>();
+    public static final int ITEM_TYPE = 0;
 
-    public static Map<String, JsonObject> getItemVisionCache() {
-        return itemVisionKey;
+    public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
+        return ITEM_VISION_KEY;
+    }
+
+    public static CopyOnWriteArrayList<JsonObject> getItemVisionCache() {
+        return ITEM_VISION_CACHE;
     }
 
     public static JsonObject getVisionData(ItemStack itemstack) {
@@ -80,25 +87,28 @@ public class VisionHandler {
         return getVisionData(null, false, null, entity, null, null);
     }
 
+    private static void clearCaches() {
+        ITEM_VISION_KEY.clear();
+        ITEM_VISION_CACHE.clear();
+        /*
+        BLOCK_VISION_CACHE.clear();
+        ENTITY_VISION_CACHE.clear();
+        EFFECT_VISION_CACHE.clear();
+        ENCHANTMENT_VISION_CACHE.clear();
+
+         */
+    }
+
     @SubscribeEvent
     public static void onWorldLoad(net.minecraftforge.event.level.LevelEvent.Load event) {
-        // clearing caches
-        itemVisionKey.clear();
-        blockVisionKey.clear();
-        entityVisionKey.clear();
-        effectVisionKey.clear();
-        enchantmentVisionKey.clear();
-		/* 
-		// VminusMod.LOGGER.info("CACHES CLEARED:" + itemVisionKey);
-		/* Preloaded visions to reduce in-world lag
-		Entities are not preloaded due to crashes of not having a world to generate the entity in. 
-		if (VminusModVariables.main_item_vision != null) {
+        if (VminusModVariables.main_item_vision != null) {
 			for (Item item : ForgeRegistries.ITEMS.getValues()) {
 				ItemStack itemStack = new ItemStack(item);
 				getVisionData(itemStack);
 			}
 		}
 		// VminusMod.LOGGER.info("PRE-LOADED CACHE:" + itemVisionKey);
+        /*
 		if (VminusModVariables.main_block_vision != null) {
 			for (Block block : ForgeRegistries.BLOCKS.getValues()) {
 				getVisionData(block);
@@ -116,8 +126,10 @@ public class VisionHandler {
 				getVisionData(enchantment);
 			}
 		}
-		// VminusMod.LOGGER.info("PRE-LOADED CACHE:" + enchantmentVisionKey);
-		*/
+	    //Entities are not preloaded due to crashes of not having a world to generate the entity in.
+         */
+		//VminusMod.LOGGER.info("PRE-LOADED KEY:" + ITEM_VISION_KEY);
+        //VminusMod.LOGGER.info("PRE-LOADED CACHE:" + ITEM_VISION_CACHE);
     }
 
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
@@ -127,18 +139,14 @@ public class VisionHandler {
         //getting the registery ids of the different objects
         if (debug)
             VminusMod.LOGGER.info("______________DEBUGGING______________");
-        if (itemstack != null) {
-            type = 0;
-        }
-        if (block != null) {
+        if (itemstack != null)
+            type = ITEM_TYPE;
+        if (block != null)
             type = 1;
-        }
-        if (entity != null) {
+        if (entity != null)
             type = 2;
-        }
-        if (effect != null) {
+        if (effect != null)
             type = 3;
-        }
         if (enchantment != null) {
             if (debug)
                 VminusMod.LOGGER.info("Enchantment is not null: " + enchantment);
@@ -147,7 +155,7 @@ public class VisionHandler {
         if (debug)
             VminusMod.LOGGER.info("Type: " + type);
         switch (type) {
-            case 0:
+            case ITEM_TYPE:
                 // items
                 mainVision = VminusModVariables.main_item_vision;
                 if (itemstack.hasTag() && itemstack.getOrCreateTag().contains("vision")) {
@@ -155,8 +163,8 @@ public class VisionHandler {
                 } else {
                     id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
                 }
-                //if (itemVisionKey.containsKey(id))
-                //	return itemVisionKey.get(id);
+                if (ITEM_VISION_KEY.containsKey(id))
+                	return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
                 break;
             case 1:
                 // blocks
@@ -196,13 +204,11 @@ public class VisionHandler {
 				*/
                 break;
             default:
-                if (debug)
-                    VminusMod.LOGGER.warn("Type could not be found.");
+                VminusMod.LOGGER.warn("Vision type could not be found.");
                 return null;
         }
         if (mainVision == null) {
-            if (debug)
-                VminusMod.LOGGER.info("Main vision could not be found: " + id);
+            VminusMod.LOGGER.warn("Main vision could not be found: " + id);
             return null;
         }
         // checks the caches to see if the json object was already merged and added before
@@ -216,7 +222,7 @@ public class VisionHandler {
         }
         // merge tag-based data
         switch (type) {
-            case 0:
+            case ITEM_TYPE:
                 // items tag
                 for (String key : mainVision.keySet()) {
                     if (key.startsWith("#") && isItemTagged(itemstack, key)) {
@@ -247,29 +253,35 @@ public class VisionHandler {
         // merging globally applied data
         for (String key : mainVision.keySet()) {
             if (key.equals("global")) {
-                if (debug)
-                    VminusMod.LOGGER.info("Applying global data to: " + id);
                 JsonObject globalData = mainVision.getAsJsonObject(key);
                 mergedData = mergeJsonObjects(mergedData, globalData);
             }
         }
-        // caching any found & merged jsons to reduce lag
-        if (itemstack != null && !itemVisionKey.containsKey(id)) {
-            itemVisionKey.put(id, mergedData);
+        if (mergedData != null && !mergedData.entrySet().isEmpty()) {
+            if (itemstack != null) {
+                int index = ITEM_VISION_CACHE.indexOf(mergedData);
+                if (index == -1) {
+                    ITEM_VISION_CACHE.add(mergedData);
+                    index = ITEM_VISION_CACHE.size() - 1;
+                }
+                if (!ITEM_VISION_KEY.containsKey(id))
+                    ITEM_VISION_KEY.put(id, index);
+            }
         }
-        if (block != null && !blockVisionKey.containsKey(id)) {
-            blockVisionKey.put(id, mergedData);
-        }
-        if (entity != null && !entityVisionKey.containsKey(id)) {
-            entityVisionKey.put(id, mergedData);
-        }
-        if (effect != null && !effectVisionKey.containsKey(id)) {
-            effectVisionKey.put(id, mergedData);
-        }
-        if (enchantment != null && !enchantmentVisionKey.containsKey(id)) {
+
+        if (block != null && !BLOCK_VISION_CACHE.containsKey(id))
+            BLOCK_VISION_CACHE.put(id, mergedData);
+
+        if (entity != null && !ENTITY_VISION_CACHE.containsKey(id))
+            ENTITY_VISION_CACHE.put(id, mergedData);
+
+        if (effect != null && !EFFECT_VISION_CACHE.containsKey(id))
+            EFFECT_VISION_CACHE.put(id, mergedData);
+
+        if (enchantment != null && !ENCHANTMENT_VISION_CACHE.containsKey(id)) {
             if (debug)
                 VminusMod.LOGGER.info("Enchantment vision key adding: " + id);
-            enchantmentVisionKey.put(id, mergedData);
+            ENCHANTMENT_VISION_CACHE.put(id, mergedData);
         }
         if (mergedData.entrySet().isEmpty()) {
             if (debug)
