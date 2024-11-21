@@ -1,6 +1,6 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionHandler;
 import net.lixir.vminus.VminusMod;
 import net.lixir.vminus.network.VminusModVariables;
 

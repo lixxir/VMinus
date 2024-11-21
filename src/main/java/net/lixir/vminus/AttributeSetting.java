@@ -4,6 +4,8 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

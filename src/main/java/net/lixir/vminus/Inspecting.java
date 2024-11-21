@@ -1,6 +1,8 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;

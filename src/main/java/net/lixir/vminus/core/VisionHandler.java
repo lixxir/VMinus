@@ -1,8 +1,9 @@
-package net.lixir.vminus;
+package net.lixir.vminus.core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VminusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;

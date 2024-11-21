@@ -3,7 +3,7 @@ package net.lixir.vminus.procedures;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.MessageArgument;
 import net.minecraft.network.chat.Component;

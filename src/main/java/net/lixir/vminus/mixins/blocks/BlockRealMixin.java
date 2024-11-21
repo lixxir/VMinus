@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins.blocks;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VisionValueHelper;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.SoundHelper;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;

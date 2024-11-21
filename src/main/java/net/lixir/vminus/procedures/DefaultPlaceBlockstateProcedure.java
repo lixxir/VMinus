@@ -3,7 +3,7 @@ package net.lixir.vminus.procedures;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;

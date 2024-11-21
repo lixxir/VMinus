@@ -1,8 +1,8 @@
 package net.lixir.vminus.procedures;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VisionValueHelper;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.Event;

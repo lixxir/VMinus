@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VisionValueHelper;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.core.VisionHandler;
 import net.lixir.vminus.VminusMod;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;

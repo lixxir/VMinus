@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.*;
+import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.procedures.IsBannedEnchantmentProcedure;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;

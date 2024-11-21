@@ -1,0 +1,22 @@
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+
+# build
+
+build/
+
+# idea
+
+.idea/

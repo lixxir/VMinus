@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.*;
+import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;

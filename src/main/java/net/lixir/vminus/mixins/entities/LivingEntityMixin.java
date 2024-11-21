@@ -2,9 +2,9 @@ package net.lixir.vminus.mixins.entities;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VisionValueHelper;
+import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.SoundHelper;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

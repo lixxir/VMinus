@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(HorseArmorLayer.class)
 public class HorseArmorLayerMixin {
+    // Adds the enchantment layer glint to horse armor.
     @ModifyVariable(method = "render", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/renderer/MultiBufferSource;getBuffer(Lnet/minecraft/client/renderer/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;", shift = At.Shift.AFTER))
     private VertexConsumer render(VertexConsumer builderIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Horse horse, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
                                   float headPitch) {

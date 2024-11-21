@@ -2,8 +2,8 @@ package net.lixir.vminus.mixins.level;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.DirectionHelper;
-import net.lixir.vminus.VisionValueHelper;
-import net.lixir.vminus.VisionHandler;
+import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
