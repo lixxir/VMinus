@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#vminus:raw_fish",
+    "#vminus:cooked_fish",
+    "#vminus:cooked_meats",
+    "#vminus:raw_meats"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "minecraft:iron_leggings": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.17,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "6ab2328a-6a89-11ef-b73b-325096b39f47"
+      },
+      {
+        "id": "vminus:blast_protection",
+        "name": "Blast protection",
+        "value": 0.25,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "68a12f8c-6a89-11ef-b9ff-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.03,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "2e721a60-6a89-11ef-a534-325096b39f47"
+      }
+    ]
+  }
+}

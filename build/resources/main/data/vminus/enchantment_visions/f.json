@@ -1,0 +1,22 @@
+{
+  "minecraft:sharpness": {
+    "particle": "minecraft:angry_villager",
+    "max_level": 3,
+    "min_level": 2,
+    "treasure": true,
+    "discoverable": true,
+    "tradeable": true,
+    "curse": true,
+    "exclusive_enchantable": false,
+    "enchantable": [
+      "#minecraft:axes",
+      "minecraft:dirt"
+    ],
+    "compatible": [
+      "minecraft:smite"
+    ],
+    "incompatible": [
+      "minecraft:fire_aspect"
+    ]
+  }
+}

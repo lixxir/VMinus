@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:swords",
+    "#minecraft:shovels",
+    "#vminus:bows"
+  ]
+}

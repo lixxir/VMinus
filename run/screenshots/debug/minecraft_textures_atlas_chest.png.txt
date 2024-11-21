@@ -1,0 +1,11 @@
+minecraft:entity/chest/christmas	x=0	y=0	w=64	h=64
+minecraft:entity/chest/christmas_left	x=64	y=0	w=64	h=64
+minecraft:entity/chest/christmas_right	x=0	y=64	w=64	h=64
+minecraft:entity/chest/ender	x=64	y=64	w=64	h=64
+minecraft:entity/chest/normal	x=128	y=0	w=64	h=64
+minecraft:entity/chest/normal_left	x=128	y=64	w=64	h=64
+minecraft:entity/chest/normal_right	x=192	y=0	w=64	h=64
+minecraft:entity/chest/trapped	x=192	y=64	w=64	h=64
+minecraft:entity/chest/trapped_left	x=0	y=128	w=64	h=64
+minecraft:entity/chest/trapped_right	x=64	y=128	w=64	h=64
+minecraft:missingno	x=128	y=128	w=16	h=16

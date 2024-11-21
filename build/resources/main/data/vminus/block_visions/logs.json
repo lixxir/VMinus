@@ -1,0 +1,13 @@
+{
+  "#minecraft:logs": {
+    "sound": [
+      {
+        "break": "minecraft:block.cherry_wood.break",
+        "step": "minecraft:block.cherry_wood.step",
+        "place": "minecraft:block.cherry_wood.place",
+        "hit": "minecraft:block.cherry_wood.hit",
+        "fall": "minecraft:block.cherry_wood.fall"
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:turtle_egg",
+    "minecraft:sniffer_egg",
+    "minecraft:redstone_lamp",
+    "minecraft:glowstone",
+    "#forge:stained_glass",
+    "minecraft:glass",
+    "minecraft:beacon",
+    "#minecraft:candles",
+    "minecraft:end_rod",
+    "#vminus:mob_heads",
+    "minecraft:lever"
+  ]
+}

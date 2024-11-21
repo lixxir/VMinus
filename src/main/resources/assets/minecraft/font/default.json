@@ -1,0 +1,342 @@
+{
+   "providers": [
+        {
+          "type": "bitmap",
+           "file": "vminus:customunicode/attack_speed.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF1" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/attack_damage.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF2" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/attack_reach.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF3" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/sword.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF4" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/pickaxe.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF5" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/axe.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF6" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/shovel.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF7" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/hoe.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uFFF8" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/helmet.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF1" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/chestplate.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF2" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/leggings.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF3" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/boots.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF4" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/horse_armor.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF5" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/bow.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF6" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/crossbow.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF7" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/fishing_rod.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF8" ]
+       },
+            {
+          "type": "bitmap",
+           "file": "vminus:customunicode/repeater.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF9" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/anvil.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE0" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/rune.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE1" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/reinforced.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE2" ]
+       },
+         {
+          "type": "bitmap",
+           "file": "vminus:customunicode/critical_damage.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE3" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/fire_protection.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE4" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/blast_protection.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE5" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/magic_protection.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE6" ]
+       },
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/fall_protection.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE7" ]
+       },
+     
+          {
+          "type": "bitmap",
+           "file": "vminus:customunicode/speed.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFE9" ]
+       },
+             {
+          "type": "bitmap",
+           "file": "vminus:customunicode/armor_toughness.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEFF0" ]
+       },
+                    {
+          "type": "bitmap",
+           "file": "vminus:customunicode/knockback_resistance.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE0" ]
+       },
+                    {
+          "type": "bitmap",
+           "file": "vminus:customunicode/luck.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE1" ]
+       },
+                   {
+          "type": "bitmap",
+           "file": "vminus:customunicode/health.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE2" ]
+       },
+                  {
+          "type": "bitmap",
+           "file": "vminus:customunicode/jump_strength.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE3" ]
+       },
+                     {
+          "type": "bitmap",
+           "file": "vminus:customunicode/inspect.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE4" ]
+       },
+                  {
+          "type": "bitmap",
+           "file": "vminus:customunicode/inspect_held.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE5" ]
+       },
+                         {
+          "type": "bitmap",
+           "file": "vminus:customunicode/shimmered.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE6" ]
+       },
+            {
+          "type": "bitmap",
+           "file": "vminus:customunicode/inspect_bauble.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE7" ]
+       },
+            {
+          "type": "bitmap",
+           "file": "vminus:customunicode/shield.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE8" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/saturation.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEEE9" ]
+       },
+            {
+          "type": "bitmap",
+           "file": "vminus:customunicode/hunger.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF0E" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/fast_hunger_shank.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF1E" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/slow_hunger_shank.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF2E" ]
+       },
+           {
+          "type": "bitmap",
+           "file": "vminus:customunicode/eating_duration.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF3E" ]
+       },
+                  {
+          "type": "bitmap",
+           "file": "vminus:customunicode/effect.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF4E" ]
+       },
+                  {
+          "type": "bitmap",
+           "file": "vminus:customunicode/bad_effect.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF5E" ]
+       },
+                {
+          "type": "bitmap",
+           "file": "vminus:customunicode/block_reach.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF6E" ]
+       },
+                {
+          "type": "bitmap",
+           "file": "vminus:customunicode/mob_detection_range.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF7E" ]
+       },
+       
+                {
+          "type": "bitmap",
+           "file": "vminus:customunicode/luminance.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF8E" ]
+       },
+                 {
+          "type": "bitmap",
+           "file": "vminus:customunicode/stat_boost_health_lost.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF9E" ]
+       },
+                  {
+          "type": "bitmap",
+           "file": "vminus:customunicode/death_durability.png",
+           "ascent": 8,
+           "height": 9,
+           "chars": [ "\uEF01" ]
+       }
+   ]
+}

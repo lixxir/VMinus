@@ -1,0 +1,11 @@
+{
+  "#vminus:lightfooted": {
+    "nbt": [
+      {
+        "value": true,
+        "type": "boolean",
+        "name": "lightfooted"
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:large_fern",
+    "minecraft:sunflower",
+    "minecraft:lilac",
+    "minecraft:tall_grass",
+    "minecraft:tall_seagrass",
+    "minecraft:rose_bush",
+    "minecraft:peony"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#vminus:all_copper",
+    "#vminus:all_exposed_copper",
+    "#vminus:all_weathered_copper",
+    "#vminus:all_oxidized_copper"
+  ]
+}

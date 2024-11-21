@@ -1,0 +1,48 @@
+net/lixir/vminus/mixins/AbstractClientPlayerMixin playerInfo f_108546_
+net/lixir/vminus/mixins/CreativeTabMixin displayItems f_243839_
+net/lixir/vminus/mixins/CreativeTabMixin displayItemsSearchTab f_243841_
+net/lixir/vminus/mixins/DiggerItemMixin blocks f_40979_
+net/lixir/vminus/mixins/DiggerItemMixin speed f_40980_
+net/lixir/vminus/mixins/GuiGraphicsMixin pose f_279612_
+net/lixir/vminus/mixins/GuiGraphicsMixin bufferSource f_279627_
+net/lixir/vminus/mixins/ItemMMixin foodProperties f_41380_
+net/lixir/vminus/mixins/ItemMMixin rarity f_41369_
+net/lixir/vminus/mixins/ItemStackMixin tag f_41590_
+net/lixir/vminus/mixins/ItemStackMixin entityRepresentation f_41592_
+net/lixir/vminus/mixins/ItemstackTooltipMixin tag f_41590_
+net/lixir/vminus/mixins/ItemstackTooltipMixin entityRepresentation f_41592_
+net/lixir/vminus/mixins/LivingEntityMixin activeEffects f_20945_
+net/lixir/vminus/mixins/AbstractClientPlayerMixin getPlayerInfo ()Lnet/minecraft/client/multiplayer/PlayerInfo; m_108558_
+net/lixir/vminus/mixins/BowlFoodItemMixin finishUsingItem (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack; m_5922_
+net/lixir/vminus/mixins/EnchantmentHelperMixin getBlockEfficiency (Lnet/minecraft/world/entity/LivingEntity;)I m_44926_
+net/lixir/vminus/mixins/ItemMMixin getRarity (Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/Rarity; m_41460_
+net/lixir/vminus/mixins/ItemStackMixin expandBlockState (Ljava/lang/String;)Ljava/util/Collection; m_41761_
+net/lixir/vminus/mixins/ItemStackMixin getItem ()Lnet/minecraft/world/item/Item; m_41720_
+net/lixir/vminus/mixins/ItemStackMixin getHideFlags ()I m_41618_
+net/lixir/vminus/mixins/ItemStackMixin getDamageValue ()I m_41773_
+net/lixir/vminus/mixins/ItemStackMixin getMaxDamage ()I m_41776_
+net/lixir/vminus/mixins/ItemStackMixin getBarColor ()I m_150949_
+net/lixir/vminus/mixins/ItemStackMixin getRarity ()Lnet/minecraft/world/item/Rarity; m_41791_
+net/lixir/vminus/mixins/ItemStackMixin isDamageableItem ()Z m_41763_
+net/lixir/vminus/mixins/ItemstackTooltipMixin expandBlockState (Ljava/lang/String;)Ljava/util/Collection; m_41761_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getItem ()Lnet/minecraft/world/item/Item; m_41720_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getHideFlags ()I m_41618_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getDamageValue ()I m_41773_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getMaxDamage ()I m_41776_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getBarColor ()I m_150949_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getRarity ()Lnet/minecraft/world/item/Rarity; m_41791_
+net/lixir/vminus/mixins/ItemstackTooltipMixin getHoverName ()Lnet/minecraft/network/chat/Component; m_41786_
+net/lixir/vminus/mixins/ItemstackTooltipMixin hasCustomHoverName ()Z m_41788_
+net/lixir/vminus/mixins/ItemstackTooltipMixin isDamageableItem ()Z m_41763_
+net/lixir/vminus/mixins/ItemstackTooltipMixin appendEnchantmentNames (Ljava/util/List;Lnet/minecraft/nbt/ListTag;)V m_41709_
+net/lixir/vminus/mixins/LevelChunkSectionMixin setBlockState (IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState; m_62991_
+net/lixir/vminus/mixins/LevelMixin setBlock (Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z m_7731_
+net/lixir/vminus/mixins/LevelMixin setBlockAndUpdate (Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z m_46597_
+net/lixir/vminus/mixins/LevelMixin updateNeighborsAt (Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V m_46672_
+net/lixir/vminus/mixins/LivingEntityMixin spawnItemParticles (Lnet/minecraft/world/item/ItemStack;I)V m_21060_
+net/lixir/vminus/mixins/LootTableMixin getAvailableSlots (Lnet/minecraft/world/Container;Lnet/minecraft/util/RandomSource;)Ljava/util/List; m_230919_
+net/lixir/vminus/mixins/LootTableMixin getRandomItems (Lnet/minecraft/world/level/storage/loot/LootContext;)Lit/unimi/dsi/fastutil/objects/ObjectArrayList; m_230922_
+net/lixir/vminus/mixins/LootTableMixin shuffleAndSplitItems (Lit/unimi/dsi/fastutil/objects/ObjectArrayList;ILnet/minecraft/util/RandomSource;)V m_230924_
+net/lixir/vminus/mixins/LootTableMixin fill (Lnet/minecraft/world/Container;Lnet/minecraft/world/level/storage/loot/LootParams;J)V m_287188_
+net/lixir/vminus/mixins/PlayerMixin playSound (Lnet/minecraft/sounds/SoundEvent;FF)V m_5496_
+net/lixir/vminus/mixins/PlayerMixin getFoodData ()Lnet/minecraft/world/food/FoodData; m_36324_

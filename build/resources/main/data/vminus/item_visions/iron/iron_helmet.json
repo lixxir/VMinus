@@ -1,0 +1,35 @@
+{
+  "minecraft:iron_helmet": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.15,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "247e08ac-6a89-11ef-b5ff-325096b39f47"
+      },
+      {
+        "id": "vminus:blast_protection",
+        "name": "Blast protection",
+        "value": 0.20,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "228fb54a-6a89-11ef-b8df-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.02,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "2e721a60-6a89-11ef-a534-325096b39f47"
+      }
+    ]
+  }
+}

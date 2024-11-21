@@ -1,0 +1,35 @@
+{
+  "minecraft:iron_chestplate": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.19,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "6ab2328a-6a89-11ef-b73b-325096b39f47"
+      },
+      {
+        "id": "vminus:blast_protection",
+        "name": "Blast protection",
+        "value": 0.30,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "68a12f8c-6a89-11ef-b9ff-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.04,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "2e721a60-6a89-11ef-a534-325096b39f47"
+      }
+    ]
+  }
+}

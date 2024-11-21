@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="vminus"
+version="1.0.0"
+displayName="V-Minus"
+displayURL="https://curseforge.com/minecraft/mc-mods/v-minus"
+logoFile="logo.png"
+credits="."
+authors="lixir"
+description="Contains many functions to edit and ban vanilla features. Used as a core for Abyssmal."
+
+# Start of user code block mod configuration
+# End of user code block mod configuration
+
+[[dependencies.vminus]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"
+
+
+

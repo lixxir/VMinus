@@ -1,0 +1,24 @@
+{
+  "#vminus:iron_tools": {
+    "remove_attributes": [
+      {
+        "id": "vminus:mining_speed"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:mining_speed",
+        "name": "Mining speed",
+        "value": 8,
+        "operation": "addition",
+        "slot": "mainhand",
+        "uuid": "3a539bf0-7e99-11ef-a5dd-325096b39f47"
+      }
+    ],
+    "durability": [
+      {
+        "value": 768
+      }
+    ]
+  }
+}
