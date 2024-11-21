@@ -63,7 +63,6 @@ public class EnchantmentAttackParticles {
                     Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(mainhandItem);
                     for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
                         Enchantment enchantment = entry.getKey();
-                        System.out.println(enchantment);
                         // getting the vision data from the enchant
                         JsonObject visionData = VisionHandler.getVisionData(enchantment);
                         if (visionData != null && visionData.has("particle")) {

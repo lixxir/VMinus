@@ -31,10 +31,8 @@ import java.util.List;
 public class CustomEffectParticles {
     @SubscribeEvent
     public static void onEntityTick(LivingEvent.LivingTickEvent event) {
-        execute(event.getEntity().level(), event.getEntity());
-    }
-
-    public static void execute(LevelAccessor world, Entity entity) {
+        LevelAccessor world = event.getEntity().level();
+        Entity entity = event.getEntity();
         if (entity == null || !(world instanceof ServerLevel serverWorld))
             return;
         if (world.getLevelData().getGameTime() % 4 == 0 && entity instanceof LivingEntity livingEntity) {
