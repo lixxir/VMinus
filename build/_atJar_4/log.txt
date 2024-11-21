@@ -1,7 +1,0 @@
-Java Launcher: C:\Users\alixb\.gradle\jdks\adoptium-17-x64-hotspot-windows\jdk-17.0.6+10\bin\java.exe
-Arguments: '--inJar, C:\Users\alixb\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.2.0\forge-1.20.1-47.2.0-injected.jar, --outJar, C:\Users\alixb\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.2.0_mapped_official_1.20.1\forge-1.20.1-47.2.0_mapped_official_1.20.1.jar, --logFile, accesstransform.log, --atFile, C:\Users\alixb\Documents\VMinus\VMinus\build\_atJar_4\parent_at.cfg'
-Classpath:
- - C:\Users\alixb\.gradle\caches\forge_gradle\maven_downloader\net\minecraftforge\accesstransformers\8.2.0\accesstransformers-8.2.0-fatjar.jar
-Working directory: C:\Users\alixb\Documents\VMinus\VMinus\build\_atJar_4
-Main class: net.minecraftforge.accesstransformer.TransformerProcessor
-====================================

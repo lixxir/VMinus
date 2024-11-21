@@ -1,8 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "vminus:block/placeholder",
-    "particle": "vminus:block/placeholder"
-  },
-  "render_type": "solid"
-}
