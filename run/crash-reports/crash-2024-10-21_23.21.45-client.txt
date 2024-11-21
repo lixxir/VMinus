@@ -5,9 +5,9 @@ Time: 2024-10-21 23:21:45
 Description: Unexpected error
 
 java.lang.NullPointerException: Cannot invoke "Object.getClass()" because "defaultValue" is null
-	at net.lixir.vminus.JsonValueUtil.convertToNumber(JsonValueUtil.java:193) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:153) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:130) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.convertToNumber(JsonValueUtil.java:193) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:153) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:130) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.enchantment.Enchantment.handler$zbn000$getMinLevel(Enchantment.java:526) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:EnchantmentMixin,pl:mixin:A}
 	at net.minecraft.world.item.enchantment.Enchantment.getMinLevel(Enchantment.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:EnchantmentMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTabs.lambda$generateEnchantmentBookTypesAllLevels$43(CreativeModeTabs.java:1627) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:classloading,pl:accesstransformer:B}
@@ -73,9 +73,9 @@ A detailed walkthrough of the error, its code path and all known details is as f
 -- Head --
 Thread: Render thread
 Stacktrace:
-	at net.lixir.vminus.JsonValueUtil.convertToNumber(JsonValueUtil.java:193) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:153) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:130) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.convertToNumber(JsonValueUtil.java:193) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:153) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:130) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.enchantment.Enchantment.handler$zbn000$getMinLevel(Enchantment.java:526) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:EnchantmentMixin,pl:mixin:A}
 	at net.minecraft.world.item.enchantment.Enchantment.getMinLevel(Enchantment.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:EnchantmentMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTabs.lambda$generateEnchantmentBookTypesAllLevels$43(CreativeModeTabs.java:1627) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:classloading,pl:accesstransformer:B}

@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.lixir.vminus.JsonValueUtil;
+import net.lixir.vminus.VisionValueHelper;
 import net.lixir.vminus.LootTableAccessor;
 import net.lixir.vminus.VisionHandler;
 import net.minecraft.resources.ResourceLocation;
@@ -54,7 +54,7 @@ public abstract class LootTableMixin {
         List<Integer> availableSlots = this.getAvailableSlots(container, randomSource);
         ObjectArrayList<ItemStack> filteredItems = itemStacks.stream().filter(itemstack -> {
             JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            return !JsonValueUtil.isBooleanMet(itemData, "banned", itemstack);
+            return !VisionValueHelper.isBooleanMet(itemData, "banned", itemstack);
         }).collect(Collectors.toCollection(ObjectArrayList::new));
         this.shuffleAndSplitItems(filteredItems, availableSlots.size(), randomSource);
         for (ItemStack itemstack : filteredItems) {

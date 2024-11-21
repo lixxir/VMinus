@@ -67,7 +67,7 @@ public class Inspecting {
             inspectNum++;
         }
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (inspectable || JsonValueUtil.isBooleanMet(itemData, "inspectable", itemstack)) {
+        if (inspectable || VisionValueHelper.isBooleanMet(itemData, "inspectable", itemstack)) {
             if (!altDown) {
                 tooltip.add(Component.literal("\u00A79[ALT" + IconHandler.getIcon("inspect") + "\u00A79]"));
             } else {

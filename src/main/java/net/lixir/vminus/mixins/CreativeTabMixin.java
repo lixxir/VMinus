@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.JsonValueUtil;
+import net.lixir.vminus.VisionValueHelper;
 import net.lixir.vminus.VisionHandler;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +28,7 @@ public abstract class CreativeTabMixin {
         List<ItemStack> itemsToRemove = new ArrayList<>();
         for (ItemStack itemstack : displayItems) {
             JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            if (JsonValueUtil.isBooleanMet(itemData, "banned", itemstack)) {
+            if (VisionValueHelper.isBooleanMet(itemData, "banned", itemstack)) {
                 itemsToRemove.add(itemstack);
             }
         }
@@ -36,7 +36,7 @@ public abstract class CreativeTabMixin {
         itemsToRemove.clear();
         for (ItemStack itemstack : displayItemsSearchTab) {
             JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            if (JsonValueUtil.isBooleanMet(itemData, "banned", itemstack)) {
+            if (VisionValueHelper.isBooleanMet(itemData, "banned", itemstack)) {
                 itemsToRemove.add(itemstack);
             }
         }

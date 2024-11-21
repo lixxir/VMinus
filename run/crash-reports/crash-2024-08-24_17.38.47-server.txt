@@ -5,7 +5,7 @@ Time: 2024-08-24 17:38:47
 Description: Ticking entity
 
 java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonElement.getAsFloat()" because the return value of "com.google.gson.JsonObject.get(String)" is null
-	at net.lixir.vminus.JsonValueUtil.getFoodProperties(JsonValueUtil.java:255) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFoodProperties(JsonValueUtil.java:255) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.Item.handler$zze000$onGetFoodProperties(Item.java:558) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:ItemMMixin,pl:mixin:A}
 	at net.minecraft.world.item.Item.getFoodProperties(Item.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:ItemMMixin,pl:mixin:A}
 	at net.minecraftforge.common.extensions.IForgeItem.getFoodProperties(IForgeItem.java:851) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23190%23197!/:?] {re:mixin,re:classloading}
@@ -43,7 +43,7 @@ A detailed walkthrough of the error, its code path and all known details is as f
 -- Head --
 Thread: Server thread
 Stacktrace:
-	at net.lixir.vminus.JsonValueUtil.getFoodProperties(JsonValueUtil.java:255) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFoodProperties(JsonValueUtil.java:255) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.Item.handler$zze000$onGetFoodProperties(Item.java:558) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:ItemMMixin,pl:mixin:A}
 	at net.minecraft.world.item.Item.getFoodProperties(Item.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:ItemMMixin,pl:mixin:A}
 	at net.minecraftforge.common.extensions.IForgeItem.getFoodProperties(IForgeItem.java:851) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23190%23197!/:?] {re:mixin,re:classloading}

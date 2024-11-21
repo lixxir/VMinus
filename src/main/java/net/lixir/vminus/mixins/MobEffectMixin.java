@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.JsonValueUtil;
+import net.lixir.vminus.VisionValueHelper;
 import net.lixir.vminus.VisionHandler;
 import net.lixir.vminus.VminusMod;
 import net.minecraft.world.effect.MobEffect;
@@ -21,7 +21,7 @@ public abstract class MobEffectMixin {
     private void getColor(CallbackInfoReturnable<Integer> cir) {
         JsonObject visionData = VisionHandler.getVisionData(effect);
         if (visionData != null && visionData.has("color")) {
-            String color = JsonValueUtil.getFirstValidString(visionData, "color");
+            String color = VisionValueHelper.getFirstValidString(visionData, "color");
             if (color.startsWith("#")) {
                 int colorInt = Integer.parseInt(color.substring(1), 16);
                 cir.setReturnValue(colorInt);
@@ -35,7 +35,7 @@ public abstract class MobEffectMixin {
     public void getCategory(CallbackInfoReturnable<MobEffectCategory> cir) {
         JsonObject visionData = VisionHandler.getVisionData(effect);
         if (visionData != null && visionData.has("category")) {
-            String category = JsonValueUtil.getFirstValidString(visionData, "category");
+            String category = VisionValueHelper.getFirstValidString(visionData, "category");
             MobEffectCategory customCategory = getCategoryFromString(category);
             if (customCategory != null) {
                 cir.setReturnValue(customCategory);

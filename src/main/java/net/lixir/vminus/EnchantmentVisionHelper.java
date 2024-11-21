@@ -12,7 +12,7 @@ public class EnchantmentVisionHelper {
     public static int getMinLevel(Enchantment enchantment, int defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("min_level")) {
-            return JsonValueUtil.isNumberMet(visionData, "min_level", defaultValue);
+            return VisionValueHelper.isNumberMet(visionData, "min_level", defaultValue);
         }
         return defaultValue;
     }
@@ -20,7 +20,7 @@ public class EnchantmentVisionHelper {
     public static int getMaxLevel(Enchantment enchantment, int defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("max_level")) {
-            return JsonValueUtil.isNumberMet(visionData, "max_level", defaultValue);
+            return VisionValueHelper.isNumberMet(visionData, "max_level", defaultValue);
         }
         return defaultValue;
     }
@@ -28,7 +28,7 @@ public class EnchantmentVisionHelper {
     public static boolean isTreasure(Enchantment enchantment, @Nullable boolean defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("treasure")) {
-            return JsonValueUtil.isBooleanMet(visionData, "treasure");
+            return VisionValueHelper.isBooleanMet(visionData, "treasure");
         }
         return defaultValue;
     }
@@ -36,7 +36,7 @@ public class EnchantmentVisionHelper {
     public static boolean isTradeable(Enchantment enchantment, @Nullable boolean defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("tradeable")) {
-            return JsonValueUtil.isBooleanMet(visionData, "tradeable");
+            return VisionValueHelper.isBooleanMet(visionData, "tradeable");
         }
         return defaultValue;
     }
@@ -44,7 +44,7 @@ public class EnchantmentVisionHelper {
     public static boolean isDiscoverable(Enchantment enchantment, @Nullable boolean defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("discoverable")) {
-            return JsonValueUtil.isBooleanMet(visionData, "discoverable");
+            return VisionValueHelper.isBooleanMet(visionData, "discoverable");
         }
         return defaultValue;
     }
@@ -52,7 +52,7 @@ public class EnchantmentVisionHelper {
     public static boolean isCurse(Enchantment enchantment, @Nullable boolean defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("curse")) {
-            return JsonValueUtil.isBooleanMet(visionData, "curse");
+            return VisionValueHelper.isBooleanMet(visionData, "curse");
         }
         return defaultValue;
     }
@@ -63,10 +63,10 @@ public class EnchantmentVisionHelper {
             return defaultValue;
         }
         if (visionData.has("exclusive_enchantable")) {
-            boolean exclusive = JsonValueUtil.isBooleanMet(visionData, "exclusive_enchantable");
+            boolean exclusive = VisionValueHelper.isBooleanMet(visionData, "exclusive_enchantable");
             if (exclusive) {
                 if (visionData.has("enchantable")) {
-                    boolean matches = JsonValueUtil.matchItemList(visionData, "enchantable", itemstack);
+                    boolean matches = VisionValueHelper.matchItemList(visionData, "enchantable", itemstack);
                     if (!matches) {
                         return false;
                     }
@@ -76,7 +76,7 @@ public class EnchantmentVisionHelper {
             }
         }
         if (visionData.has("enchantable")) {
-            boolean matches = JsonValueUtil.matchItemList(visionData, "enchantable", itemstack);
+            boolean matches = VisionValueHelper.matchItemList(visionData, "enchantable", itemstack);
             if (matches) {
                 return true;
             }
@@ -87,14 +87,14 @@ public class EnchantmentVisionHelper {
     public static boolean isCompatible(Enchantment enchantment, Enchantment otherEnchantment, @Nullable boolean defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && (visionData.has("compatible") || visionData.has("incompatible")))
-            return JsonValueUtil.EnchantmentCompatibleWith(visionData, enchantment, otherEnchantment);
+            return VisionValueHelper.EnchantmentCompatibleWith(visionData, enchantment, otherEnchantment);
         return defaultValue;
     }
 
     public static Enchantment.Rarity getRarity(Enchantment enchantment, @Nullable Enchantment.Rarity defaultValue) {
         JsonObject visionData = VisionHandler.getVisionData(enchantment);
         if (visionData != null && visionData.has("rarity")) {
-            String rarity = JsonValueUtil.getFirstValidString(visionData, "rarity").toLowerCase();
+            String rarity = VisionValueHelper.getFirstValidString(visionData, "rarity").toLowerCase();
             if (rarity != null && !rarity.isEmpty()) {
                 switch (rarity) {
                     case "uncommon":

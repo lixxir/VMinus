@@ -5,10 +5,10 @@ Time: 2024-10-02 16:56:04
 Description: Rendering screen
 
 java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonElement.getAsString()" because the return value of "com.google.gson.JsonObject.get(String)" is null
-	at net.lixir.vminus.JsonValueUtil.evaluateConditions(JsonValueUtil.java:349) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:298) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:238) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:229) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.evaluateConditions(JsonValueUtil.java:349) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:298) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:238) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:229) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.client.gui.GuiGraphics.getCustomTextureForItem(GuiGraphics.java:765) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}
 	at net.minecraft.client.gui.GuiGraphics.renderCustomTexture(GuiGraphics.java:752) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}
 	at net.minecraft.client.gui.GuiGraphics.handler$zbg000$renderItemDecorations(GuiGraphics.java:746) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}
@@ -50,10 +50,10 @@ A detailed walkthrough of the error, its code path and all known details is as f
 -- Head --
 Thread: Render thread
 Stacktrace:
-	at net.lixir.vminus.JsonValueUtil.evaluateConditions(JsonValueUtil.java:349) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:298) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:238) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:229) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.evaluateConditions(JsonValueUtil.java:349) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:298) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:238) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:229) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.client.gui.GuiGraphics.getCustomTextureForItem(GuiGraphics.java:765) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}
 	at net.minecraft.client.gui.GuiGraphics.renderCustomTexture(GuiGraphics.java:752) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}
 	at net.minecraft.client.gui.GuiGraphics.handler$zbg000$renderItemDecorations(GuiGraphics.java:746) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,pl:runtimedistcleaner:A,re:classloading,pl:mixin:APP:mixins.vminus.json:GuiGraphicsMixin,pl:mixin:A,pl:runtimedistcleaner:A}

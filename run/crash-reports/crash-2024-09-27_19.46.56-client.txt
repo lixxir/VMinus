@@ -6,9 +6,9 @@ Description: Unexpected error
 
 java.lang.ClassCastException: class com.google.gson.JsonObject cannot be cast to class com.google.gson.JsonArray (com.google.gson.JsonObject and com.google.gson.JsonArray are in module com.google.gson@2.10 of loader 'MC-BOOTSTRAP' @70e8f8e)
 	at com.google.gson.JsonObject.getAsJsonArray(JsonObject.java:199) ~[gson-2.10.jar:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:221) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isBooleanMet(JsonValueUtil.java:162) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isBooleanMet(JsonValueUtil.java:151) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:221) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isBooleanMet(JsonValueUtil.java:162) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isBooleanMet(JsonValueUtil.java:151) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.CreativeModeTab.handler$zzj000$CreativeTabOverride(CreativeModeTab.java:534) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:mixins.vminus.json:CreativeTabMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTab.buildContents(CreativeModeTab.java:132) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:mixins.vminus.json:CreativeTabMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTabs.lambda$buildAllTabContents$50(CreativeModeTabs.java:1696) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:classloading,pl:accesstransformer:B}
@@ -58,9 +58,9 @@ A detailed walkthrough of the error, its code path and all known details is as f
 Thread: Render thread
 Stacktrace:
 	at com.google.gson.JsonObject.getAsJsonArray(JsonObject.java:199) ~[gson-2.10.jar%23130!/:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:221) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isBooleanMet(JsonValueUtil.java:162) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isBooleanMet(JsonValueUtil.java:151) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:221) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isBooleanMet(JsonValueUtil.java:162) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isBooleanMet(JsonValueUtil.java:151) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.CreativeModeTab.handler$zzj000$CreativeTabOverride(CreativeModeTab.java:534) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:mixins.vminus.json:CreativeTabMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTab.buildContents(CreativeModeTab.java:132) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,pl:accesstransformer:B,re:classloading,pl:accesstransformer:B,pl:mixin:APP:mixins.vminus.json:CreativeTabMixin,pl:mixin:A}
 	at net.minecraft.world.item.CreativeModeTabs.lambda$buildAllTabContents$50(CreativeModeTabs.java:1696) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:classloading,pl:accesstransformer:B}

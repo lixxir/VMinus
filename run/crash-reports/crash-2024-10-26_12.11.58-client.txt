@@ -8,9 +8,9 @@ java.lang.StackOverflowError: Unexpected error
 	at com.google.gson.internal.LinkedTreeMap.findByObject(LinkedTreeMap.java:208) ~[gson-2.10.jar%23130!/:?] {}
 	at com.google.gson.internal.LinkedTreeMap.containsKey(LinkedTreeMap.java:106) ~[gson-2.10.jar%23130!/:?] {}
 	at com.google.gson.JsonObject.has(JsonObject.java:165) ~[gson-2.10.jar%23130!/:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:365) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:278) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:261) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:365) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:278) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:261) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.level.chunk.LevelChunkSection.handler$zbi000$setBlockState(LevelChunkSection.java:545) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}
 	at net.minecraft.world.level.chunk.LevelChunkSection.setBlockState(LevelChunkSection.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}
 	at net.minecraft.world.level.chunk.LevelChunkSection.handler$zbi000$setBlockState(LevelChunkSection.java:550) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}
@@ -1040,9 +1040,9 @@ Stacktrace:
 	at com.google.gson.internal.LinkedTreeMap.findByObject(LinkedTreeMap.java:208) ~[gson-2.10.jar%23130!/:?] {}
 	at com.google.gson.internal.LinkedTreeMap.containsKey(LinkedTreeMap.java:106) ~[gson-2.10.jar%23130!/:?] {}
 	at com.google.gson.JsonObject.has(JsonObject.java:165) ~[gson-2.10.jar%23130!/:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.checkConditions(JsonValueUtil.java:365) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:278) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.getFirstValidString(JsonValueUtil.java:261) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.checkConditions(JsonValueUtil.java:365) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:278) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.getFirstValidString(JsonValueUtil.java:261) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.level.chunk.LevelChunkSection.handler$zbi000$setBlockState(LevelChunkSection.java:545) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}
 	at net.minecraft.world.level.chunk.LevelChunkSection.setBlockState(LevelChunkSection.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}
 	at net.minecraft.world.level.chunk.LevelChunkSection.handler$zbi000$setBlockState(LevelChunkSection.java:550) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:LevelChunkSectionMixin,pl:mixin:A}

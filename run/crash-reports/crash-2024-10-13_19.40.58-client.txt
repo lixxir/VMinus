@@ -7,7 +7,7 @@ Description: Unexpected error
 java.lang.UnsupportedOperationException: JsonObject
 	at com.google.gson.JsonElement.getAsInt(JsonElement.java:239) ~[gson-2.10.jar:?] {re:mixin}
 	at com.google.gson.JsonArray.getAsInt(JsonArray.java:342) ~[gson-2.10.jar:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:38) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:38) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$isDamageableItem(ItemStack.java:1788) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.isDamageableItem(ItemStack.java:308) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getDurability(ItemStack.java:1606) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
@@ -69,7 +69,7 @@ Thread: Render thread
 Stacktrace:
 	at com.google.gson.JsonElement.getAsInt(JsonElement.java:239) ~[gson-2.10.jar%23130!/:?] {re:mixin}
 	at com.google.gson.JsonArray.getAsInt(JsonArray.java:342) ~[gson-2.10.jar%23130!/:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:38) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:38) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$isDamageableItem(ItemStack.java:1788) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.isDamageableItem(ItemStack.java:308) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getDurability(ItemStack.java:1606) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}

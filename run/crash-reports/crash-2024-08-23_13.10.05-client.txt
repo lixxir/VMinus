@@ -5,8 +5,8 @@ Time: 2024-08-23 13:10:05
 Description: Rendering screen
 
 java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonElement.getAsString()" because the return value of "com.google.gson.JsonObject.get(String)" is null
-	at net.lixir.vminus.JsonValueUtil.evaluateConditions(JsonValueUtil.java:48) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:24) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.evaluateConditions(JsonValueUtil.java:48) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:24) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1305) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$isDamageableItem(ItemStack.java:1316) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
@@ -49,8 +49,8 @@ A detailed walkthrough of the error, its code path and all known details is as f
 -- Head --
 Thread: Render thread
 Stacktrace:
-	at net.lixir.vminus.JsonValueUtil.evaluateConditions(JsonValueUtil.java:48) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:24) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.evaluateConditions(JsonValueUtil.java:48) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:24) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1305) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$isDamageableItem(ItemStack.java:1316) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}

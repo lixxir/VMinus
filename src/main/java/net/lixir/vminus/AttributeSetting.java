@@ -108,7 +108,7 @@ public class AttributeSetting {
             }
         }
         if (itemData != null && itemData.has("nbt")) {
-            ItemStack copyStack = JsonValueUtil.setNbts(itemData, itemstack.copy());
+            ItemStack copyStack = VisionValueHelper.setNbts(itemData, itemstack.copy());
             //System.out.println(itemData);
             CompoundTag copyTag = copyStack.getOrCreateTag();
             if (copyTag != null && !copyTag.isEmpty()) {

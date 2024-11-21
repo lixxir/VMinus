@@ -6,8 +6,8 @@ Description: Unexpected error
 
 java.lang.ClassCastException: class com.google.gson.JsonPrimitive cannot be cast to class com.google.gson.JsonArray (com.google.gson.JsonPrimitive and com.google.gson.JsonArray are in module com.google.gson@2.10 of loader 'MC-BOOTSTRAP' @70e8f8e)
 	at com.google.gson.JsonObject.getAsJsonArray(JsonObject.java:199) ~[gson-2.10.jar:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:145) ~[main/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:134) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:145) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:134) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1365) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:APP:mixins.vminus.json:ItemstackTooltipMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:APP:mixins.vminus.json:ItemstackTooltipMixin,pl:mixin:A}
 	at net.lixir.vminus.DurabilityHelper.getDurability(DurabilityHelper.java:16) ~[main/:?] {re:mixin,re:classloading}
@@ -69,8 +69,8 @@ A detailed walkthrough of the error, its code path and all known details is as f
 Thread: Render thread
 Stacktrace:
 	at com.google.gson.JsonObject.getAsJsonArray(JsonObject.java:199) ~[gson-2.10.jar%23130!/:?] {re:mixin}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:145) ~[%23196!/:?] {re:mixin,re:classloading}
-	at net.lixir.vminus.JsonValueUtil.isNumberMet(JsonValueUtil.java:134) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:145) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.isNumberMet(JsonValueUtil.java:134) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1365) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:APP:mixins.vminus.json:ItemstackTooltipMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:APP:mixins.vminus.json:ItemstackTooltipMixin,pl:mixin:A}
 	at net.lixir.vminus.DurabilityHelper.getDurability(DurabilityHelper.java:16) ~[%23196!/:?] {re:mixin,re:classloading}

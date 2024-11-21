@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.JsonValueUtil;
+import net.lixir.vminus.VisionValueHelper;
 import net.lixir.vminus.VisionHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -26,7 +26,7 @@ public class BannedEntitySpawnProcedure {
         if (entity == null)
             return;
         JsonObject visionData = VisionHandler.getVisionData(entity);
-        if (JsonValueUtil.isBooleanMet(visionData, "banned", entity)) {
+        if (VisionValueHelper.isBooleanMet(visionData, "banned", entity)) {
             if (event != null && event.isCancelable()) {
                 event.setCanceled(true);
             } else if (event != null && event.hasResult()) {

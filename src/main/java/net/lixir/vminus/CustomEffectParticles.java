@@ -95,7 +95,7 @@ public class CustomEffectParticles {
         }
         JsonObject visionData = VisionHandler.getVisionData(mobEffect);
         if (visionData != null && visionData.has("particle")) {
-            String effectString = JsonValueUtil.getFirstValidString(visionData, "particle");
+            String effectString = VisionValueHelper.getFirstValidString(visionData, "particle");
             ResourceLocation particleLocation = new ResourceLocation(effectString);
             ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(particleLocation);
             if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {

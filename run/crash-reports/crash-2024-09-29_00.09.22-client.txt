@@ -5,7 +5,7 @@ Time: 2024-09-29 00:09:22
 Description: Unexpected error
 
 java.lang.NullPointerException: Cannot invoke "com.google.gson.JsonArray.iterator()" because "valueArray" is null
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:34) ~[main/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:34) ~[main/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1745) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getTooltipLines(ItemStack.java:1261) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
@@ -64,7 +64,7 @@ A detailed walkthrough of the error, its code path and all known details is as f
 -- Head --
 Thread: Render thread
 Stacktrace:
-	at net.lixir.vminus.JsonValueUtil.applyOperations(JsonValueUtil.java:34) ~[%23196!/:?] {re:mixin,re:classloading}
+	at net.lixir.vminus.VisionValueHelper.applyOperations(JsonValueUtil.java:34) ~[%23196!/:?] {re:mixin,re:classloading}
 	at net.minecraft.world.item.ItemStack.handler$zzf000$getMaxDamage(ItemStack.java:1745) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getMaxDamage(ItemStack.java:327) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}
 	at net.minecraft.world.item.ItemStack.getTooltipLines(ItemStack.java:1261) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,xf:fml:forge:itemstack,re:classloading,xf:fml:forge:itemstack,pl:mixin:APP:mixins.vminus.json:ItemStackMixin,pl:mixin:A}

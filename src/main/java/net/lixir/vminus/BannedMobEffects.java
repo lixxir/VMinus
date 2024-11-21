@@ -56,7 +56,7 @@ public class BannedMobEffects {
         }
         JsonObject visionData = VisionHandler.getVisionData(mobEffect);
         if (visionData != null && visionData.has("banned")) {
-            boolean banned = JsonValueUtil.isBooleanMet(visionData, "banned");
+            boolean banned = VisionValueHelper.isBooleanMet(visionData, "banned");
             if (banned) {
                 if (event != null && event.hasResult()) {
                     event.setResult(Event.Result.DENY);

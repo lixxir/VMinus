@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.JsonValueUtil;
+import net.lixir.vminus.VisionValueHelper;
 import net.lixir.vminus.VisionHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -37,9 +37,9 @@ public class DespawnBannedItemProcedure {
             JsonObject itemData = VisionHandler.getVisionData(convert);
             if (itemData != null) {
                 if (itemData.has("drop_replace") || itemData.has("replace")) {
-                    String replaceString = JsonValueUtil.getFirstValidString(itemData, "replace", convert);
+                    String replaceString = VisionValueHelper.getFirstValidString(itemData, "replace", convert);
                     if (replaceString == null || replaceString.isEmpty())
-                        replaceString = JsonValueUtil.getFirstValidString(itemData, "drop_replace", convert);
+                        replaceString = VisionValueHelper.getFirstValidString(itemData, "drop_replace", convert);
                     ResourceLocation replaceLocation = new ResourceLocation(replaceString);
                     Item replacementItem = ForgeRegistries.ITEMS.getValue(replaceLocation);
                     if (replacementItem != null) {
@@ -53,7 +53,7 @@ public class DespawnBannedItemProcedure {
                         ItemEntity newItemEntity = new ItemEntity(world, entity.getX(), entity.getY(), entity.getZ(), newItemStack);
                         world.addFreshEntity(newItemEntity);
                     }
-                } else if (itemData.has("banned") && JsonValueUtil.isBooleanMet(itemData, "banned", convert)) {
+                } else if (itemData.has("banned") && VisionValueHelper.isBooleanMet(itemData, "banned", convert)) {
                     if (event != null && event.isCancelable()) {
                         event.setCanceled(true);
                     } else if (event != null && event.hasResult()) {

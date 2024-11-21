@@ -66,7 +66,7 @@ public class EnchantmentAttackParticles {
                         JsonObject visionData = VisionHandler.getVisionData(enchantment);
                         if (visionData != null && visionData.has("particle")) {
                             // getting the string and resource location to add to the particle list
-                            String particleString = JsonValueUtil.getFirstValidString(visionData, "particle");
+                            String particleString = VisionValueHelper.getFirstValidString(visionData, "particle");
                             if (!particleString.isEmpty() && particleString != null) {
                                 ResourceLocation particleLocation = new ResourceLocation(particleString);
                                 if (particleLocation != null)

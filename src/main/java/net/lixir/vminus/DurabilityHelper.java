@@ -14,16 +14,16 @@ public class DurabilityHelper {
         int maxDurability = itemstack.isDamageableItem() ? itemstack.getMaxDamage() : 0;
         int damage = itemstack.isDamageableItem() ? itemstack.getDamageValue() : 0;
         if (itemData != null && itemData.has("fake_durability")) {
-            int fakeDurability = JsonValueUtil.isNumberMet(itemData, "fake_durability", maxDurability, itemstack);
+            int fakeDurability = VisionValueHelper.isNumberMet(itemData, "fake_durability", maxDurability, itemstack);
             maxDurability += fakeDurability;
         }
         if (itemData != null && itemData.has("fake_durability_multiplier")) {
-            int fakeDurability = JsonValueUtil.isNumberMet(itemData, "fake_durability_multiplier", 1, itemstack);
+            int fakeDurability = VisionValueHelper.isNumberMet(itemData, "fake_durability_multiplier", 1, itemstack);
             maxDurability *= fakeDurability;
         }
         int durability = itemstack.isDamageableItem() ? maxDurability - damage : 0;
         if (itemData != null && itemData.has("fake_damage_multiplier")) {
-            int fakeDamage = JsonValueUtil.isNumberMet(itemData, "fake_damage_multiplier", 0, itemstack);
+            int fakeDamage = VisionValueHelper.isNumberMet(itemData, "fake_damage_multiplier", 0, itemstack);
             durability -= (fakeDamage * itemstack.getMaxDamage());
         }
         CompoundTag tag = itemstack.getTag();

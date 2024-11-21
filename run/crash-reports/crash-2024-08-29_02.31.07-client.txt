@@ -4,7 +4,7 @@
 Time: 2024-08-29 02:31:07
 Description: Tesselating block model
 
-java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "net.lixir.vminus.JsonValueUtil.isNumberMet(com.google.gson.JsonObject, String, java.lang.Number, net.minecraft.world.item.ItemStack)" is null
+java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because the return value of "net.lixir.vminus.VisionValueHelper.isNumberMet(com.google.gson.JsonObject, String, java.lang.Number, net.minecraft.world.item.ItemStack)" is null
 	at net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.handler$zzi000$getLightEmission(BlockBehaviour.java:979) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:BlockStateBaseMixin,pl:mixin:A}
 	at net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase.getLightEmission(BlockBehaviour.java) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23191!/:?] {re:mixin,re:classloading,pl:mixin:APP:mixins.vminus.json:BlockStateBaseMixin,pl:mixin:A}
 	at net.minecraftforge.common.extensions.IForgeBlock.getLightEmission(IForgeBlock.java:115) ~[forge-1.20.1-47.2.0_mapped_official_1.20.1-recomp.jar%23190%23197!/:?] {re:classloading,re:mixin}
