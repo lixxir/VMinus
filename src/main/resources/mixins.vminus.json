@@ -8,7 +8,7 @@
     "client.HorseArmorLayerMixin",
     "RecipeManagerMixin",
     "entities.ItemEntityMixin",
-    "items.ItemMMixin",
+    "items.ItemMixin",
     "items.ItemStackMixin",
     "entities.LivingEntityMixin",
     "blocks.BlockStateBaseMixin",

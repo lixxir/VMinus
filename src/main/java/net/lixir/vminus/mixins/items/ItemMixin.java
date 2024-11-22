@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @Mixin(Item.class)
-public abstract class ItemMMixin {
+public abstract class ItemMixin {
     @Unique
     private final Item item = (Item) (Object) this;
     @Shadow

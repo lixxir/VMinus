@@ -124,6 +124,7 @@ public class VMinusEvents {
                             if (attribute != null) {
                                 UUID attributeUUID = attributeData.has("uuid") ? UUID.fromString(attributeData.get("uuid").getAsString()) : UUID.randomUUID();
                                 String compositeId = itemId + "|" + attributeId;
+                                // caching uuids
                                 if (UUID_CACHE.get(compositeId) != null) {
                                     attributeUUID = UUID_CACHE.get(compositeId);
                                 } else {
@@ -133,8 +134,9 @@ public class VMinusEvents {
                                 }
                                 EquipmentSlot slot = EquipmentSlot.MAINHAND;
                                 if (attributeData.has("slot")) {
-                                    slot = EquipmentSlot.valueOf(attributeData.get("slot").getAsString().toUpperCase();
+                                    slot = EquipmentSlot.valueOf(attributeData.get("slot").getAsString().toUpperCase());
                                 } else {
+                                    // attempted fallback to get the equipment slot if not defined.
                                     if (itemstack.is(ItemTags.create(new ResourceLocation("forge", "armors/helmets")))) {
                                         slot = EquipmentSlot.HEAD;
                                     } else if (itemstack.is(ItemTags.create(new ResourceLocation("forge", "armors/chestplates")))) {
@@ -143,10 +145,6 @@ public class VMinusEvents {
                                         slot = EquipmentSlot.LEGS;
                                     } else if (itemstack.is(ItemTags.create(new ResourceLocation("forge", "armors/boots")))) {
                                         slot = EquipmentSlot.FEET;
-                                    } else if (itemstack instanceof ShieldItem) {
-                                        slot = EquipmentSlot.OFFHAND;
-                                    }else if (itemstack instanceof ElytraItem) {
-                                        slot = EquipmentSlot.CHEST;
                                     }
                                 }
                                 if (eventSlot == slot) {

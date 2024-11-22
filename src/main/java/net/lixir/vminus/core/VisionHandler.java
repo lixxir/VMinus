@@ -158,6 +158,7 @@ public class VisionHandler {
         boolean found = false;
         boolean inverted = false;
         for (String matchKey : parts) {
+            matchKey = matchKey.toLowerCase();
             // inverting checks
             if (matchKey.startsWith("!")) {
                 inverted = true;

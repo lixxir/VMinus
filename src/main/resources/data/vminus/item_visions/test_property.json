@@ -1,0 +1,5 @@
+{
+  "minecraft:crossbow": {
+    "max_damage": 512
+  }
+}

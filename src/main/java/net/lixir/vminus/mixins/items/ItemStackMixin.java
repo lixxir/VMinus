@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.*;
 import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.core.VisionPropertyHelper;
 import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.procedures.IsBannedEnchantmentProcedure;
 import net.minecraft.nbt.CompoundTag;
@@ -297,8 +298,9 @@ public abstract class ItemStackMixin {
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("durability")) {
-            int maxDurability = VisionValueHelper.isNumberMet(itemData, "durability", cir.getReturnValue() != null ? cir.getReturnValue() : 0, itemstack);
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "durability");
+        if (!propertyMet.isEmpty()) {
+            int maxDurability = VisionValueHelper.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, itemstack);
             cir.setReturnValue(maxDurability);
         }
     }

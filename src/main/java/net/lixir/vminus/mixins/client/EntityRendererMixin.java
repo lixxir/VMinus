@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.client;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.lixir.vminus.core.VisionValueHelper;
-import net.lixir.vminus.PropertyHelper;
+import net.lixir.vminus.core.VisionPropertyHelper;
 import net.lixir.vminus.core.VisionHandler;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -24,11 +24,10 @@ public abstract class EntityRendererMixin<T extends Entity> {
         if (entity instanceof Player player) {
             ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
             JsonObject itemData = VisionHandler.getVisionData(helmet);
-            String propertyMet = PropertyHelper.shouldHideNameTag(itemData, helmet);
+            String propertyMet = VisionPropertyHelper.propertyMet(itemData, "hides_nametag");
             if (!propertyMet.isEmpty()) {
-                if (VisionValueHelper.isBooleanMet(itemData, propertyMet, helmet)) {
+                if (VisionValueHelper.isBooleanMet(itemData, propertyMet, helmet))
                     ci.cancel();
-                }
             }
         }
     }
