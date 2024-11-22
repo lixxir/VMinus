@@ -27,6 +27,9 @@ public class VisionPropertyHelper {
         put("use_duration", Arrays.asList(
                 "use_duration", "use_time", "use_speed"
         ));
+        put("stack_size", Arrays.asList(
+                "stack_size", "stacks_to", "max_stack", "max_stack_size"
+        ));
     }};
     public static String propertyMet(JsonObject visionData, String propertyList) {
         if (visionData != null) {

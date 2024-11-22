@@ -2,6 +2,7 @@ package net.lixir.vminus.mixins.items;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.visions.VisionPropertyHelper;
 import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.nbt.CompoundTag;
@@ -34,8 +35,9 @@ public abstract class ItemMixin {
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         ItemStack itemstack = new ItemStack(item);
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("stack_size")) {
-            int newStackSize = VisionValueHelper.isNumberMet(itemData, "stack_size", cir.getReturnValue() != null ? cir.getReturnValue() : 64, itemstack);
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "stack_size");
+        if (!propertyMet.isEmpty()) {
+            int newStackSize = VisionValueHelper.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 64, itemstack);
             cir.setReturnValue(Math.max(newStackSize, 1));
         }
     }
