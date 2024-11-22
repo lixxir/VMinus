@@ -1,4 +1,4 @@
-package net.lixir.vminus.core;
+package net.lixir.vminus.visions;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

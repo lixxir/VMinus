@@ -1,6 +1,0 @@
-{
-  "minecraft:crossbow": {
-    "priority" : 5,
-    "max_damage": 512
-  }
-}

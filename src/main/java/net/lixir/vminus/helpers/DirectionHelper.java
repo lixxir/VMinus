@@ -1,4 +1,4 @@
-package net.lixir.vminus;
+package net.lixir.vminus.helpers;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;

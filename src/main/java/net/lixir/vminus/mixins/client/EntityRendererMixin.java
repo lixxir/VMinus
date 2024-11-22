@@ -2,9 +2,9 @@ package net.lixir.vminus.mixins.client;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.lixir.vminus.core.VisionValueHelper;
-import net.lixir.vminus.core.VisionPropertyHelper;
-import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionPropertyHelper;
+import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.network.chat.Component;

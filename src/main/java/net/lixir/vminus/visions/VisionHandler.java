@@ -1,4 +1,4 @@
-package net.lixir.vminus.core;
+package net.lixir.vminus.visions;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -154,54 +154,78 @@ public class VisionHandler {
     private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         final String originalKey = key;
         key = key.replaceAll(" ", "");
-        String[] parts = key.split("\\|");
-        boolean found = false;
-        boolean inverted = false;
+        String[] parts = key.split(",");
+        boolean matchExplicitlyAllowed = false;
+        boolean requiredFailed = false;
+
         for (String matchKey : parts) {
+            boolean found = false;
+            boolean inverted = false;
+            boolean required = false;
+
             matchKey = matchKey.toLowerCase();
-            // inverting checks
+
+            if (matchKey.startsWith("&")) {
+                required = true;
+                matchKey = matchKey.substring(1);
+            }
+
             if (matchKey.startsWith("!")) {
                 inverted = true;
                 matchKey = matchKey.substring(1);
             }
-            // id matching
-            if (matchKey.equals(id) == !inverted) {
+
+            if (matchKey.equals(id)) {
                 found = true;
-                break;
             }
-            // global
-            if (matchKey.equals("global") == !inverted) {
+
+            if (matchKey.equals("global")) {
                 found = true;
-                break;
             }
-            // items tag
-            if (itemstack != null) {
-                if (matchKey.startsWith("#") == !inverted && isItemTagged(itemstack, matchKey) == !inverted) {
+
+            if (itemstack != null && matchKey.startsWith("#")) {
+                if (isItemTagged(itemstack, matchKey)) {
                     found = true;
-                    break;
-                }
-            }
-            // blocks tags
-            if (block != null) {
-                if (matchKey.startsWith("#") == !inverted && isBlockTagged(block, matchKey) == !inverted) {
-                    found = true;
-                    break;
-                }
-            }
-            // entities type tags
-            if (entity != null) {
-                if (matchKey.startsWith("#") == !inverted && isEntityTagged(entity, matchKey) == !inverted) {
-                    found = true;
-                    break;
                 }
             }
 
+            if (block != null && matchKey.startsWith("#")) {
+                if (isBlockTagged(block, matchKey)) {
+                    found = true;
+                }
+            }
 
+            if (entity != null && matchKey.startsWith("#")) {
+                if (isEntityTagged(entity, matchKey)) {
+                    found = true;
+                }
+            }
+
+            if (inverted) {
+                found = !found;
+            }
+
+            if (required && !found) {
+                requiredFailed = true;
+                break;
+            }
+
+
+            if (found && !inverted) {
+                matchExplicitlyAllowed = true;
+            }
         }
-        if (found == true) {
-            JsonObject matchedData = mainVision.getAsJsonObject(originalKey);
+
+
+        if (requiredFailed || !matchExplicitlyAllowed) {
+            return mergedData;
+        }
+
+        JsonObject matchedData = mainVision.getAsJsonObject(originalKey);
+        if (matchedData != null) {
             mergedData = mergeJsonObjects(mergedData, matchedData);
         }
+
         return mergedData;
     }
 
@@ -280,7 +304,7 @@ public class VisionHandler {
         JsonObject mergedData = new JsonObject();
         // merge all data
         for (String key : mainVision.keySet())
-            scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
+            mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
         // cache any uncached data
         if (mergedData != null && !mergedData.entrySet().isEmpty()) {
             if (itemstack != null) {

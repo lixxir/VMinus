@@ -1,7 +1,6 @@
-package net.lixir.vminus.core;
+package net.lixir.vminus.visions;
 
 import com.google.gson.JsonObject;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.HashMap;

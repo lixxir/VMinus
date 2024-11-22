@@ -1,5 +1,6 @@
 {
   "#vminus:rarity/epic": {
+    "priority": 600,
     "rarity": "epic"
   }
 }

@@ -1,5 +1,6 @@
 {
   "#vminus:rarity/uncommon": {
+    "priority": 600,
     "rarity": "uncommon"
   }
 }

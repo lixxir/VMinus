@@ -1,8 +1,8 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.core.VisionHandler;
-import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;

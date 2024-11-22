@@ -2,9 +2,9 @@ package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.LootTableAccessor;
-import net.lixir.vminus.core.VisionHandler;
+import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;

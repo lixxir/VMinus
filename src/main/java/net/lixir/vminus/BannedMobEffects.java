@@ -1,8 +1,8 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.core.VisionHandler;
-import net.lixir.vminus.core.VisionValueHelper;
+import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.event.entity.living.MobEffectEvent;

@@ -1,7 +1,7 @@
 package net.lixir.vminus.network.resource;
 
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.core.ResourceVisionHelper;
+import net.lixir.vminus.visions.ResourceVisionHelper;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
