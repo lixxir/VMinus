@@ -1,5 +1,6 @@
-package net.lixir.vminus;
+package net.lixir.vminus.network.capes;
 
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;

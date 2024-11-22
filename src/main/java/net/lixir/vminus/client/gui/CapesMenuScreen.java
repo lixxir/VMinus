@@ -2,7 +2,7 @@ package net.lixir.vminus.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.network.CapesMenuButtonMessage;
+import net.lixir.vminus.network.capes.CapesMenuButtonMessage;
 import net.lixir.vminus.procedures.*;
 import net.lixir.vminus.world.inventory.CapesMenuMenu;
 import net.minecraft.client.gui.GuiGraphics;

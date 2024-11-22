@@ -4,11 +4,16 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.core.ResourceVisionHelper;
 import net.lixir.vminus.core.VisionHandler;
 import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.init.VminusModAttributes;
+import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.network.capes.SetCapePacket;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -19,14 +24,20 @@ import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ISystemReportExtender;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -36,11 +47,33 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VMinusEvents {
     private static final ConcurrentHashMap<String, UUID> UUID_CACHE = new ConcurrentHashMap<>();
     @SubscribeEvent
-    public static void onWorldLoad(net.minecraftforge.event.level.LevelEvent.Load event) {
+    public static void onNonClientWorldLoad(LevelEvent.Load event) {
+        LevelAccessor world = event.getLevel();
+        if (world.isClientSide())
+            return;
+        ResourceVisionHelper.generateItemVisionsFile(world);
+        ResourceVisionHelper.generateBlockVisionsFile(world);
+        ResourceVisionHelper.generateEntityVisionsFile(world);
+        ResourceVisionHelper.generateEffectVisionsFile(world);
+        ResourceVisionHelper.generateEnchantmentVisionsFile(world);
+    }
+    @SubscribeEvent
+    public static void onWorldLoad(LevelEvent.Load event) {
         // Loading all visions for optimization
         VisionHandler.clearCaches();
         VisionHandler.loadVisions();
     }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(PlayerLoggedInEvent event) {
+        ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
+        for (ServerPlayer otherPlayer : newPlayer.server.getPlayerList().getPlayers()) {
+            otherPlayer.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
+                VMinusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, otherPlayer.getUUID()), newPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+            });
+        }
+    }
+
 
     // Setting attributes, removing nbt, and some other things.
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -108,7 +141,8 @@ public class VMinusEvents {
                                     }
                                 }
                             }
-                            AttributeModifier.Operation operation = AttributeModifier.Operation.ADDITION;
+
+                            AttributeModifier.Operation operation;
                             switch (operationString) {
                                 case "multiply_base":
                                     operation = AttributeModifier.Operation.MULTIPLY_BASE;
@@ -122,10 +156,12 @@ public class VMinusEvents {
                             }
                             Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attributeId));
                             if (attribute != null) {
-                                UUID attributeUUID = attributeData.has("uuid") ? UUID.fromString(attributeData.get("uuid").getAsString()) : UUID.randomUUID();
+                                UUID attributeUUID;
                                 String compositeId = itemId + "|" + attributeId;
-                                // caching uuids
-                                if (UUID_CACHE.get(compositeId) != null) {
+                                // caching & getting uuids
+                                if (attributeData.has("uuid") ) {
+                                    attributeUUID = UUID.fromString(attributeData.get("uuid").getAsString());
+                                } else  if (UUID_CACHE.get(compositeId) != null) {
                                     attributeUUID = UUID_CACHE.get(compositeId);
                                 } else {
                                     UUID randomUUID = UUID.randomUUID();

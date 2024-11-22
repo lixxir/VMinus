@@ -1,8 +1,10 @@
-package net.lixir.vminus;
+package net.lixir.vminus.network.resource;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.network.resource.SendJsonFilesPacket;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 

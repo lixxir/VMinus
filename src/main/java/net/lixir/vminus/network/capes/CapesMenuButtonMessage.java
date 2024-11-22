@@ -1,4 +1,4 @@
-package net.lixir.vminus.network;
+package net.lixir.vminus.network.capes;
 
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.procedures.*;

@@ -1,6 +1,6 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.SetCapePacket;
+import net.lixir.vminus.network.capes.SetCapePacket;
 import net.lixir.vminus.VMinusMod;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

@@ -5,7 +5,7 @@
 package net.lixir.vminus.init;
 
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.network.OpenCapesMenuMessage;
+import net.lixir.vminus.network.capes.OpenCapesMenuMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;

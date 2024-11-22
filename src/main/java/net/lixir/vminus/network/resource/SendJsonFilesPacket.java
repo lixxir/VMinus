@@ -1,5 +1,6 @@
-package net.lixir.vminus;
+package net.lixir.vminus.network.resource;
 
+import net.lixir.vminus.VMinusMod;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

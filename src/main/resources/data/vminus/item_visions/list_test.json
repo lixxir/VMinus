@@ -1,18 +1,11 @@
 {
   "minecraft:netherite_chestplate | #minecraft:swords | minecraft:diamond_sword": {
-    "remove_attributes": [
-      {
-        "id": "minecraft:generic.attack_damage"
-      }
-    ],
     "attributes": [
       {
+        "replace": true,
         "id": "minecraft:generic.max_health",
-        "name": "Attack damage",
         "value": 7,
-        "operation": "addition",
-        "slot": "mainhand",
-        "uuid": "d4807392-6b16-11ef-bd76-325096b39f47"
+        "slot": "mainhand"
       }
     ]
   }
