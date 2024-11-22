@@ -10,11 +10,13 @@ import net.lixir.vminus.network.capes.SetCapePacket;
 import net.lixir.vminus.visions.ResourceVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -30,6 +32,7 @@ import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -48,6 +51,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Mod.EventBusSubscriber
 public class VMinusEvents {
     private static final ConcurrentHashMap<String, UUID> UUID_CACHE = new ConcurrentHashMap<>();
+    private static boolean isModLoaded(String modId) {
+        return net.minecraftforge.fml.ModList.get().isLoaded(modId);
+    }
 
     @SubscribeEvent
     public static void onNonClientWorldLoad(LevelEvent.Load event) {
@@ -106,20 +112,35 @@ public class VMinusEvents {
                 directEntity = damagesource.getDirectEntity();
                 System.out.println(mainhandItem);
                 if (!mainhandItem.isEmpty() && mainhandItem.isEnchanted()) {
-                    if ((sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) >= 0.75 || !(sourceentity instanceof Player) || directEntity == null && !(directEntity == (damagesource.getEntity()))) {
+                    if (((isModLoaded("detour") && (sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) >= 0.75) || !isModLoaded("detour"))
+                            || !(sourceentity instanceof Player) || directEntity == null
+                            && !(directEntity == (damagesource.getEntity())) && entity.isAttackable()) {
                         // iterating through all of the items enchants
                         Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(mainhandItem);
                         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
                             Enchantment enchantment = entry.getKey();
                             // getting the vision data from the enchant
                             JsonObject visionData = VisionHandler.getVisionData(enchantment);
-                            if (visionData != null && visionData.has("particle")) {
-                                // getting the string and resource location to add to the particle list
-                                String particleString = VisionValueHelper.getFirstValidString(visionData, "particle");
-                                if (!particleString.isEmpty() && particleString != null) {
-                                    ResourceLocation particleLocation = new ResourceLocation(particleString);
-                                    if (particleLocation != null)
-                                        particles.add(particleLocation);
+                            if (visionData != null) {
+                                if (visionData.has("particle")) {
+                                    // getting the string and resource location to add to the particle list
+                                    String particleString = VisionValueHelper.getFirstValidString(visionData, "particle");
+                                    if (!particleString.isEmpty() && particleString != null) {
+                                        ResourceLocation particleLocation = new ResourceLocation(particleString);
+                                        if (particleLocation != null)
+                                            particles.add(particleLocation);
+                                    }
+                                }
+                                if (visionData.has("sound")) {
+                                    String soundString = VisionValueHelper.getFirstValidString(visionData, "sound");
+                                    if (!world.isClientSide())
+                                        world.playSound(null, BlockPos.containing(sourceentity.getX(),
+                                                sourceentity.getY() + 1,
+                                                sourceentity.getZ()),
+                                                Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(soundString))),
+                                                SoundSource.PLAYERS,
+                                                (float) 0.8,
+                                                (float) 1);
                                 }
                             }
                         }
@@ -144,6 +165,8 @@ public class VMinusEvents {
                             }
                         }
                     }
+
+
                 }
             }
         }

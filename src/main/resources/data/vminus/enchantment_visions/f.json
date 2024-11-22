@@ -1,6 +1,7 @@
 {
   "minecraft:sharpness": {
     "particle": "minecraft:angry_villager",
+    "sound": "entity.warden.angry",
     "max_level": 3,
     "min_level": 2,
     "treasure": true,
