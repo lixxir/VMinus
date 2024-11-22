@@ -2,10 +2,12 @@ package net.lixir.vminus.mixins.items;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Pair;
 import net.lixir.vminus.visions.VisionPropertyHelper;
 import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Item.class)
@@ -42,13 +45,39 @@ public abstract class ItemMixin {
         }
     }
 
-    @Inject(method = "getFoodProperties", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
     private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
         ItemStack itemstack = new ItemStack(item);
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        FoodProperties originalProperties = cir.getReturnValue();
+        FoodProperties.Builder modifiedFoodProperties = null;
+        if (originalProperties != null) {
+            modifiedFoodProperties = new FoodProperties.Builder();
+            modifiedFoodProperties.nutrition(originalProperties.getNutrition());
+            modifiedFoodProperties.saturationMod(originalProperties.getSaturationModifier());
+
+            List<Pair<MobEffectInstance, Float>> effects = originalProperties.getEffects();
+
+            for (Pair<MobEffectInstance, Float> effectInstance : effects) {
+                JsonObject visionData = VisionHandler.getVisionData(effectInstance.getFirst().getEffect());
+                if (visionData != null && visionData.has("banned")) {
+                    continue;
+                } else {
+                    modifiedFoodProperties.effect(effectInstance.getFirst(),effectInstance.getSecond());
+                }
+            }
+
+            if (originalProperties.canAlwaysEat())
+                modifiedFoodProperties.alwaysEat();
+            if (originalProperties.isMeat())
+                modifiedFoodProperties.meat();
+            if (originalProperties.isFastFood())
+                modifiedFoodProperties.fast();
+        }
         if (itemData != null && itemData.has("food_properties")) {
-            FoodProperties customFoodProperties = VisionValueHelper.getFoodProperties(itemData, itemstack, foodProperties);
-            cir.setReturnValue(customFoodProperties);
+            cir.setReturnValue(VisionValueHelper.getFoodProperties(itemData, itemstack, modifiedFoodProperties != null ? modifiedFoodProperties.build() : originalProperties));
+        } else if (modifiedFoodProperties != null) {
+            cir.setReturnValue(modifiedFoodProperties.build());
         }
     }
 
