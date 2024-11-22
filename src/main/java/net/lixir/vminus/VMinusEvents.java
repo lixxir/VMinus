@@ -4,25 +4,35 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.ResourceVisionHelper;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.network.capes.SetCapePacket;
+import net.lixir.vminus.visions.ResourceVisionHelper;
+import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -32,14 +42,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber
 public class VMinusEvents {
     private static final ConcurrentHashMap<String, UUID> UUID_CACHE = new ConcurrentHashMap<>();
+
     @SubscribeEvent
     public static void onNonClientWorldLoad(LevelEvent.Load event) {
         LevelAccessor world = event.getLevel();
@@ -51,6 +60,7 @@ public class VMinusEvents {
         ResourceVisionHelper.generateEffectVisionsFile(world);
         ResourceVisionHelper.generateEnchantmentVisionsFile(world);
     }
+
     @SubscribeEvent
     public static void onWorldLoad(LevelEvent.Load event) {
         // Loading all visions for optimization
@@ -68,6 +78,76 @@ public class VMinusEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onEntityAttacked(LivingAttackEvent event) {
+        if (event != null && event.getEntity() != null) {
+
+            LevelAccessor world = event.getEntity().level();
+            DamageSource damagesource = event.getSource();
+            Entity entity = event.getEntity();
+            Entity sourceentity = event.getSource().getEntity();
+            Entity immediatesourceentity = event.getSource().getDirectEntity();
+            double amount = event.getAmount();
+
+            if (damagesource == null || entity == null || immediatesourceentity == null || sourceentity == null)
+                return;
+
+            List<ResourceLocation> particles = new ArrayList<ResourceLocation>();
+            ItemStack mainhandItem;
+            double vX = 0;
+            double vY = 0;
+            double vZ = 0;
+            double ranX = 0;
+            double ranZ = 0;
+            double ranY = 0;
+            Entity directEntity = null;
+            if (sourceentity != null && !(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
+                mainhandItem = (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY);
+                directEntity = damagesource.getDirectEntity();
+                System.out.println(mainhandItem);
+                if (!mainhandItem.isEmpty() && mainhandItem.isEnchanted()) {
+                    if ((sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) >= 0.75 || !(sourceentity instanceof Player) || directEntity == null && !(directEntity == (damagesource.getEntity()))) {
+                        // iterating through all of the items enchants
+                        Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(mainhandItem);
+                        for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                            Enchantment enchantment = entry.getKey();
+                            // getting the vision data from the enchant
+                            JsonObject visionData = VisionHandler.getVisionData(enchantment);
+                            if (visionData != null && visionData.has("particle")) {
+                                // getting the string and resource location to add to the particle list
+                                String particleString = VisionValueHelper.getFirstValidString(visionData, "particle");
+                                if (!particleString.isEmpty() && particleString != null) {
+                                    ResourceLocation particleLocation = new ResourceLocation(particleString);
+                                    if (particleLocation != null)
+                                        particles.add(particleLocation);
+                                }
+                            }
+                        }
+                    }
+                    // spawning random particles from the created list
+                    if (particles.size() > 0) {
+                        for (int index0 = 0; index0 < Mth.nextInt(RandomSource.create(), 5, 7); index0++) {
+                            ResourceLocation chosenParticle = particles.get(Mth.nextInt(RandomSource.create(), 0, (particles.size() - 1)));
+                            System.out.println(chosenParticle);
+                            // getting random positions
+                            ranX = entity.getX() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * (-1) - 0.3, entity.getBbWidth() / 2 + 0.3);
+                            ranY = entity.getY() + Mth.nextDouble(RandomSource.create(), 0, entity.getBbHeight() + 0.3);
+                            ranZ = entity.getZ() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * (-1) - 0.3, entity.getBbWidth() / 2 + 0.3);
+                            // getting random velocities
+                            vX = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
+                            vY = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
+                            vZ = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
+                            ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(chosenParticle);
+                            if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {
+                                //world.sendParticles(simpleParticleType, ranX, ranY, ranZ, 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
+                                world.addParticle(simpleParticleType, ranX, ranY, ranZ, vX, vY, vZ);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // Setting attributes, removing nbt, and some other things.
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -113,7 +193,7 @@ public class VMinusEvents {
                             } else {
                                 if (attributeId.indexOf(".") != -1) {
                                     attributeName = attributeId.substring(attributeId.indexOf(".") + 1);
-                                } else  if (attributeId.indexOf(":") != -1) {
+                                } else if (attributeId.indexOf(":") != -1) {
                                     attributeName = attributeId.substring(attributeId.indexOf(":") + 1);
                                 }
                                 attributeName = attributeName.replaceAll("_", " ");
@@ -121,7 +201,7 @@ public class VMinusEvents {
 
                             String operationString = attributeData.has("operation") ? attributeData.get("operation").getAsString().toLowerCase() : "addition";
                             double attributeValue = attributeData.get("value").getAsDouble();
-                            boolean replace = attributeData.has("replace") ? attributeData.get("replace").getAsBoolean() : false;
+                            boolean replace = attributeData.has("replace") && attributeData.get("replace").getAsBoolean();
                             if (replace) {
                                 if (event != null) {
                                     Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
@@ -153,9 +233,9 @@ public class VMinusEvents {
                                 UUID attributeUUID;
                                 String compositeId = itemId + "|" + attributeId;
                                 // caching & getting uuids
-                                if (attributeData.has("uuid") ) {
+                                if (attributeData.has("uuid")) {
                                     attributeUUID = UUID.fromString(attributeData.get("uuid").getAsString());
-                                } else  if (UUID_CACHE.get(compositeId) != null) {
+                                } else if (UUID_CACHE.get(compositeId) != null) {
                                     attributeUUID = UUID_CACHE.get(compositeId);
                                 } else {
                                     UUID randomUUID = UUID.randomUUID();
