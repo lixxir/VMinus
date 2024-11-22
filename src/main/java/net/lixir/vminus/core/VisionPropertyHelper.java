@@ -16,6 +16,18 @@ public class VisionPropertyHelper {
         put("durability", Arrays.asList(
                 "durability", "max_damage"
         ));
+        put("damageable", Arrays.asList(
+                "damageable", "is_damageable", "can_be_damaged"
+        ));
+        put("enchantable", Arrays.asList(
+                "enchantable", "is_enchantable", "can_be_enchanted"
+        ));
+        put("foil", Arrays.asList(
+                "foil", "enchantment_glint", "glint", "enchanting_foil", "enchantment_foil", "enchanting_glint"
+        ));
+        put("use_duration", Arrays.asList(
+                "use_duration", "use_time", "use_speed"
+        ));
     }};
     public static String propertyMet(JsonObject visionData, String propertyList) {
         if (visionData != null) {

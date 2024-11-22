@@ -224,8 +224,8 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "enchant", at = @At("HEAD"), cancellable = true)
     public void enchant(Enchantment enchantment, int level, CallbackInfo ci) {
-        String enchantmentRegistery = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-        if (IsBannedEnchantmentProcedure.execute(enchantmentRegistery)) {
+        String enchantmentRegistry = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
+        if (IsBannedEnchantmentProcedure.execute(enchantmentRegistry)) {
             ci.cancel();
             return;
         }
@@ -308,16 +308,18 @@ public abstract class ItemStackMixin {
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("damageable")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, "damageable", itemstack));
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "damageable");
+        if (!propertyMet.isEmpty()) {
+            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
     @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("enchantable")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, "enchantable", itemstack));
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "damageable");
+        if (!propertyMet.isEmpty()) {
+            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
@@ -354,8 +356,9 @@ public abstract class ItemStackMixin {
     @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("foil")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, "foil", itemstack));
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "foil");
+        if (!propertyMet.isEmpty()) {
+            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
@@ -384,9 +387,10 @@ public abstract class ItemStackMixin {
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemData != null && itemData.has("use_duration")) {
+        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "use_duration");
+        if (!propertyMet.isEmpty()) {
             int defaultDuration = 32;
-            int calculatedDuration = VisionValueHelper.isNumberMet(itemData, "use_duration", defaultDuration, itemstack);
+            int calculatedDuration = VisionValueHelper.isNumberMet(itemData, propertyMet, defaultDuration, itemstack);
             if (calculatedDuration != defaultDuration) {
                 cir.setReturnValue(calculatedDuration);
             }
