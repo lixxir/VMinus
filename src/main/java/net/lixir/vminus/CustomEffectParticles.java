@@ -82,7 +82,7 @@ public class CustomEffectParticles {
 
     private static double[] getSpawnCoordinates(Entity entity) {
         double spawnX = entity.getX() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
-        double spawnY = entity.getY() + Mth.nextDouble(RandomSource.create(), 0, entity.getBbHeight() + 0.3);
+        double spawnY = entity.getY() + Mth.nextDouble(RandomSource.create(), 0, entity.getBbHeight());
         double spawnZ = entity.getZ() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
         return new double[]{spawnX, spawnY, spawnZ};
     }
