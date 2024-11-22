@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
 import net.lixir.vminus.SetCapePacket;
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
@@ -14,6 +14,6 @@ public class SetTrollCapeProcedure {
         if (!entity.level().isClientSide())
             return;
         UUID playerUUID = player.getUUID();
-        VminusMod.PACKET_HANDLER.sendToServer(new SetCapePacket("troll", playerUUID));
+        VMinusMod.PACKET_HANDLER.sendToServer(new SetCapePacket("troll", playerUUID));
     }
 }

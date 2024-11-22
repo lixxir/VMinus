@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.core.VisionHandler;
-import net.lixir.vminus.VminusMod;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -42,7 +42,7 @@ public class RecipeManagerMixin {
                 }
                 filteredMap.put(resourceLocation, jsonElement);
             } catch (IllegalArgumentException | JsonParseException e) {
-                VminusMod.LOGGER.error("Parsing error loading recipe {}", resourceLocation, e);
+                VMinusMod.LOGGER.error("Parsing error loading recipe {}", resourceLocation, e);
                 filteredMap.put(resourceLocation, jsonElement);
             }
         }
@@ -60,7 +60,7 @@ public class RecipeManagerMixin {
                     processIngredientElement(ingredientElement);
                 }
             } else {
-                VminusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
+                VMinusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
             }
         }
         if (jsonObject.has("key")) {
@@ -82,7 +82,7 @@ public class RecipeManagerMixin {
                 processIngredientElement(nestedElement);
             }
         } else {
-            VminusMod.LOGGER.warn("Unexpected ingredient format: {}", ingredientElement.getClass().getSimpleName());
+            VMinusMod.LOGGER.warn("Unexpected ingredient format: {}", ingredientElement.getClass().getSimpleName());
         }
     }
 
@@ -123,7 +123,7 @@ public class RecipeManagerMixin {
                     }
                 }
             } else {
-                VminusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
+                VMinusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
             }
         }
         if (jsonObject.has("key")) {
@@ -201,7 +201,7 @@ public class RecipeManagerMixin {
             new ResourceLocation(resourceLocation);
             return true;
         } catch (IllegalArgumentException e) {
-            VminusMod.LOGGER.warn("Invalid ResourceLocation: {}", resourceLocation);
+            VMinusMod.LOGGER.warn("Invalid ResourceLocation: {}", resourceLocation);
             return false;
         }
     }

@@ -1,6 +1,6 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,7 +26,7 @@ public class ModUnloadResetVariableProcedure {
                 try {
                     return new com.google.gson.Gson().fromJson(rawJson, com.google.gson.JsonObject.class);
                 } catch (Exception e) {
-                    VminusMod.LOGGER.error(e);
+                    VMinusMod.LOGGER.error(e);
                     return new com.google.gson.Gson().fromJson("{}", com.google.gson.JsonObject.class);
                 }
             }
@@ -36,7 +36,7 @@ public class ModUnloadResetVariableProcedure {
                 try {
                     return new com.google.gson.Gson().fromJson(rawJson, com.google.gson.JsonObject.class);
                 } catch (Exception e) {
-                    VminusMod.LOGGER.error(e);
+                    VMinusMod.LOGGER.error(e);
                     return new com.google.gson.Gson().fromJson("{}", com.google.gson.JsonObject.class);
                 }
             }
@@ -46,7 +46,7 @@ public class ModUnloadResetVariableProcedure {
                 try {
                     return new com.google.gson.Gson().fromJson(rawJson, com.google.gson.JsonObject.class);
                 } catch (Exception e) {
-                    VminusMod.LOGGER.error(e);
+                    VMinusMod.LOGGER.error(e);
                     return new com.google.gson.Gson().fromJson("{}", com.google.gson.JsonObject.class);
                 }
             }
@@ -56,7 +56,7 @@ public class ModUnloadResetVariableProcedure {
                 try {
                     return new com.google.gson.Gson().fromJson(rawJson, com.google.gson.JsonObject.class);
                 } catch (Exception e) {
-                    VminusMod.LOGGER.error(e);
+                    VMinusMod.LOGGER.error(e);
                     return new com.google.gson.Gson().fromJson("{}", com.google.gson.JsonObject.class);
                 }
             }
@@ -66,7 +66,7 @@ public class ModUnloadResetVariableProcedure {
                 try {
                     return new com.google.gson.Gson().fromJson(rawJson, com.google.gson.JsonObject.class);
                 } catch (Exception e) {
-                    VminusMod.LOGGER.error(e);
+                    VMinusMod.LOGGER.error(e);
                     return new com.google.gson.Gson().fromJson("{}", com.google.gson.JsonObject.class);
                 }
             }

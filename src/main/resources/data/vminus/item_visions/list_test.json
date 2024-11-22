@@ -1,5 +1,5 @@
 {
-  "minecraft:netherite_chestplate | #minecraft:swords | !minecraft:diamond_sword": {
+  "minecraft:netherite_chestplate | #minecraft:swords | minecraft:diamond_sword": {
     "remove_attributes": [
       {
         "id": "minecraft:generic.attack_damage"

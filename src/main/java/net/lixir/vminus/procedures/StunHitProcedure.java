@@ -1,6 +1,6 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -39,7 +39,7 @@ public class StunHitProcedure {
                         void timedLoop(int current, int total, int ticks) {
                             entity.makeStuckInBlock(Blocks.AIR.defaultBlockState(), new Vec3(0.25, 0.05, 0.25));
                             final int tick2 = ticks;
-                            VminusMod.queueServerWork(tick2, () -> {
+                            VMinusMod.queueServerWork(tick2, () -> {
                                 if (total > current + 1) {
                                     timedLoop(current + 1, total, tick2);
                                 }

@@ -4,7 +4,7 @@
  */
 package net.lixir.vminus.init;
 
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.OpenCapesMenuMessage;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ public class VminusModKeyMappings {
         public void setDown(boolean isDown) {
             super.setDown(isDown);
             if (isDownOld != isDown && isDown) {
-                VminusMod.PACKET_HANDLER.sendToServer(new OpenCapesMenuMessage(0, 0));
+                VMinusMod.PACKET_HANDLER.sendToServer(new OpenCapesMenuMessage(0, 0));
                 OpenCapesMenuMessage.pressAction(Minecraft.getInstance().player, 0, 0);
             }
             isDownOld = isDown;

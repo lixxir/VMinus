@@ -54,6 +54,7 @@
     "enchantments.ThornsEnchantmentMixin",
     "enchantments.TridentImpalerEnchantmentMixin",
     "enchantments.ProtectionEnchantmentMixin",
+    "enchantments.DamageEnchantmentMixin",
     "enchantments.TridentLoyaltyEnchantmentMixin",
     "enchantments.TridentRiptideEnchantmentMixin",
     "enchantments.VanishingCurseEnchantmentMixin",

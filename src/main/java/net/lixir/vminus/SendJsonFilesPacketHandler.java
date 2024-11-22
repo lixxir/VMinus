@@ -64,27 +64,27 @@ public class SendJsonFilesPacketHandler {
             switch (type) {
                 case 0:
                     VminusModVariables.main_item_vision = jsonObject;
-                    VminusMod.LOGGER.info("Processed Item Vision: " + jsonObject);
+                    VMinusMod.LOGGER.info("Processed Item Vision: " + jsonObject);
                     break;
                 case 1:
                     VminusModVariables.main_block_vision = jsonObject;
-                    VminusMod.LOGGER.info("Processed Block Vision: " + jsonObject);
+                    VMinusMod.LOGGER.info("Processed Block Vision: " + jsonObject);
                     break;
                 case 2:
                     VminusModVariables.main_entity_vision = jsonObject;
-                    VminusMod.LOGGER.info("Processed Entity Vision: " + jsonObject);
+                    VMinusMod.LOGGER.info("Processed Entity Vision: " + jsonObject);
                     break;
                 case 3:
                     VminusModVariables.main_effect_vision = jsonObject;
-                    VminusMod.LOGGER.info("Processed Effect Vision: " + jsonObject);
+                    VMinusMod.LOGGER.info("Processed Effect Vision: " + jsonObject);
                     break;
                 case 4:
                     VminusModVariables.main_enchantment_vision = jsonObject;
-                    VminusMod.LOGGER.info("Processed Encahntment Vision: " + jsonObject);
+                    VMinusMod.LOGGER.info("Processed Encahntment Vision: " + jsonObject);
                     break;
             }
         } catch (IOException e) {
-            VminusMod.LOGGER.error("Error processing received JSON: ", e);
+            VMinusMod.LOGGER.error("Error processing received JSON: ", e);
         }
     }
 }

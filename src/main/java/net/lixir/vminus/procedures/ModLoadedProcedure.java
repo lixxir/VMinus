@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
 import com.google.gson.*;
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -97,11 +97,11 @@ public class ModLoadedProcedure {
             @Override
             public void accept(ResourceLocation resourceLocation, IoSupplier<InputStream> ioSupplier) {
                 try {
-                    VminusMod.LOGGER.info("Processing resource vision: " + resourceLocation);
+                    VMinusMod.LOGGER.info("Processing resource vision: " + resourceLocation);
                     String jsonString = new java.io.BufferedReader(new java.io.InputStreamReader(ioSupplier.get(), java.nio.charset.StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
                     JsonObject newJsonObject = new Gson().fromJson(jsonString, JsonObject.class);
                     if (newJsonObject == null) {
-                        VminusMod.LOGGER.warn("Failed to parse JSON from resource vision: " + resourceLocation);
+                        VMinusMod.LOGGER.warn("Failed to parse JSON from resource vision: " + resourceLocation);
                         return;
                     }
                     for (String key : newJsonObject.keySet()) {
@@ -120,7 +120,7 @@ public class ModLoadedProcedure {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    VminusMod.LOGGER.error("Error processing resource vision vision: " + resourceLocation, e);
+                    VMinusMod.LOGGER.error("Error processing resource vision vision: " + resourceLocation, e);
                 }
             }
         }
@@ -134,16 +134,16 @@ public class ModLoadedProcedure {
         File configDir = new File("config/vminus/" + folderName);
         if (!configDir.exists()) {
             if (configDir.mkdirs()) {
-                VminusMod.LOGGER.info("Created directory: " + configDir.getPath());
+                VMinusMod.LOGGER.info("Created directory: " + configDir.getPath());
             } else {
-                VminusMod.LOGGER.error("Failed to create directory: " + configDir.getPath());
+                VMinusMod.LOGGER.error("Failed to create directory: " + configDir.getPath());
             }
         }
         if (configDir.exists() && configDir.isDirectory()) {
             File[] jsonFiles = configDir.listFiles((dir, name) -> name.endsWith(".json"));
             if (jsonFiles != null) {
                 for (File file : jsonFiles) {
-                    VminusMod.LOGGER.info("Processing config vision: " + file.getName());
+                    VMinusMod.LOGGER.info("Processing config vision: " + file.getName());
                     try (FileReader reader = new FileReader(file)) {
                         JsonObject configJson = JsonParser.parseReader(reader).getAsJsonObject();
                         for (String key : configJson.keySet()) {
@@ -161,7 +161,7 @@ public class ModLoadedProcedure {
                             }
                         }
                     } catch (IOException e) {
-                        VminusMod.LOGGER.error("Error reading config vision: " + file.getName(), e);
+                        VMinusMod.LOGGER.error("Error reading config vision: " + file.getName(), e);
                     }
                 }
             }

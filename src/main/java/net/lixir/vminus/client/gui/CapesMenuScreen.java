@@ -1,7 +1,7 @@
 package net.lixir.vminus.client.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.CapesMenuButtonMessage;
 import net.lixir.vminus.procedures.*;
 import net.lixir.vminus.world.inventory.CapesMenuMenu;
@@ -106,7 +106,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         super.init();
         imagebutton_beeper_cape = new ImageButton(this.leftPos + 18, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_beeper_cape.png"), 24, 48, e -> {
             if (NotHasBeeperCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(0, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(0, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 0, x, y, z);
             }
         }) {
@@ -120,7 +120,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_beeper_cape);
         imagebutton_no_cape = new ImageButton(this.leftPos + 1, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_no_cape.png"), 24, 48, e -> {
             if (NotHasEmptyCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(1, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(1, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 1, x, y, z);
             }
         }) {
@@ -144,7 +144,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_no_cape_selected);
         imagebutton_beeper_cape_selected = new ImageButton(this.leftPos + 18, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_beeper_cape_selected.png"), 24, 48, e -> {
             if (HasBeeperCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(3, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(3, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 3, x, y, z);
             }
         }) {
@@ -168,7 +168,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_locked_cape);
         imagebutton_ghost_cape = new ImageButton(this.leftPos + 35, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_ghost_cape.png"), 24, 48, e -> {
             if (NotHasGhostCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(5, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(5, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 5, x, y, z);
             }
         }) {
@@ -182,7 +182,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_ghost_cape);
         imagebutton_ghost_cape_selected = new ImageButton(this.leftPos + 35, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_ghost_cape_selected.png"), 24, 48, e -> {
             if (HasGhostCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(6, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(6, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 6, x, y, z);
             }
         }) {
@@ -206,7 +206,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_locked_cape1);
         imagebutton_marrow_cape = new ImageButton(this.leftPos + 52, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_marrow_cape.png"), 24, 48, e -> {
             if (NotHasMarrowCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(8, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(8, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 8, x, y, z);
             }
         }) {
@@ -220,7 +220,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_marrow_cape);
         imagebutton_marrow_cape_selected = new ImageButton(this.leftPos + 52, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_marrow_cape_selected.png"), 24, 48, e -> {
             if (HasMarrowCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(9, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(9, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 9, x, y, z);
             }
         }) {
@@ -244,7 +244,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_locked_cape2);
         imagebutton_shroud_cape = new ImageButton(this.leftPos + 69, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_shroud_cape.png"), 24, 48, e -> {
             if (NotHasShroudCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(11, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(11, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 11, x, y, z);
             }
         }) {
@@ -258,7 +258,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_shroud_cape);
         imagebutton_shroud_cape_selected = new ImageButton(this.leftPos + 69, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_shroud_cape_selected.png"), 24, 48, e -> {
             if (HasShroudCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(12, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(12, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 12, x, y, z);
             }
         }) {
@@ -282,7 +282,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_locked_cape3);
         imagebutton_troll_cape = new ImageButton(this.leftPos + 86, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_troll_cape.png"), 24, 48, e -> {
             if (NotHasTrollCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(14, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(14, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 14, x, y, z);
             }
         }) {
@@ -296,7 +296,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
         this.addRenderableWidget(imagebutton_troll_cape);
         imagebutton_troll_cape_selected = new ImageButton(this.leftPos + 86, this.topPos + 15, 24, 24, 0, 0, 24, new ResourceLocation("vminus:textures/screens/atlas/imagebutton_troll_cape_selected.png"), 24, 48, e -> {
             if (HasTrollCapeProcedure.execute(entity)) {
-                VminusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(15, x, y, z));
+                VMinusMod.PACKET_HANDLER.sendToServer(new CapesMenuButtonMessage(15, x, y, z));
                 CapesMenuButtonMessage.handleButtonAction(entity, 15, x, y, z);
             }
         }) {

@@ -1,6 +1,6 @@
 package net.lixir.vminus.network;
 
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.procedures.OpenCapesMenuOnKeyPressedProcedure;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -55,6 +55,6 @@ public class OpenCapesMenuMessage {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VminusMod.addNetworkMessage(OpenCapesMenuMessage.class, OpenCapesMenuMessage::buffer, OpenCapesMenuMessage::new, OpenCapesMenuMessage::handler);
+        VMinusMod.addNetworkMessage(OpenCapesMenuMessage.class, OpenCapesMenuMessage::buffer, OpenCapesMenuMessage::new, OpenCapesMenuMessage::handler);
     }
 }

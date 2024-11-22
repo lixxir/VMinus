@@ -29,15 +29,15 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Mod("vminus")
-public class VminusMod {
-    public static final Logger LOGGER = LogManager.getLogger(VminusMod.class);
+public class VMinusMod {
+    public static final Logger LOGGER = LogManager.getLogger(VMinusMod.class);
     public static final String MODID = "vminus";
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel PACKET_HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
     private static int messageID = 0;
 
-    public VminusMod() {
+    public VMinusMod() {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         VminusModBlocks.REGISTRY.register(bus);

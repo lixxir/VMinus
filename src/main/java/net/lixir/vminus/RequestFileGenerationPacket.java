@@ -51,27 +51,27 @@ public class RequestFileGenerationPacket {
         for (int i = 0; i < itemJson.length(); i += chunkSize) {
             String chunk = itemJson.substring(i, Math.min(itemJson.length(), i + chunkSize));
             boolean isLastChunk = (i + chunkSize) >= itemJson.length();
-            VminusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket(chunk, "", "", "", "", isLastChunk, (byte) 0));
+            VMinusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket(chunk, "", "", "", "", isLastChunk, (byte) 0));
         }
         for (int i = 0; i < blockJson.length(); i += chunkSize) {
             String chunk = blockJson.substring(i, Math.min(blockJson.length(), i + chunkSize));
             boolean isLastChunk = (i + chunkSize) >= blockJson.length();
-            VminusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", chunk, "", "", "", isLastChunk, (byte) 1));
+            VMinusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", chunk, "", "", "", isLastChunk, (byte) 1));
         }
         for (int i = 0; i < entityJson.length(); i += chunkSize) {
             String chunk = entityJson.substring(i, Math.min(entityJson.length(), i + chunkSize));
             boolean isLastChunk = (i + chunkSize) >= entityJson.length();
-            VminusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", chunk, "", "", isLastChunk, (byte) 2));
+            VMinusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", chunk, "", "", isLastChunk, (byte) 2));
         }
         for (int i = 0; i < effectJson.length(); i += chunkSize) {
             String chunk = effectJson.substring(i, Math.min(effectJson.length(), i + chunkSize));
             boolean isLastChunk = (i + chunkSize) >= entityJson.length();
-            VminusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", "", chunk, "", isLastChunk, (byte) 3));
+            VMinusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", "", chunk, "", isLastChunk, (byte) 3));
         }
         for (int i = 0; i < enchantmentJson.length(); i += chunkSize) {
             String chunk = enchantmentJson.substring(i, Math.min(enchantmentJson.length(), i + chunkSize));
             boolean isLastChunk = (i + chunkSize) >= enchantmentJson.length();
-            VminusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", "", "", chunk, isLastChunk, (byte) 4));
+            VMinusMod.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new SendJsonFilesPacket("", "", "", "", chunk, isLastChunk, (byte) 4));
         }
     }
 
@@ -84,6 +84,6 @@ public class RequestFileGenerationPacket {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VminusMod.addNetworkMessage(RequestFileGenerationPacket.class, RequestFileGenerationPacket::encode, RequestFileGenerationPacket::decode, RequestFileGenerationPacket::handle);
+        VMinusMod.addNetworkMessage(RequestFileGenerationPacket.class, RequestFileGenerationPacket::encode, RequestFileGenerationPacket::decode, RequestFileGenerationPacket::handle);
     }
 }

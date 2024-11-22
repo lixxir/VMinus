@@ -48,7 +48,7 @@ public class SendJsonFilesPacket {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VminusMod.addNetworkMessage(SendJsonFilesPacket.class, SendJsonFilesPacket::encode, SendJsonFilesPacket::decode, SendJsonFilesPacketHandler::handle);
+        VMinusMod.addNetworkMessage(SendJsonFilesPacket.class, SendJsonFilesPacket::encode, SendJsonFilesPacket::decode, SendJsonFilesPacketHandler::handle);
     }
 
     public String getItemJsonChunk() {

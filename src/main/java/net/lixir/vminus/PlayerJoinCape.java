@@ -13,7 +13,7 @@ public class PlayerJoinCape {
         ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
         for (ServerPlayer otherPlayer : newPlayer.server.getPlayerList().getPlayers()) {
             otherPlayer.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
-                VminusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, otherPlayer.getUUID()), newPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                VMinusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, otherPlayer.getUUID()), newPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             });
         }
     }

@@ -52,11 +52,11 @@ public class SetCapePacket {
                         capability.cape_id = packet.capeId;
                         capability.syncPlayerVariables(player);
                         for (ServerPlayer otherPlayer : player.server.getPlayerList().getPlayers()) {
-                            VminusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, player.getUUID()), otherPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                            VMinusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, player.getUUID()), otherPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                         }
                     });
                 } else {
-                    VminusMod.LOGGER.error("Could not find the player for the cape packet!");
+                    VMinusMod.LOGGER.error("Could not find the player for the cape packet!");
                 }
             }
         });
@@ -65,6 +65,6 @@ public class SetCapePacket {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VminusMod.addNetworkMessage(SetCapePacket.class, SetCapePacket::encode, SetCapePacket::decode, SetCapePacket::handle);
+        VMinusMod.addNetworkMessage(SetCapePacket.class, SetCapePacket::encode, SetCapePacket::decode, SetCapePacket::handle);
     }
 }

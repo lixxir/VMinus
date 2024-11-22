@@ -1,6 +1,6 @@
 package net.lixir.vminus.network;
 
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.procedures.*;
 import net.lixir.vminus.world.inventory.CapesMenuMenu;
 import net.minecraft.core.BlockPos;
@@ -107,6 +107,6 @@ public class CapesMenuButtonMessage {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VminusMod.addNetworkMessage(CapesMenuButtonMessage.class, CapesMenuButtonMessage::buffer, CapesMenuButtonMessage::new, CapesMenuButtonMessage::handler);
+        VMinusMod.addNetworkMessage(CapesMenuButtonMessage.class, CapesMenuButtonMessage::buffer, CapesMenuButtonMessage::new, CapesMenuButtonMessage::handler);
     }
 }

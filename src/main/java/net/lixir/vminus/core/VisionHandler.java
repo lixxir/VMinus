@@ -3,7 +3,7 @@ package net.lixir.vminus.core;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -95,7 +94,31 @@ public class VisionHandler {
         return getVisionData(null, false, null, entity, null, null);
     }
 
-    private static void clearCaches() {
+    public static void loadVisions() {
+        if (VminusModVariables.main_item_vision != null) {
+            for (Item item : ForgeRegistries.ITEMS.getValues()) {
+                ItemStack itemStack = new ItemStack(item);
+                VisionHandler.getVisionData(itemStack);
+            }
+        }
+        if (VminusModVariables.main_block_vision != null) {
+            for (Block block : ForgeRegistries.BLOCKS.getValues()) {
+                VisionHandler.getVisionData(block);
+            }
+        }
+        if (VminusModVariables.main_effect_vision != null) {
+            for (MobEffect effect : ForgeRegistries.MOB_EFFECTS.getValues()) {
+                VisionHandler.getVisionData(effect);
+            }
+        }
+        if (VminusModVariables.main_enchantment_vision != null) {
+            for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS.getValues()) {
+                VisionHandler.getVisionData(enchantment);
+            }
+        }
+        //Entities are not preloaded due to errors.
+    }
+    public static void clearCaches() {
         ITEM_VISION_KEY.clear();
         ITEM_VISION_CACHE.clear();
 
@@ -112,33 +135,7 @@ public class VisionHandler {
         ENCHANTMENT_VISION_CACHE.clear();
     }
 
-    @SubscribeEvent
-    public static void onWorldLoad(net.minecraftforge.event.level.LevelEvent.Load event) {
-        clearCaches();
-        // Preloading all caches for optimization
-        if (VminusModVariables.main_item_vision != null) {
-            for (Item item : ForgeRegistries.ITEMS.getValues()) {
-                ItemStack itemStack = new ItemStack(item);
-                getVisionData(itemStack);
-            }
-        }
-        if (VminusModVariables.main_block_vision != null) {
-            for (Block block : ForgeRegistries.BLOCKS.getValues()) {
-                getVisionData(block);
-            }
-        }
-        if (VminusModVariables.main_effect_vision != null) {
-            for (MobEffect effect : ForgeRegistries.MOB_EFFECTS.getValues()) {
-                getVisionData(effect);
-            }
-        }
-        if (VminusModVariables.main_enchantment_vision != null) {
-            for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS.getValues()) {
-                getVisionData(enchantment);
-            }
-        }
-        //Entities are not preloaded due to crashes of not having a world to generate the entity in.
-    }
+
 
     private static void cacheVision(Map<String, Integer> visionKey, CopyOnWriteArrayList<JsonObject> visionCache,
                                     JsonObject mergedData, String id) {
@@ -212,7 +209,7 @@ public class VisionHandler {
         String id = "";
         byte type = -1;
         if (debug)
-            VminusMod.LOGGER.info("______________DEBUGGING______________");
+            VMinusMod.LOGGER.info("______________DEBUGGING______________");
         // Determines the type of vision and gets the id of the feature, or if it already exists in the cache, then use that.
         if (itemstack != null)
             type = ITEM_TYPE;
@@ -225,7 +222,7 @@ public class VisionHandler {
         if (enchantment != null)
             type = ENCHANTMENT_TYPE;
         if (debug)
-            VminusMod.LOGGER.info("Type: " + type);
+            VMinusMod.LOGGER.info("Type: " + type);
         switch (type) {
             case ITEM_TYPE:
                 // items
@@ -272,11 +269,11 @@ public class VisionHandler {
                     return ENCHANTMENT_VISION_CACHE.get(ENCHANTMENT_VISION_KEY.get(id));
                 break;
             default:
-                VminusMod.LOGGER.warn("Vision type could not be found.");
+                VMinusMod.LOGGER.warn("Vision type could not be found.");
                 return null;
         }
         if (mainVision == null) {
-            VminusMod.LOGGER.warn("Main vision could not be found: " + id);
+            VMinusMod.LOGGER.warn("Main vision could not be found: " + id);
             return null;
         }
         JsonObject mergedData = new JsonObject();
@@ -299,7 +296,7 @@ public class VisionHandler {
         }
         if (mergedData.entrySet().isEmpty()) {
             if (debug)
-                VminusMod.LOGGER.warn("Merged data entry set is empty: " + id);
+                VMinusMod.LOGGER.warn("Merged data entry set is empty: " + id);
             return null;
         }
         return mergedData;

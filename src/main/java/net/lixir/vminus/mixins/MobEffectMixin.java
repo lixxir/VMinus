@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.core.VisionValueHelper;
 import net.lixir.vminus.core.VisionHandler;
-import net.lixir.vminus.VminusMod;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,7 +26,7 @@ public abstract class MobEffectMixin {
                 int colorInt = Integer.parseInt(color.substring(1), 16);
                 cir.setReturnValue(colorInt);
             } else {
-                VminusMod.LOGGER.warn("Mob Effect color must begin with a \"#\": " + effect);
+                VMinusMod.LOGGER.warn("Mob Effect color must begin with a \"#\": " + effect);
             }
         }
     }
@@ -53,7 +53,7 @@ public abstract class MobEffectMixin {
             case "neutral":
                 return MobEffectCategory.NEUTRAL;
             default:
-                VminusMod.LOGGER.warn("Unknown Mob Effect Category: " + category);
+                VMinusMod.LOGGER.warn("Unknown Mob Effect Category: " + category);
         }
         return null;
     }

@@ -1,7 +1,7 @@
 package net.lixir.vminus.network;
 
 import net.lixir.vminus.RequestFileGenerationPacket;
-import net.lixir.vminus.VminusMod;
+import net.lixir.vminus.VMinusMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +18,7 @@ public class ClientSideWorldLoaded {
         Entity entity = event.getEntity();
         if (entity instanceof Player && entity == Minecraft.getInstance().player) {
             //VminusMod.LOGGER.info("Sending RequestFileGenerationPacket to server...");
-            VminusMod.PACKET_HANDLER.sendToServer(new RequestFileGenerationPacket());
+            VMinusMod.PACKET_HANDLER.sendToServer(new RequestFileGenerationPacket());
             //VminusMod.LOGGER.info("Packet sent to server successfully.");
         }
     }

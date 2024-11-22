@@ -165,14 +165,14 @@ public abstract class ItemStackMixin {
                 if (startColorString != null)
                     startColor = Integer.decode(startColorString.trim());
             } catch (NumberFormatException e) {
-                VminusMod.LOGGER.error("Invalid start_color format: " + itemData.get("start_color").getAsString());
+                VMinusMod.LOGGER.error("Invalid start_color format: " + itemData.get("start_color").getAsString());
             }
             try {
                 String endColorString = VisionValueHelper.getFirstValidString(itemData, "bar", itemstack, "end_color");
                 if (endColorString != null)
                     endColor = Integer.decode(endColorString.trim());
             } catch (NumberFormatException e) {
-                VminusMod.LOGGER.error("Invalid end_color format: " + itemData.get("end_color").getAsString());
+                VMinusMod.LOGGER.error("Invalid end_color format: " + itemData.get("end_color").getAsString());
             }
             float durabilityRatio = (float) DurabilityHelper.getDurability(itemstack) / (float) DurabilityHelper.getDurability(true, itemstack);
             int transitionColor = interpolateColor(endColor, startColor, durabilityRatio);
