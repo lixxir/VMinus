@@ -29,19 +29,28 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class VisionHandler {
-    // json caches
+    // json caches & keys for optimization
     private static final ConcurrentHashMap<String, Integer> ITEM_VISION_KEY = new ConcurrentHashMap<>();
     private static final CopyOnWriteArrayList<JsonObject> ITEM_VISION_CACHE = new CopyOnWriteArrayList<>();
-    private static final ConcurrentHashMap<String, JsonObject> BLOCK_VISION_CACHE = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, JsonObject> ENTITY_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
-    private static final ConcurrentHashMap<String, JsonObject> EFFECT_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
-    private static final ConcurrentHashMap<String, JsonObject> ENCHANTMENT_VISION_CACHE = new ConcurrentHashMap<String, JsonObject>();
+    private static final ConcurrentHashMap<String, Integer> BLOCK_VISION_KEY = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<JsonObject> BLOCK_VISION_CACHE = new CopyOnWriteArrayList<>();
+    private static final ConcurrentHashMap<String, Integer> ENTITY_VISION_KEY = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<JsonObject> ENTITY_VISION_CACHE = new CopyOnWriteArrayList<>();
+    private static final ConcurrentHashMap<String, Integer> EFFECT_VISION_KEY = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<JsonObject> EFFECT_VISION_CACHE = new CopyOnWriteArrayList<>();
+    private static final ConcurrentHashMap<String, Integer> ENCHANTMENT_VISION_KEY = new ConcurrentHashMap<>();
+    private static final CopyOnWriteArrayList<JsonObject> ENCHANTMENT_VISION_CACHE = new CopyOnWriteArrayList<>();
+
     // tag & resource location caches
-    private static final ConcurrentHashMap<String, ResourceLocation> resourceLocationCache = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, TagKey<EntityType<?>>> entityTagCache = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, TagKey<Block>> blockTagCache = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, TagKey<Item>> itemTagCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ResourceLocation> RESOURCE_LOCATION_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<EntityType<?>>> ENTITY_TAG_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<Block>> BLOCK_TAG_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, TagKey<Item>> ITEM_TAG_CACHE = new ConcurrentHashMap<>();
     public static final int ITEM_TYPE = 0;
+    public static final int BLOCK_TYPE = 1;
+    public static final int ENTITY_TYPE = 2;
+    public static final int EFFECT_TYPE = 3;
+    public static final int ENCHANTMENT_TYPE = 4;
 
     public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
         return ITEM_VISION_KEY;
@@ -90,68 +99,77 @@ public class VisionHandler {
     private static void clearCaches() {
         ITEM_VISION_KEY.clear();
         ITEM_VISION_CACHE.clear();
-        /*
-        BLOCK_VISION_CACHE.clear();
-        ENTITY_VISION_CACHE.clear();
-        EFFECT_VISION_CACHE.clear();
-        ENCHANTMENT_VISION_CACHE.clear();
 
-         */
+        BLOCK_VISION_KEY.clear();
+        BLOCK_VISION_CACHE.clear();
+
+        ENTITY_VISION_KEY.clear();
+        ENTITY_VISION_CACHE.clear();
+
+        EFFECT_VISION_KEY.clear();
+        EFFECT_VISION_CACHE.clear();
+
+        ENCHANTMENT_VISION_KEY.clear();
+        ENCHANTMENT_VISION_CACHE.clear();
     }
 
     @SubscribeEvent
     public static void onWorldLoad(net.minecraftforge.event.level.LevelEvent.Load event) {
+        clearCaches();
+       // Preloading all caches for optimization
         if (VminusModVariables.main_item_vision != null) {
 			for (Item item : ForgeRegistries.ITEMS.getValues()) {
 				ItemStack itemStack = new ItemStack(item);
 				getVisionData(itemStack);
 			}
 		}
-		// VminusMod.LOGGER.info("PRE-LOADED CACHE:" + itemVisionKey);
-        /*
 		if (VminusModVariables.main_block_vision != null) {
 			for (Block block : ForgeRegistries.BLOCKS.getValues()) {
 				getVisionData(block);
 			}
 		}
-		// VminusMod.LOGGER.info("PRE-LOADED CACHE:" + blockVisionKey);
 		if (VminusModVariables.main_effect_vision != null) {
 			for (MobEffect effect : ForgeRegistries.MOB_EFFECTS.getValues()) {
 				getVisionData(effect);
 			}
 		}
-		// VminusMod.LOGGER.info("PRE-LOADED CACHE:" + effectVisionKey);
 		if (VminusModVariables.main_enchantment_vision != null) {
 			for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS.getValues()) {
 				getVisionData(enchantment);
 			}
 		}
 	    //Entities are not preloaded due to crashes of not having a world to generate the entity in.
-         */
-		//VminusMod.LOGGER.info("PRE-LOADED KEY:" + ITEM_VISION_KEY);
-        //VminusMod.LOGGER.info("PRE-LOADED CACHE:" + ITEM_VISION_CACHE);
     }
-
+    private static void cacheVision(Map<String, Integer> visionKey, CopyOnWriteArrayList<JsonObject> visionCache,
+                                    JsonObject mergedData, String id) {
+        if (mergedData != null && !mergedData.entrySet().isEmpty()) {
+            int index = visionCache.indexOf(mergedData);
+            if (index == -1) {
+                visionCache.add(mergedData);
+                index = visionCache.size() - 1;
+            }
+            if (!visionKey.containsKey(id)) {
+                visionKey.put(id, index);
+            }
+        }
+    }
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
         JsonObject mainVision = null;
         String id = "";
         byte type = -1;
-        //getting the registery ids of the different objects
         if (debug)
             VminusMod.LOGGER.info("______________DEBUGGING______________");
+        // Determines the type of vision and gets the id of the feature, or if it already exists in the cache, then use that.
         if (itemstack != null)
             type = ITEM_TYPE;
         if (block != null)
-            type = 1;
+            type = BLOCK_TYPE;
         if (entity != null)
-            type = 2;
+            type = ENTITY_TYPE;
         if (effect != null)
-            type = 3;
-        if (enchantment != null) {
-            if (debug)
-                VminusMod.LOGGER.info("Enchantment is not null: " + enchantment);
-            type = 4;
-        }
+            type = EFFECT_TYPE;
+        if (enchantment != null)
+            type = ENCHANTMENT_TYPE;
         if (debug)
             VminusMod.LOGGER.info("Type: " + type);
         switch (type) {
@@ -163,45 +181,41 @@ public class VisionHandler {
                 } else {
                     id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
                 }
+
                 if (ITEM_VISION_KEY.containsKey(id))
                 	return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
                 break;
-            case 1:
+            case BLOCK_TYPE:
                 // blocks
                 mainVision = VminusModVariables.main_block_vision;
                 id = ForgeRegistries.BLOCKS.getKey(block).toString();
-                //if (blockVisionKey.containsKey(id))
-                //	return blockVisionKey.get(id);
+
+                if (BLOCK_VISION_KEY.containsKey(id))
+                    return BLOCK_VISION_CACHE.get(BLOCK_VISION_KEY.get(id));
                 break;
-            case 2:
+            case ENTITY_TYPE:
                 // entities
                 mainVision = VminusModVariables.main_entity_vision;
                 id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-                //if (entityVisionKey.containsKey(id))
-                //	return entityVisionKey.get(id);
+
+                if (ENTITY_VISION_KEY.containsKey(id))
+                    return ENTITY_VISION_CACHE.get(ENTITY_VISION_KEY.get(id));
                 break;
-            case 3:
+            case EFFECT_TYPE:
                 // effects
                 mainVision = VminusModVariables.main_effect_vision;
                 id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
-                //if (effectVisionKey.containsKey(id))
-                //	return effectVisionKey.get(id);
+
+                if (EFFECT_VISION_KEY.containsKey(id))
+                    return EFFECT_VISION_CACHE.get(EFFECT_VISION_KEY.get(id));
                 break;
-            case 4:
+            case ENCHANTMENT_TYPE:
                 // enchantments
                 mainVision = VminusModVariables.main_enchantment_vision;
-                if (debug)
-                    VminusMod.LOGGER.info("Found main enchantment vision: " + mainVision);
                 id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-                if (debug)
-                    VminusMod.LOGGER.info("Found enchantment id: " + id);
-				/*
-								if (enchantmentVisionKey.containsKey(id)) {
-									if (debug == true)
-										VminusMod.LOGGER.info("Enchantment Vision Key has: " + id);
-									return enchantmentVisionKey.get(id);
-								}
-				*/
+
+                if (ENCHANTMENT_VISION_KEY.containsKey(id))
+                    return ENCHANTMENT_VISION_CACHE.get(ENCHANTMENT_VISION_KEY.get(id));
                 break;
             default:
                 VminusMod.LOGGER.warn("Vision type could not be found.");
@@ -211,7 +225,6 @@ public class VisionHandler {
             VminusMod.LOGGER.warn("Main vision could not be found: " + id);
             return null;
         }
-        // checks the caches to see if the json object was already merged and added before
         JsonObject mergedData = new JsonObject();
         // merge id-specific data
         if (mainVision.has(id)) {
@@ -231,7 +244,7 @@ public class VisionHandler {
                     }
                 }
                 break;
-            case 1:
+            case BLOCK_TYPE:
                 // blocks tags
                 for (String key : mainVision.keySet()) {
                     if (key.startsWith("#") && isBlockTagged(block, key)) {
@@ -240,7 +253,7 @@ public class VisionHandler {
                     }
                 }
                 break;
-            case 2:
+            case ENTITY_TYPE:
                 // entities type tags
                 for (String key : mainVision.keySet()) {
                     if (key.startsWith("#") && isEntityTagged(entity, key)) {
@@ -259,29 +272,16 @@ public class VisionHandler {
         }
         if (mergedData != null && !mergedData.entrySet().isEmpty()) {
             if (itemstack != null) {
-                int index = ITEM_VISION_CACHE.indexOf(mergedData);
-                if (index == -1) {
-                    ITEM_VISION_CACHE.add(mergedData);
-                    index = ITEM_VISION_CACHE.size() - 1;
-                }
-                if (!ITEM_VISION_KEY.containsKey(id))
-                    ITEM_VISION_KEY.put(id, index);
+                cacheVision(ITEM_VISION_KEY, ITEM_VISION_CACHE, mergedData, id);
+            } else if (block != null) {
+                cacheVision(BLOCK_VISION_KEY, BLOCK_VISION_CACHE, mergedData, id);
+            } else if (entity != null) {
+                cacheVision(ENTITY_VISION_KEY, ENTITY_VISION_CACHE, mergedData, id);
+            } else if (effect != null) {
+                cacheVision(EFFECT_VISION_KEY, EFFECT_VISION_CACHE, mergedData, id);
+            } else if (enchantment != null) {
+                cacheVision(ENCHANTMENT_VISION_KEY, ENCHANTMENT_VISION_CACHE, mergedData, id);
             }
-        }
-
-        if (block != null && !BLOCK_VISION_CACHE.containsKey(id))
-            BLOCK_VISION_CACHE.put(id, mergedData);
-
-        if (entity != null && !ENTITY_VISION_CACHE.containsKey(id))
-            ENTITY_VISION_CACHE.put(id, mergedData);
-
-        if (effect != null && !EFFECT_VISION_CACHE.containsKey(id))
-            EFFECT_VISION_CACHE.put(id, mergedData);
-
-        if (enchantment != null && !ENCHANTMENT_VISION_CACHE.containsKey(id)) {
-            if (debug)
-                VminusMod.LOGGER.info("Enchantment vision key adding: " + id);
-            ENCHANTMENT_VISION_CACHE.put(id, mergedData);
         }
         if (mergedData.entrySet().isEmpty()) {
             if (debug)
@@ -292,25 +292,25 @@ public class VisionHandler {
     }
 
     private static ResourceLocation getOrCreateResourceLocation(String tagNamespace) {
-        return resourceLocationCache.computeIfAbsent(tagNamespace, ResourceLocation::new);
+        return RESOURCE_LOCATION_CACHE.computeIfAbsent(tagNamespace, ResourceLocation::new);
     }
 
     private static boolean isItemTagged(ItemStack itemstack, String tag) {
         String tagNamespace = tag.substring(1);
-        TagKey<Item> itemTag = itemTagCache.computeIfAbsent(tagNamespace, ns -> ItemTags.create(getOrCreateResourceLocation(ns)));
+        TagKey<Item> itemTag = ITEM_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> ItemTags.create(getOrCreateResourceLocation(ns)));
         return itemstack.is(itemTag);
     }
 
     private static boolean isBlockTagged(Block block, String tag) {
         String tagNamespace = tag.substring(1);
         BlockState blockstate = block.defaultBlockState();
-        TagKey<Block> blockTag = blockTagCache.computeIfAbsent(tagNamespace, ns -> BlockTags.create(getOrCreateResourceLocation(ns)));
+        TagKey<Block> blockTag = BLOCK_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> BlockTags.create(getOrCreateResourceLocation(ns)));
         return blockstate.is(blockTag);
     }
 
     private static boolean isEntityTagged(Entity entity, String tag) {
         String tagNamespace = tag.substring(1);
-        TagKey<EntityType<?>> entityTag = entityTagCache.computeIfAbsent(tagNamespace, ns -> TagKey.create(Registries.ENTITY_TYPE, getOrCreateResourceLocation(ns)));
+        TagKey<EntityType<?>> entityTag = ENTITY_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> TagKey.create(Registries.ENTITY_TYPE, getOrCreateResourceLocation(ns)));
         return entity.getType().is(entityTag);
     }
 
