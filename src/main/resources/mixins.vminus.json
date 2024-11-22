@@ -53,6 +53,7 @@
     "enchantments.SwiftSneakEnchantmentMixin",
     "enchantments.ThornsEnchantmentMixin",
     "enchantments.TridentImpalerEnchantmentMixin",
+    "enchantments.ProtectionEnchantmentMixin",
     "enchantments.TridentLoyaltyEnchantmentMixin",
     "enchantments.TridentRiptideEnchantmentMixin",
     "enchantments.VanishingCurseEnchantmentMixin",
