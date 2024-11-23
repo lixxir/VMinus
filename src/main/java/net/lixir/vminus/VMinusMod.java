@@ -4,8 +4,12 @@ import net.lixir.vminus.init.VminusModBlocks;
 import net.lixir.vminus.init.VminusModEntities;
 import net.lixir.vminus.init.VminusModItems;
 import net.lixir.vminus.init.VminusModMenus;
+import net.lixir.vminus.network.mob_variants.MobVariantSyncPacket;
+import net.lixir.vminus.network.mob_variants.MobVariantSyncPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -15,6 +19,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +38,12 @@ public class VMinusMod {
     public static final Logger LOGGER = LogManager.getLogger(VMinusMod.class);
     public static final String MODID = "vminus";
     private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel PACKET_HANDLER = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals);
+    public static final SimpleChannel PACKET_HANDLER = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(MODID, "network_channel"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
     private static int messageID = 0;
 
@@ -44,9 +54,24 @@ public class VMinusMod {
         VminusModItems.REGISTRY.register(bus);
         VminusModEntities.REGISTRY.register(bus);
         VminusModMenus.REGISTRY.register(bus);
+
+        // Register network messages
+        registerNetworkMessages();
     }
 
-    public static <T> void addNetworkMessage(Class<T> messageType, BiConsumer<T, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, T> decoder, BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
+    private void registerNetworkMessages() {
+        addNetworkMessage(
+                MobVariantSyncPacket.class,
+                MobVariantSyncPacket::encode,
+                MobVariantSyncPacket::decode,
+                MobVariantSyncPacketHandler::handle
+        );
+    }
+
+    public static <T> void addNetworkMessage(Class<T> messageType,
+                                             BiConsumer<T, FriendlyByteBuf> encoder,
+                                             Function<FriendlyByteBuf, T> decoder,
+                                             BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
         PACKET_HANDLER.registerMessage(messageID, messageType, encoder, decoder, messageConsumer);
         messageID++;
     }
@@ -68,5 +93,17 @@ public class VMinusMod {
             actions.forEach(e -> e.getKey().run());
             workQueue.removeAll(actions);
         }
+    }
+
+    public static void sendToAllClients(Object message) {
+        PACKET_HANDLER.send(PacketDistributor.ALL.noArg(), message);
+    }
+
+    public static void sendToTrackingEntity(Entity entity, Object message) {
+        PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
+    }
+
+    public static void sendToPlayer(ServerPlayer player, Object message) {
+        PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 }

@@ -13,6 +13,7 @@
     "blocks.CocaoBlockMixin",
     "blocks.PowderSnowBlockMixin",
     "client.HorseArmorLayerMixin",
+    "client.AbstractZombieRendererMixin",
     "enchantments.ArrowDamageEnchantmentMixin",
     "enchantments.ArrowKnockbackEnchantmentMixin",
     "enchantments.ArrowPiercingEnchantmentMixin",
