@@ -378,6 +378,7 @@ public class VisionValueHelper {
             }
         }
         if (entity != null) {
+            CompoundTag persistentData = entity.getPersistentData();
             if (conditions.has("in_dimension")) {
                 ResourceLocation dimensionLocation = entity.level().dimension().location();
                 String dimensionId = conditions.get("in_dimension").getAsString();
@@ -413,6 +414,106 @@ public class VisionValueHelper {
                 double zVal = conditions.get("get_z").getAsDouble();
                 boolean inverted = checkInverted(conditions);
                 if ((entity.getZ() > zVal) == inverted) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("get_integer_tag")) {
+                JsonObject getIntTag = conditions.getAsJsonObject("get_integer_tag");
+                String tagName = getIntTag.get("name").getAsString();
+                int expectedValue = getIntTag.get("value").getAsInt();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_INT)) {
+                    int nbtValue = persistentData.getInt(tagName);
+                    if ((nbtValue == expectedValue) == isNegated) {
+                        return false;
+                    }
+                } else if (!isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("get_double_tag")) {
+                JsonObject getDoubleTag = conditions.getAsJsonObject("get_double_tag");
+                String tagName = getDoubleTag.get("name").getAsString();
+                double expectedValue = getDoubleTag.get("value").getAsDouble();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_DOUBLE)) {
+                    double nbtValue = persistentData.getDouble(tagName);
+                    if ((nbtValue == expectedValue) == isNegated) {
+                        return false;
+                    }
+                } else if (!isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("get_string_tag")) {
+                JsonObject getStringTag = conditions.getAsJsonObject("get_string_tag");
+                String tagName = getStringTag.get("name").getAsString();
+                String expectedValue = getStringTag.get("value").getAsString();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_STRING)) {
+                    String nbtValue = persistentData.getString(tagName);
+                    if ((nbtValue.equals(expectedValue)) == isNegated) {
+                        return false;
+                    }
+                } else if (!isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("get_boolean_tag")) {
+                JsonObject getBooleanTag = conditions.getAsJsonObject("get_boolean_tag");
+                String tagName = getBooleanTag.get("name").getAsString();
+                boolean expectedValue = getBooleanTag.get("value").getAsBoolean();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_BYTE)) {
+                    boolean nbtValue = persistentData.getBoolean(tagName);
+                    if ((nbtValue == expectedValue) == isNegated) {
+                        return false;
+                    }
+                } else if (!isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("has_integer_tag")) {
+                String tagName = conditions.get("has_integer_tag").getAsString();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_INT) == isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("has_double_tag")) {
+                String tagName = conditions.get("has_double_tag").getAsString();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_DOUBLE) == isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("has_string_tag")) {
+                String tagName = conditions.get("has_string_tag").getAsString();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_STRING) == isNegated) {
+                    return false;
+                }
+            }
+
+            if (conditions.has("has_boolean_tag")) {
+                String tagName = conditions.get("has_boolean_tag").getAsString();
+                boolean isNegated = checkInverted(conditions);
+
+                if (persistentData.contains(tagName, Tag.TAG_BYTE) == isNegated) {
                     return false;
                 }
             }

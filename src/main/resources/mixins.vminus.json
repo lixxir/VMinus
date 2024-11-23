@@ -13,7 +13,7 @@
     "blocks.CocaoBlockMixin",
     "blocks.PowderSnowBlockMixin",
     "client.HorseArmorLayerMixin",
-    "client.AbstractZombieRendererMixin",
+    "client.entityrenderers.AbstractZombieRendererMixin",
     "enchantments.ArrowDamageEnchantmentMixin",
     "enchantments.ArrowKnockbackEnchantmentMixin",
     "enchantments.ArrowPiercingEnchantmentMixin",
@@ -63,7 +63,7 @@
   "client": [
     "client.AbstractClientPlayerMixin",
     "client.CapeLayerMixin",
-    "client.EntityRendererMixin",
+    "client.entityrenderers.EntityRendererMixin",
     "client.GuiGraphicsMixin"
   ],
   "minVersion": "0.8"
