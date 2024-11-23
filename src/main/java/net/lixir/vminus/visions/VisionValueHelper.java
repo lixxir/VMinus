@@ -4,10 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.NumberUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -15,6 +18,7 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -99,28 +103,6 @@ public class VisionValueHelper {
             }
         }
         return builder.build();
-    }
-
-    private static JsonObject getFirstMatchingElement(JsonObject visionData, String checkFor, ItemStack itemstack, Block block, Entity entity, String value) {
-        visionData = getVisionData(visionData, itemstack, block, entity);
-        if (checkValidParams(visionData, checkFor)) {
-            JsonElement dataElement = visionData.get(checkFor);
-            if (dataElement.isJsonArray()) {
-                JsonArray dataArray = dataElement.getAsJsonArray();
-                for (JsonElement element : dataArray) {
-                    JsonObject dataObject = element.getAsJsonObject();
-                    if (checkConditions(dataObject, itemstack, block, entity) && dataObject.has(value)) {
-                        return dataObject;
-                    }
-                }
-            } else if (dataElement.isJsonObject()) {
-                JsonObject dataObject = dataElement.getAsJsonObject();
-                if (checkConditions(dataObject, itemstack, block, entity) && dataObject.has(value)) {
-                    return dataObject;
-                }
-            }
-        }
-        return null;
     }
 
     public static <T extends Number> T isNumberMet(@Nullable JsonObject visionData, String checkFor, T defaultValue) {
@@ -357,29 +339,26 @@ public class VisionValueHelper {
     public static boolean checkConditions(JsonObject conditionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         boolean conditionsMet = true;
         if (conditionData.has("conditions")) {
+            System.out.println("has condition");
             JsonElement conditionsElement = conditionData.get("conditions");
-
             if (conditionsElement.isJsonArray()) {
                 JsonArray conditions = conditionsElement.getAsJsonArray();
                 for (JsonElement conditionElement : conditions) {
                     JsonObject condition = conditionElement.getAsJsonObject();
-                    conditionsMet = conditionsMet && evaluateConditions(condition, itemstack, block, entity);
+                    conditionsMet = evaluateConditions(condition, itemstack, block, entity);
                     if (!conditionsMet)
                         break;
                 }
-            }
-
-            else if (conditionsElement.isJsonObject()) {
+            } else if (conditionsElement.isJsonObject()) {
                 JsonObject condition = conditionsElement.getAsJsonObject();
                 conditionsMet = evaluateConditions(condition, itemstack, block, entity);
-            }
-
-            else {
+            } else {
                 conditionsMet = false;
             }
         }
         return conditionsMet;
     }
+
 
 
     public static boolean checkInverted(JsonObject conditions) {
@@ -404,6 +383,15 @@ public class VisionValueHelper {
                 String dimensionId = conditions.get("in_dimension").getAsString();
                 boolean inverted = checkInverted(conditions);
                 if (inverted == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
+                    return false;
+                }
+            }
+            if (conditions.has("in_biome_tag")) {
+                String biomeId = conditions.get("in_biome_tag").getAsString();
+                LevelAccessor level = entity.level();
+                BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ())
+                boolean inverted = checkInverted(conditions);
+                if (inverted == level.getBiome(pos).is(TagKey.create(Registries.BIOME, new ResourceLocation(biomeId)))) {
                     return false;
                 }
             }
@@ -774,14 +762,20 @@ public class VisionValueHelper {
         }
         return values;
     }
-
     public static List<String> getListOfStrings(JsonObject itemData, String checkFor, @Nullable Entity entity) {
+        return getListOfStrings(itemData,checkFor,"value",entity);
+    }
+    public static List<String> getListOfStrings(JsonObject itemData, String checkFor, String valueString, @Nullable Entity entity) {
         JsonArray jsonArray = itemData.getAsJsonArray(checkFor);
         List<String> validValues = new ArrayList<>();
         for (JsonElement element : jsonArray) {
             JsonObject jsonObject = element.getAsJsonObject();
-            if (checkConditions(jsonObject, entity) && jsonObject.has("value")) {
-                validValues.add(jsonObject.get("value").getAsString());
+            if (checkConditions(jsonObject, entity) && jsonObject.has(valueString)) {
+                int weight = 1;
+                if (jsonObject.has("weight"))
+                    weight = jsonObject.get("weight").getAsInt();
+                for (int i = 0; i < weight; i++)
+                    validValues.add(jsonObject.get(valueString).getAsString());
             }
         }
         return validValues;

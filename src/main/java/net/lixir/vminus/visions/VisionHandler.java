@@ -53,9 +53,14 @@ public class VisionHandler {
     public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
         return ITEM_VISION_KEY;
     }
-
     public static CopyOnWriteArrayList<JsonObject> getItemVisionCache() {
         return ITEM_VISION_CACHE;
+    }
+    public static ConcurrentHashMap<String, Integer> getEntityVisionKey() {
+        return ENTITY_VISION_KEY;
+    }
+    public static CopyOnWriteArrayList<JsonObject> getEntityVisionCache() {
+        return ENTITY_VISION_CACHE;
     }
 
     public static JsonObject getVisionData(ItemStack itemstack) {
@@ -230,8 +235,8 @@ public class VisionHandler {
     }
 
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
-        JsonObject mainVision = null;
-        String id = "";
+        JsonObject mainVision;
+        String id;
         byte type = -1;
         if (debug)
             VMinusMod.LOGGER.info("______________DEBUGGING______________");
@@ -248,6 +253,8 @@ public class VisionHandler {
             type = ENCHANTMENT_TYPE;
         if (debug)
             VMinusMod.LOGGER.info("Type: " + type);
+        if (type == -1)
+            return null;
         switch (type) {
             case ITEM_TYPE:
                 // items
@@ -257,7 +264,6 @@ public class VisionHandler {
                 } else {
                     id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
                 }
-
                 if (ITEM_VISION_KEY.containsKey(id))
                     return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
                 break;
@@ -306,15 +312,14 @@ public class VisionHandler {
         for (String key : mainVision.keySet())
             mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
         // cache any uncached data
-        boolean validConditions = true;
+        boolean validConditions;
         boolean wasNull = false;
-        if (mergedData.has("conditions"))
-            validConditions = VisionValueHelper.checkConditions(mergedData, itemstack, block, entity);
         if (mergedData == null) {
             wasNull = true;
             mergedData = new JsonObject();
         }
-        if (mergedData != null && !mergedData.entrySet().isEmpty()) {
+        validConditions = VisionValueHelper.checkConditions(mergedData, itemstack, block, entity);
+        if (!mergedData.entrySet().isEmpty()) {
             if (itemstack != null) {
                 cacheVision(ITEM_VISION_KEY, ITEM_VISION_CACHE, mergedData, id);
             } else if (block != null) {

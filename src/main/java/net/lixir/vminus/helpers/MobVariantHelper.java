@@ -1,7 +1,6 @@
 package net.lixir.vminus.helpers;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -10,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class VariantHelper {
+public class MobVariantHelper {
     public static String setOrGetVariant(Entity entity, JsonObject visionData) {
         String chosenVariant = entity.getPersistentData().getString("variant");
         if (chosenVariant.isEmpty()) {

@@ -4,7 +4,7 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.helpers.VariantHelper;
+import net.lixir.vminus.helpers.MobVariantHelper;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.network.capes.SetCapePacket;
@@ -101,8 +101,11 @@ public class VMinusEvents {
         System.out.println("Joined: " + entity);
 
         if (visionData != null && visionData.has("variants")) {
-            final String chosenVariant = VariantHelper.setOrGetVariant(entity, visionData);
+            final String chosenVariant = MobVariantHelper.setOrGetVariant(entity, visionData);
 
+
+            /* Have to have the first one without a delay for when it first spawns,
+             and another one with a delay on rejoin so that it works */
             serverLevel.getServer().execute(() -> {
                 VMinusMod.PACKET_HANDLER.send(
                         PacketDistributor.TRACKING_ENTITY.with(() -> entity),
