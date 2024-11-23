@@ -98,12 +98,9 @@ public class VMinusEvents {
 
         Entity entity = event.getEntity();
         JsonObject visionData = VisionHandler.getVisionData(entity);
-        System.out.println("Joined: " + entity);
 
         if (visionData != null && visionData.has("variants")) {
             final String chosenVariant = MobVariantHelper.setOrGetVariant(entity, visionData);
-
-
             /* Have to have the first one without a delay for when it first spawns,
              and another one with a delay on rejoin so that it works */
             serverLevel.getServer().execute(() -> {
@@ -151,7 +148,6 @@ public class VMinusEvents {
             if (sourceentity != null && !(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
                 mainhandItem = (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY);
                 directEntity = damagesource.getDirectEntity();
-                System.out.println(mainhandItem);
                 if (!mainhandItem.isEmpty() && mainhandItem.isEnchanted()) {
                     if (((isModLoaded("detour") && (sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) >= 0.75) || !isModLoaded("detour"))
                             || !(sourceentity instanceof Player) || directEntity == null

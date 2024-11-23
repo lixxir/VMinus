@@ -17,7 +17,6 @@ public class MobVariantSyncPacketHandler {
             if (mc.level != null) {
                 Entity entity = mc.level.getEntity(packet.entityId());
                 if (entity != null) {
-                    VMinusMod.LOGGER.info("Entity ID {} found on client. Syncing variant: {}", entity.getId(), packet.variant());
                     entity.getPersistentData().putString("variant", packet.variant());
                 } else {
                     VMinusMod.LOGGER.warn("Entity ID {} not found on client.", packet.entityId());
