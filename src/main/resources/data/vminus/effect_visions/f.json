@@ -1,7 +1,0 @@
-{
-  "minecraft:regeneration": {
-    "color": "#62a2fc",
-    "particle": "minecraft:angry_villager",
-    "banned": true
-  }
-}
