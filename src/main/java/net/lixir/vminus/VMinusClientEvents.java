@@ -1,6 +1,7 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.helpers.VariantHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -25,7 +27,7 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class VMinusClientEvents {
     // Requesting to accumulate all the stored jsons on the server-side for visions.
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Player && entity == Minecraft.getInstance().player) {

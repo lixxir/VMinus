@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.helpers.VariantHelper;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.network.capes.SetCapePacket;
@@ -76,47 +77,50 @@ public class VMinusEvents {
         // Loading all visions for optimization
         VisionHandler.clearCaches();
         VisionHandler.loadVisions();
+        LevelAccessor level = event.getLevel();
     }
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerLoggedInEvent event) {
-        ServerPlayer newPlayer = (ServerPlayer) event.getEntity();
-        for (ServerPlayer otherPlayer : newPlayer.server.getPlayerList().getPlayers()) {
+        ServerPlayer serverPlayer = (ServerPlayer) event.getEntity();
+        ServerLevel serverLevel = serverPlayer.serverLevel();
+        for (ServerPlayer otherPlayer : serverPlayer.server.getPlayerList().getPlayers()) {
             otherPlayer.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
-                VMinusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, otherPlayer.getUUID()), newPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                VMinusMod.PACKET_HANDLER.sendTo(new SetCapePacket(capability.cape_id, otherPlayer.getUUID()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             });
         }
+
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
 
         Entity entity = event.getEntity();
         JsonObject visionData = VisionHandler.getVisionData(entity);
+        System.out.println("Joined: " + entity);
 
         if (visionData != null && visionData.has("variants")) {
+            final String chosenVariant = VariantHelper.setOrGetVariant(entity, visionData);
+
             serverLevel.getServer().execute(() -> {
-                String chosenVariant = setVariant(entity, visionData);
                 VMinusMod.PACKET_HANDLER.send(
                         PacketDistributor.TRACKING_ENTITY.with(() -> entity),
                         new MobVariantSyncPacket(entity.getId(), chosenVariant)
                 );
             });
+            VMinusMod.queueServerWork(1, () -> {
+                serverLevel.getServer().execute(() -> {
+                    VMinusMod.PACKET_HANDLER.send(
+                            PacketDistributor.TRACKING_ENTITY.with(() -> entity),
+                            new MobVariantSyncPacket(entity.getId(), chosenVariant)
+                    );
+                });
+            });
         }
+
     }
 
-    private static String setVariant(Entity entity, JsonObject visionData) {
-        String chosenVariant = entity.getPersistentData().getString("variant");
-        if (chosenVariant.isEmpty()) {
-            List<String> variants = VisionValueHelper.getListOfStrings(visionData, "variants", entity);
-            chosenVariant = !variants.isEmpty()
-                    ? variants.get(Mth.nextInt(RandomSource.create(), 0, variants.size() - 1))
-                    : "default";
-            entity.getPersistentData().putString("variant", chosenVariant);
-        }
-        return chosenVariant;
-    }
 
     @SubscribeEvent
     public static void onEntityAttacked(LivingAttackEvent event) {
@@ -329,7 +333,7 @@ public class VMinusEvents {
             }
         }
         if (itemData != null && itemData.has("nbt")) {
-            ItemStack copyStack = VisionValueHelper.setNbts(itemData, itemstack.copy());
+            ItemStack copyStack = VisionValueHelper.setNBTs(itemData, itemstack.copy());
             //System.out.println(itemData);
             CompoundTag copyTag = copyStack.getOrCreateTag();
             if (copyTag != null && !copyTag.isEmpty()) {
