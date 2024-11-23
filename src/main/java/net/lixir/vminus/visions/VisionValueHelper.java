@@ -390,7 +390,7 @@ public class VisionValueHelper {
             if (conditions.has("in_biome_tag")) {
                 String biomeId = conditions.get("in_biome_tag").getAsString();
                 LevelAccessor level = entity.level();
-                BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ())
+                BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ());
                 boolean inverted = checkInverted(conditions);
                 if (inverted == level.getBiome(pos).is(TagKey.create(Registries.BIOME, new ResourceLocation(biomeId)))) {
                     return false;
