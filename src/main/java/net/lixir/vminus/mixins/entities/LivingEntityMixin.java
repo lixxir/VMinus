@@ -16,6 +16,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -55,6 +56,22 @@ public abstract class LivingEntityMixin {
                     this.spawnItemParticles(itemstack, 5);
             }
             ci.cancel();
+        }
+    }
+
+    // Automatic custom loot tables for variants
+    @Inject(method = "getLootTable", at = @At("HEAD"), cancellable = true)
+    public void getLootTable(CallbackInfoReturnable<ResourceLocation> cir) {
+        if (entity.getPersistentData() != null) {
+            if (entity.getPersistentData().contains("variant")) {
+                String variant = entity.getPersistentData().getString("variant");
+                String entityName = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).getPath();
+                if (!variant.equals("normal")) {
+                    ResourceLocation customLoot = new ResourceLocation("vminus:entities/variant/" + entityName + "/" + variant);
+                    if (customLoot != null)
+                        cir.setReturnValue(customLoot);
+                }
+            }
         }
     }
 

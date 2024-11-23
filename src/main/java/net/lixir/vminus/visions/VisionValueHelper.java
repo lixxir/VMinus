@@ -44,10 +44,6 @@ public class VisionValueHelper {
         return modifiedValue;
     }
 
-    /*
-    TO DO:
-        - Effect visions should also just ban the effects from being in food properties
-     */
     public static FoodProperties getFoodProperties(JsonObject itemData, @Nullable ItemStack itemstack, @Nullable FoodProperties defaultProperties) {
         FoodProperties.Builder builder = new FoodProperties.Builder();
         if (itemData != null && itemData.has("food_properties")) {
@@ -286,62 +282,6 @@ public class VisionValueHelper {
         return null;
     }
 
-    public static boolean isStringMet(JsonObject itemData, String param, @Nullable ItemStack itemstack) {
-        String stringResult = null;
-        if (itemData == null)
-            itemData = VisionHandler.getVisionData(itemstack);
-        if (checkValidParams(itemData, param)) {
-            JsonArray conditionArray = itemData.getAsJsonArray(param);
-            for (JsonElement element : conditionArray) {
-                JsonObject elementObject = element.getAsJsonObject();
-                if (checkConditions(elementObject, itemstack) && elementObject.has("value")) {
-                    stringResult = elementObject.get("value").getAsString();
-                }
-            }
-        }
-        if (stringResult == null) {
-            return false;
-        }
-        //if (itemstack != null && itemstack.hasTag()) {
-        //	CompoundTag nbt = itemstack.getTag();
-        //	return nbt.contains(param, Tag.TAG_STRING) && nbt.getString(param).equals(stringResult);
-        //}
-        return false;
-    }
-
-    public static Map<String, Object> getBlockStateSetters(JsonObject blockData, String blockTag) {
-        Map<String, Object> blockStateSetters = new HashMap<>();
-        if (blockData.has(blockTag)) {
-            JsonObject blockStates = blockData.getAsJsonObject(blockTag);
-            if (blockStates.has("place_blockstate")) {
-                JsonArray blockStateArray = blockStates.getAsJsonArray("place_blockstate");
-                for (JsonElement element : blockStateArray) {
-                    JsonObject stateObject = element.getAsJsonObject();
-                    if (stateObject.has("name") && stateObject.has("value") && stateObject.has("type")) {
-                        String name = stateObject.get("name").getAsString();
-                        String type = stateObject.get("type").getAsString();
-                        Object value;
-                        switch (type) {
-                            case "boolean":
-                                value = stateObject.get("value").getAsBoolean();
-                                break;
-                            case "int":
-                                value = stateObject.get("value").getAsInt();
-                                break;
-                            case "enum":
-                                value = stateObject.get("value").getAsString();
-                                break;
-                            default:
-                                throw new IllegalArgumentException("Unsupported block state type: " + type);
-                        }
-                        blockStateSetters.put(name, value);
-                    }
-                }
-            }
-        }
-        return blockStateSetters;
-    }
-
     public static Boolean checkValidParams(@Nullable JsonObject itemData, @Nullable String param) {
         if (itemData != null) {
             return itemData.has(param);
@@ -455,8 +395,8 @@ public class VisionValueHelper {
             if (conditions.has("in_dimension")) {
                 ResourceLocation dimensionLocation = entity.level().dimension().location();
                 String dimensionId = conditions.get("in_dimension").getAsString();
-                boolean isNegated = checkInverted(conditions);
-                if (isNegated == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
+                boolean IsInverted = checkInverted(conditions);
+                if (IsInverted == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
                     return false;
                 }
             }
@@ -830,7 +770,17 @@ public class VisionValueHelper {
         }
         return attributes;
     }
-
+    public static List<String> getListOfStrings(JsonObject itemData, String checkFor, @Nullable Entity entity) {
+        JsonArray jsonArray = itemData.getAsJsonArray(checkFor);
+        List<String> validValues = new ArrayList<>();
+        for (JsonElement element : jsonArray) {
+            JsonObject jsonObject = element.getAsJsonObject();
+            if (checkConditions(jsonObject, entity) && jsonObject.has("value")) {
+                validValues.add(jsonObject.get("value").getAsString());
+            }
+        }
+        return validValues;
+    }
     public static String getRarity(JsonObject itemData, ItemStack itemstack, String defaultRarity) {
         String rarity = defaultRarity;
         JsonArray rarityArray = itemData.getAsJsonArray("rarity");

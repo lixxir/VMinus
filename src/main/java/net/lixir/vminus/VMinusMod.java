@@ -4,8 +4,8 @@ import net.lixir.vminus.init.VminusModBlocks;
 import net.lixir.vminus.init.VminusModEntities;
 import net.lixir.vminus.init.VminusModItems;
 import net.lixir.vminus.init.VminusModMenus;
-import net.lixir.vminus.network.mob_variants.MobVariantSyncPacket;
-import net.lixir.vminus.network.mob_variants.MobVariantSyncPacketHandler;
+import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
+import net.lixir.vminus.network.mobvariants.MobVariantSyncPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -95,15 +95,5 @@ public class VMinusMod {
         }
     }
 
-    public static void sendToAllClients(Object message) {
-        PACKET_HANDLER.send(PacketDistributor.ALL.noArg(), message);
-    }
 
-    public static void sendToTrackingEntity(Entity entity, Object message) {
-        PACKET_HANDLER.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
-    }
-
-    public static void sendToPlayer(ServerPlayer player, Object message) {
-        PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> player), message);
-    }
 }

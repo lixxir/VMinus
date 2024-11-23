@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
-import net.lixir.vminus.network.resource.SendJsonFilesPacket;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -22,32 +21,32 @@ public class SendJsonFilesPacketHandler {
     public static void handle(SendJsonFilesPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            if (packet.getType() == (byte) 0) {
-                itemJsonAccumulator.append(packet.getItemJsonChunk());
+            if (packet.type() == (byte) 0) {
+                itemJsonAccumulator.append(packet.itemJsonChunk());
                 if (packet.isLastChunk()) {
                     processReceivedJson(itemJsonAccumulator.toString(), (byte) 0);
                     itemJsonAccumulator.setLength(0);
                 }
-            } else if (packet.getType() == (byte) 1) {
-                blockJsonAccumulator.append(packet.getBlockJsonChunk());
+            } else if (packet.type() == (byte) 1) {
+                blockJsonAccumulator.append(packet.blockJsonChunk());
                 if (packet.isLastChunk()) {
                     processReceivedJson(blockJsonAccumulator.toString(), (byte) 1);
                     blockJsonAccumulator.setLength(0);
                 }
-            } else if (packet.getType() == (byte) 2) {
-                entityJsonAccumulator.append(packet.getEntityJsonChunk());
+            } else if (packet.type() == (byte) 2) {
+                entityJsonAccumulator.append(packet.entityJsonChunk());
                 if (packet.isLastChunk()) {
                     processReceivedJson(entityJsonAccumulator.toString(), (byte) 2);
                     blockJsonAccumulator.setLength(0);
                 }
-            } else if (packet.getType() == (byte) 3) {
-                effectJsonAccumulator.append(packet.getEffectJsonChunk());
+            } else if (packet.type() == (byte) 3) {
+                effectJsonAccumulator.append(packet.effectJsonChunk());
                 if (packet.isLastChunk()) {
                     processReceivedJson(effectJsonAccumulator.toString(), (byte) 3);
                     effectJsonAccumulator.setLength(0);
                 }
-            } else if (packet.getType() == (byte) 4) {
-                enchantmentJsonAccumulator.append(packet.getEnchantmentJsonChunk());
+            } else if (packet.type() == (byte) 4) {
+                enchantmentJsonAccumulator.append(packet.enchantmentJsonChunk());
                 if (packet.isLastChunk()) {
                     processReceivedJson(enchantmentJsonAccumulator.toString(), (byte) 4);
                     enchantmentJsonAccumulator.setLength(0);

@@ -7,24 +7,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class SendJsonFilesPacket {
-    private final String itemJsonChunk;
-    private final String blockJsonChunk;
-    private final String entityJsonChunk;
-    private final String effectJsonChunk;
-    private final String enchantmentJsonChunk;
-    private final boolean isLastChunk;
-    private final byte type;
-
-    public SendJsonFilesPacket(String itemJsonChunk, String blockJsonChunk, String entityJsonChunk, String effectJsonChunk, String enchantmentJsonChunk, boolean isLastChunk, byte type) {
-        this.itemJsonChunk = itemJsonChunk;
-        this.blockJsonChunk = blockJsonChunk;
-        this.entityJsonChunk = entityJsonChunk;
-        this.effectJsonChunk = effectJsonChunk;
-        this.enchantmentJsonChunk = enchantmentJsonChunk;
-        this.isLastChunk = isLastChunk;
-        this.type = type;
-    }
+public record SendJsonFilesPacket(String itemJsonChunk, String blockJsonChunk, String entityJsonChunk,
+                                  String effectJsonChunk, String enchantmentJsonChunk, boolean isLastChunk, byte type) {
 
     public static void encode(SendJsonFilesPacket packet, FriendlyByteBuf buffer) {
         buffer.writeUtf(packet.itemJsonChunk);
@@ -50,33 +34,5 @@ public class SendJsonFilesPacket {
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
         VMinusMod.addNetworkMessage(SendJsonFilesPacket.class, SendJsonFilesPacket::encode, SendJsonFilesPacket::decode, SendJsonFilesPacketHandler::handle);
-    }
-
-    public String getItemJsonChunk() {
-        return itemJsonChunk;
-    }
-
-    public String getBlockJsonChunk() {
-        return blockJsonChunk;
-    }
-
-    public String getEntityJsonChunk() {
-        return entityJsonChunk;
-    }
-
-    public String getEffectJsonChunk() {
-        return effectJsonChunk;
-    }
-
-    public String getEnchantmentJsonChunk() {
-        return enchantmentJsonChunk;
-    }
-
-    public boolean isLastChunk() {
-        return isLastChunk;
-    }
-
-    public byte getType() {
-        return type;
     }
 }

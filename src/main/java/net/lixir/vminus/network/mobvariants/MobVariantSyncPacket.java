@@ -1,4 +1,4 @@
-package net.lixir.vminus.network.mob_variants;
+package net.lixir.vminus.network.mobvariants;
 
 import net.lixir.vminus.VMinusMod;
 import net.minecraft.network.FriendlyByteBuf;
@@ -7,14 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class MobVariantSyncPacket {
-    private final int entityId;
-    private final String variant;
-
-    public MobVariantSyncPacket(int entityId, String variant) {
-        this.entityId = entityId;
-        this.variant = variant;
-    }
+public record MobVariantSyncPacket(int entityId, String variant) {
 
     public static void encode(MobVariantSyncPacket packet, FriendlyByteBuf buffer) {
         buffer.writeInt(packet.entityId);
@@ -33,13 +26,5 @@ public class MobVariantSyncPacket {
                 MobVariantSyncPacket::decode,
                 MobVariantSyncPacketHandler::handle
         );
-    }
-
-    public int getEntityId() {
-        return entityId;
-    }
-
-    public String getVariant() {
-        return variant;
     }
 }

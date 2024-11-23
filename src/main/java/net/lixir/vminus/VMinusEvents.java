@@ -7,21 +7,19 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.init.VminusModAttributes;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.network.capes.SetCapePacket;
-import net.lixir.vminus.network.mob_variants.MobVariantSyncPacket;
+import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.visions.ResourceVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,7 +28,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
@@ -38,7 +35,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -94,39 +90,32 @@ public class VMinusEvents {
 
     @SubscribeEvent
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel)) return;
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
 
         Entity entity = event.getEntity();
-        LevelAccessor world = event.getLevel();
-        double x = entity.getX();
-        double y = entity.getY();
-        double z = entity.getZ();
+        JsonObject visionData = VisionHandler.getVisionData(entity);
 
-        if (entity.getPersistentData().getString("variant").isEmpty()) {
-            List<String> variants = new ArrayList<>();
-            String chosenVariant = "";
-
-            if (entity instanceof Zombie) {
-                BlockPos pos = BlockPos.containing(x, y, z);
-               // if (world.getBiome(BlockPos.containing(x, y, z)).is(TagKey.create(Registries.BIOME, new ResourceLocation("detour:variants/zombie/snow_coat"))))
-                variants.add("normal");
-                variants.add("snow_coat");
-            }
-
-            if (!variants.isEmpty()) {
-                chosenVariant = variants.get(Mth.nextInt(RandomSource.create(), 0, variants.size()-1));
-                entity.getPersistentData().putString("variant", chosenVariant);
+        if (visionData != null && visionData.has("variants")) {
+            serverLevel.getServer().execute(() -> {
+                String chosenVariant = setVariant(entity, visionData);
                 VMinusMod.PACKET_HANDLER.send(
-                        PacketDistributor.ALL.noArg(),
+                        PacketDistributor.TRACKING_ENTITY.with(() -> entity),
                         new MobVariantSyncPacket(entity.getId(), chosenVariant)
                 );
-            }
-        } else {
-            VMinusMod.PACKET_HANDLER.send(
-                    PacketDistributor.ALL.noArg(),
-                    new MobVariantSyncPacket(entity.getId(),  entity.getPersistentData().getString("variant"))
-            );
+            });
         }
+    }
+
+    private static String setVariant(Entity entity, JsonObject visionData) {
+        String chosenVariant = entity.getPersistentData().getString("variant");
+        if (chosenVariant.isEmpty()) {
+            List<String> variants = VisionValueHelper.getListOfStrings(visionData, "variants", entity);
+            chosenVariant = !variants.isEmpty()
+                    ? variants.get(Mth.nextInt(RandomSource.create(), 0, variants.size() - 1))
+                    : "default";
+            entity.getPersistentData().putString("variant", chosenVariant);
+        }
+        return chosenVariant;
     }
 
     @SubscribeEvent
