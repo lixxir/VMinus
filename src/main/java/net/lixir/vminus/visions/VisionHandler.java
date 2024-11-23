@@ -118,6 +118,7 @@ public class VisionHandler {
         }
         //Entities are not preloaded due to errors.
     }
+
     public static void clearCaches() {
         ITEM_VISION_KEY.clear();
         ITEM_VISION_CACHE.clear();
@@ -134,7 +135,6 @@ public class VisionHandler {
         ENCHANTMENT_VISION_KEY.clear();
         ENCHANTMENT_VISION_CACHE.clear();
     }
-
 
 
     private static void cacheVision(Map<String, Integer> visionKey, CopyOnWriteArrayList<JsonObject> visionCache,
@@ -306,6 +306,14 @@ public class VisionHandler {
         for (String key : mainVision.keySet())
             mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
         // cache any uncached data
+        boolean validConditions = true;
+        boolean wasNull = false;
+        if (mergedData.has("conditions"))
+            validConditions = VisionValueHelper.checkConditions(mergedData, itemstack, block, entity);
+        if (mergedData == null) {
+            wasNull = true;
+            mergedData = new JsonObject();
+        }
         if (mergedData != null && !mergedData.entrySet().isEmpty()) {
             if (itemstack != null) {
                 cacheVision(ITEM_VISION_KEY, ITEM_VISION_CACHE, mergedData, id);
@@ -319,11 +327,10 @@ public class VisionHandler {
                 cacheVision(ENCHANTMENT_VISION_KEY, ENCHANTMENT_VISION_CACHE, mergedData, id);
             }
         }
-        if (mergedData.entrySet().isEmpty()) {
-            if (debug)
-                VMinusMod.LOGGER.warn("Merged data entry set is empty: " + id);
+        if (!validConditions || wasNull) {
             return null;
         }
+
         return mergedData;
     }
 

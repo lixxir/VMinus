@@ -20,9 +20,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VisionValueHelper {
     private static boolean isModLoaded(String modId) {
@@ -360,6 +358,7 @@ public class VisionValueHelper {
         boolean conditionsMet = true;
         if (conditionData.has("conditions")) {
             JsonElement conditionsElement = conditionData.get("conditions");
+
             if (conditionsElement.isJsonArray()) {
                 JsonArray conditions = conditionsElement.getAsJsonArray();
                 for (JsonElement conditionElement : conditions) {
@@ -368,12 +367,20 @@ public class VisionValueHelper {
                     if (!conditionsMet)
                         break;
                 }
-            } else {
+            }
+
+            else if (conditionsElement.isJsonObject()) {
+                JsonObject condition = conditionsElement.getAsJsonObject();
+                conditionsMet = evaluateConditions(condition, itemstack, block, entity);
+            }
+
+            else {
                 conditionsMet = false;
             }
         }
         return conditionsMet;
     }
+
 
     public static boolean checkInverted(JsonObject conditions) {
         if (conditions.has("inverted")) {
@@ -395,8 +402,29 @@ public class VisionValueHelper {
             if (conditions.has("in_dimension")) {
                 ResourceLocation dimensionLocation = entity.level().dimension().location();
                 String dimensionId = conditions.get("in_dimension").getAsString();
-                boolean IsInverted = checkInverted(conditions);
-                if (IsInverted == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
+                boolean inverted = checkInverted(conditions);
+                if (inverted == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
+                    return false;
+                }
+            }
+            if (conditions.has("get_x")) {
+                double xVal = conditions.get("get_x").getAsDouble();
+                boolean inverted = checkInverted(conditions);
+                if ((entity.getX() > xVal) == inverted) {
+                    return false;
+                }
+            }
+            if (conditions.has("get_y")) {
+                double yVal = conditions.get("get_y").getAsDouble();
+                boolean inverted = checkInverted(conditions);
+                if ((entity.getY() > yVal) == inverted) {
+                    return false;
+                }
+            }
+            if (conditions.has("get_z")) {
+                double zVal = conditions.get("get_z").getAsDouble();
+                boolean inverted = checkInverted(conditions);
+                if ((entity.getZ() > zVal) == inverted) {
                     return false;
                 }
             }
@@ -407,8 +435,8 @@ public class VisionValueHelper {
         if (itemstack != null) {
             if (conditions.has("is_item")) {
                 String itemId = conditions.get("is_item").getAsString();
-                boolean isNegated = checkInverted(conditions);
-                if (isNegated == itemId.equals(ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString())) {
+                boolean inverted = checkInverted(conditions);
+                if (inverted == itemId.equals(ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString())) {
                     return false;
                 }
             }
@@ -692,13 +720,12 @@ public class VisionValueHelper {
         return true;
     }
 
-    public static ItemStack setNbts(JsonObject itemData, ItemStack itemstack) {
+    public static ItemStack setNBTs(JsonObject itemData, ItemStack itemstack) {
         CompoundTag tag = itemstack.getOrCreateTag();
         if (itemData != null && itemData.has("nbt")) {
             JsonArray tagArray = itemData.getAsJsonArray("nbt");
             for (JsonElement element : tagArray) {
                 JsonObject tagData = element.getAsJsonObject();
-                boolean conditionsMet = true;
                 if (checkConditions(tagData, itemstack) && tagData.has("value") && tagData.has("type") && tagData.has("name")) {
                     String type = tagData.get("type").getAsString();
                     String name = tagData.get("name").getAsString();
@@ -748,28 +775,6 @@ public class VisionValueHelper {
         return values;
     }
 
-    public static Map<String, Double> getAttributes(JsonObject jsonData, @Nullable ItemStack itemstack) {
-        Map<String, Double> attributes = new HashMap<>();
-        if (jsonData.has("attributes")) {
-            JsonArray attributeArray = jsonData.getAsJsonArray("attributes");
-            for (JsonElement element : attributeArray) {
-                JsonObject attributeData = element.getAsJsonObject();
-                if (attributeData.has("attribute") && attributeData.has("value") && attributeData.has("operation")) {
-                    if (checkConditions(attributeData, itemstack)) {
-                        String attribute = attributeData.get("attribute").getAsString();
-                        double value = attributeData.get("value").getAsDouble();
-                        String operation = attributeData.get("operation").getAsString();
-                        if (operation.equals("add")) {
-                            attributes.put(attribute, attributes.getOrDefault(attribute, 0.0) + value);
-                        } else if (operation.equals("multiply")) {
-                            attributes.put(attribute, attributes.getOrDefault(attribute, 1.0) * value);
-                        }
-                    }
-                }
-            }
-        }
-        return attributes;
-    }
     public static List<String> getListOfStrings(JsonObject itemData, String checkFor, @Nullable Entity entity) {
         JsonArray jsonArray = itemData.getAsJsonArray(checkFor);
         List<String> validValues = new ArrayList<>();
@@ -781,6 +786,7 @@ public class VisionValueHelper {
         }
         return validValues;
     }
+
     public static String getRarity(JsonObject itemData, ItemStack itemstack, String defaultRarity) {
         String rarity = defaultRarity;
         JsonArray rarityArray = itemData.getAsJsonArray("rarity");
