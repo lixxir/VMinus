@@ -167,8 +167,6 @@ public class VisionHandler {
             boolean found = false;
             boolean inverted = false;
             boolean required = false;
-
-            matchKey = matchKey.toLowerCase();
             if (matchKey.startsWith(" "))
                 matchKey = matchKey.substring(1);
 
