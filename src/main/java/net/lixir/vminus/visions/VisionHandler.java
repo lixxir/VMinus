@@ -158,7 +158,7 @@ public class VisionHandler {
 
     private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         final String originalKey = key;
-        key = key.replaceAll(" ", "");
+        //key = key.replaceAll(" ", "");
         String[] parts = key.split(",");
         boolean matchExplicitlyAllowed = false;
         boolean requiredFailed = false;
@@ -169,6 +169,8 @@ public class VisionHandler {
             boolean required = false;
 
             matchKey = matchKey.toLowerCase();
+            if (matchKey.startsWith(" "))
+                matchKey = matchKey.substring(1);
 
             if (matchKey.startsWith("&")) {
                 required = true;
@@ -319,7 +321,7 @@ public class VisionHandler {
             mergedData = new JsonObject();
         }
         validConditions = VisionValueHelper.checkConditions(mergedData, itemstack, block, entity);
-        if (!mergedData.entrySet().isEmpty()) {
+        //if (!mergedData.entrySet().isEmpty()) {
             if (itemstack != null) {
                 cacheVision(ITEM_VISION_KEY, ITEM_VISION_CACHE, mergedData, id);
             } else if (block != null) {
@@ -331,7 +333,7 @@ public class VisionHandler {
             } else if (enchantment != null) {
                 cacheVision(ENCHANTMENT_VISION_KEY, ENCHANTMENT_VISION_CACHE, mergedData, id);
             }
-        }
+        //}
         if (!validConditions || wasNull) {
             return null;
         }
