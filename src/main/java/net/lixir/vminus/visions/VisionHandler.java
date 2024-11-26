@@ -22,17 +22,20 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import javax.json.Json;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class VisionHandler {
-    public static final int ITEM_TYPE = 0;
-    public static final int BLOCK_TYPE = 1;
-    public static final int ENTITY_TYPE = 2;
-    public static final int EFFECT_TYPE = 3;
-    public static final int ENCHANTMENT_TYPE = 4;
+    public static final byte ITEM_TYPE = 0;
+    public static final byte BLOCK_TYPE = 1;
+    public static final byte ENTITY_TYPE = 2;
+    public static final byte EFFECT_TYPE = 3;
+    public static final byte ENCHANTMENT_TYPE = 4;
     // json caches & keys for optimization
     private static final ConcurrentHashMap<String, Integer> ITEM_VISION_KEY = new ConcurrentHashMap<>();
     private static final CopyOnWriteArrayList<JsonObject> ITEM_VISION_CACHE = new CopyOnWriteArrayList<>();
@@ -156,83 +159,96 @@ public class VisionHandler {
         }
     }
 
-    private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
+    private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
+                                            @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         final String originalKey = key;
-        //key = key.replaceAll(" ", "");
-        String[] parts = key.split(",");
+
+        if (!isLikelyList(key)) {
+            key = key.trim();
+            return processSingleKey(mainVision, key, id, mergedData, itemstack, block, entity);
+        }
+
+        List<String> parts = processKeyString(key);
         boolean matchExplicitlyAllowed = false;
         boolean requiredFailed = false;
 
         for (String matchKey : parts) {
             boolean found = false;
-            boolean inverted = false;
-            boolean required = false;
-            if (matchKey.startsWith(" "))
-                matchKey = matchKey.substring(1);
+            boolean inverted = matchKey.startsWith("!");
+            boolean required = matchKey.startsWith("&");
 
-            if (matchKey.startsWith("&")) {
-                required = true;
-                matchKey = matchKey.substring(1);
-            }
+            if (inverted) matchKey = matchKey.substring(1);
+            if (required) matchKey = matchKey.substring(1);
 
-            if (matchKey.startsWith("!")) {
-                inverted = true;
-                matchKey = matchKey.substring(1);
-            }
-
-            if (matchKey.equals(id)) {
+            if (matchKey.equals(id) || matchKey.equals("global")) {
                 found = true;
+            } else if (matchKey.startsWith("#")) {
+                found = (itemstack != null && isItemTagged(itemstack, matchKey)) ||
+                        (block != null && isBlockTagged(block, matchKey)) ||
+                        (entity != null && isEntityTagged(entity, matchKey));
             }
 
-            if (matchKey.equals("global")) {
-                found = true;
-            }
-
-            if (itemstack != null && matchKey.startsWith("#")) {
-                if (isItemTagged(itemstack, matchKey)) {
-                    found = true;
-                }
-            }
-
-            if (block != null && matchKey.startsWith("#")) {
-                if (isBlockTagged(block, matchKey)) {
-                    found = true;
-                }
-            }
-
-            if (entity != null && matchKey.startsWith("#")) {
-                if (isEntityTagged(entity, matchKey)) {
-                    found = true;
-                }
-            }
-
-            if (inverted) {
-                found = !found;
-            }
-
+            if (inverted) found = !found;
             if (required && !found) {
                 requiredFailed = true;
                 break;
             }
-
-
-            if (found && !inverted) {
-                matchExplicitlyAllowed = true;
-            }
+            if (found && !inverted) matchExplicitlyAllowed = true;
         }
-
 
         if (requiredFailed || !matchExplicitlyAllowed) {
             return mergedData;
         }
 
         JsonObject matchedData = mainVision.getAsJsonObject(originalKey);
-        if (matchedData != null) {
-            mergedData = mergeJsonObjects(mergedData, matchedData);
+        return matchedData != null ? mergeJsonObjects(mergedData, matchedData) : mergedData;
+    }
+
+    private static boolean isLikelyList(String key) {
+        key = key.trim();
+        return key.endsWith(",") || (key.endsWith(" ") && key.charAt(key.length() - 2) == ',');
+    }
+
+    private static List<String> processKeyString(String key) {
+        key = key.trim();
+        if (key.endsWith(",")) {
+            key = key.substring(0, key.length() - 1);
+        }
+        return Arrays.stream(key.split(","))
+                .map(String::trim)
+                .toList();
+    }
+
+    private static JsonObject processSingleKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
+                                               @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
+        boolean found = false;
+        boolean inverted = key.startsWith("!");
+        boolean required = key.startsWith("&");
+
+        if (inverted) key = key.substring(1);
+        if (required) key = key.substring(1);
+
+        if (key.equals(id) || key.equals("global")) {
+            found = true;
+        } else if (key.startsWith("#")) {
+            found = (itemstack != null && isItemTagged(itemstack, key)) ||
+                    (block != null && isBlockTagged(block, key)) ||
+                    (entity != null && isEntityTagged(entity, key));
         }
 
-        return mergedData;
+        if (inverted) found = !found;
+
+        if (required && !found) {
+            return mergedData;
+        }
+        if (!required && !found) {
+            return mergedData;
+        }
+
+        JsonObject matchedData = mainVision.getAsJsonObject(key);
+        return matchedData != null ? mergeJsonObjects(mergedData, matchedData) : mergedData;
     }
+
 
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
         JsonObject mainVision;
@@ -251,8 +267,6 @@ public class VisionHandler {
             type = EFFECT_TYPE;
         if (enchantment != null)
             type = ENCHANTMENT_TYPE;
-        if (debug)
-            VMinusMod.LOGGER.info("Type: " + type);
         if (type == -1)
             return null;
         switch (type) {
@@ -264,7 +278,8 @@ public class VisionHandler {
                 } else {
                     id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
                 }
-                if (ITEM_VISION_KEY.containsKey(id))
+                int cache = ITEM_VISION_KEY.get(id);
+                if (cache != -1)
                     return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
                 break;
             case BLOCK_TYPE:
@@ -272,15 +287,17 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_block_vision;
                 id = ForgeRegistries.BLOCKS.getKey(block).toString();
 
-                if (BLOCK_VISION_KEY.containsKey(id))
-                    return BLOCK_VISION_CACHE.get(BLOCK_VISION_KEY.get(id));
+                cache = BLOCK_VISION_KEY.get(id);
+                if (cache != -1)
+                    return BLOCK_VISION_CACHE.get(BLOCK_ISION_KEY.get(id));
                 break;
             case ENTITY_TYPE:
                 // entities
                 mainVision = VminusModVariables.main_entity_vision;
                 id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
 
-                if (ENTITY_VISION_KEY.containsKey(id))
+                cache = ENTITY_VISION_KEY.get(id);
+                if (cache != -1)
                     return ENTITY_VISION_CACHE.get(ENTITY_VISION_KEY.get(id));
                 break;
             case EFFECT_TYPE:
@@ -288,7 +305,8 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_effect_vision;
                 id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
 
-                if (EFFECT_VISION_KEY.containsKey(id))
+                cache = EFFECT_VISION_KEY.get(id);
+                if (cache != -1)
                     return EFFECT_VISION_CACHE.get(EFFECT_VISION_KEY.get(id));
                 break;
             case ENCHANTMENT_TYPE:
@@ -296,7 +314,8 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_enchantment_vision;
                 id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
 
-                if (ENCHANTMENT_VISION_KEY.containsKey(id))
+                cache = ENCHANTMENT_VISION_KEY.get(id);
+                if (cache != -1)
                     return ENCHANTMENT_VISION_CACHE.get(ENCHANTMENT_VISION_KEY.get(id));
                 break;
             default:
