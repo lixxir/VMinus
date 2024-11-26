@@ -278,8 +278,8 @@ public class VisionHandler {
                 } else {
                     id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
                 }
-                int cache = ITEM_VISION_KEY.get(id);
-                if (cache != -1)
+
+                if (ITEM_VISION_KEY.containsKey(id))
                     return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
                 break;
             case BLOCK_TYPE:
@@ -287,17 +287,15 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_block_vision;
                 id = ForgeRegistries.BLOCKS.getKey(block).toString();
 
-                cache = BLOCK_VISION_KEY.get(id);
-                if (cache != -1)
-                    return BLOCK_VISION_CACHE.get(BLOCK_ISION_KEY.get(id));
+                if (BLOCK_VISION_KEY.containsKey(id))
+                    return BLOCK_VISION_CACHE.get(BLOCK_VISION_KEY.get(id));
                 break;
             case ENTITY_TYPE:
                 // entities
                 mainVision = VminusModVariables.main_entity_vision;
                 id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
 
-                cache = ENTITY_VISION_KEY.get(id);
-                if (cache != -1)
+                if (ENTITY_VISION_KEY.containsKey(id))
                     return ENTITY_VISION_CACHE.get(ENTITY_VISION_KEY.get(id));
                 break;
             case EFFECT_TYPE:
@@ -305,8 +303,7 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_effect_vision;
                 id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
 
-                cache = EFFECT_VISION_KEY.get(id);
-                if (cache != -1)
+                if (EFFECT_VISION_KEY.containsKey(id))
                     return EFFECT_VISION_CACHE.get(EFFECT_VISION_KEY.get(id));
                 break;
             case ENCHANTMENT_TYPE:
@@ -314,8 +311,7 @@ public class VisionHandler {
                 mainVision = VminusModVariables.main_enchantment_vision;
                 id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
 
-                cache = ENCHANTMENT_VISION_KEY.get(id);
-                if (cache != -1)
+                if (ENCHANTMENT_VISION_KEY.containsKey(id))
                     return ENCHANTMENT_VISION_CACHE.get(ENCHANTMENT_VISION_KEY.get(id));
                 break;
             default:
