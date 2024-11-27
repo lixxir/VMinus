@@ -59,6 +59,12 @@ public class VisionHandler {
     public static CopyOnWriteArrayList<JsonObject> getItemVisionCache() {
         return ITEM_VISION_CACHE;
     }
+    public static ConcurrentHashMap<String, Integer> getBlockVisionKey() {
+        return BLOCK_VISION_KEY;
+    }
+    public static CopyOnWriteArrayList<JsonObject> getBlockVisionCache() {
+        return BLOCK_VISION_CACHE;
+    }
     public static ConcurrentHashMap<String, Integer> getEntityVisionKey() {
         return ENTITY_VISION_KEY;
     }
@@ -142,21 +148,6 @@ public class VisionHandler {
 
         ENCHANTMENT_VISION_KEY.clear();
         ENCHANTMENT_VISION_CACHE.clear();
-    }
-
-
-    private static void cacheVision(Map<String, Integer> visionKey, CopyOnWriteArrayList<JsonObject> visionCache,
-                                    JsonObject mergedData, String id) {
-        if (mergedData != null && !mergedData.entrySet().isEmpty()) {
-            int index = visionCache.indexOf(mergedData);
-            if (index == -1) {
-                visionCache.add(mergedData);
-                index = visionCache.size() - 1;
-            }
-            if (!visionKey.containsKey(id)) {
-                visionKey.put(id, index);
-            }
-        }
     }
 
     private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
@@ -251,107 +242,109 @@ public class VisionHandler {
 
 
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
-        JsonObject mainVision;
-        String id;
+        String id = null;
         byte type = -1;
-        if (debug)
+
+        if (debug) {
             VMinusMod.LOGGER.info("______________DEBUGGING______________");
-        // Determines the type of vision and gets the id of the feature, or if it already exists in the cache, then use that.
-        if (itemstack != null)
+        }
+
+        if (itemstack != null) {
             type = ITEM_TYPE;
-        if (block != null)
+            id = itemstack.hasTag() && itemstack.getOrCreateTag().contains("vision")
+                    ? itemstack.getOrCreateTag().getString("vision")
+                    : ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
+        } else if (block != null) {
             type = BLOCK_TYPE;
-        if (entity != null)
+            id = ForgeRegistries.BLOCKS.getKey(block).toString();
+        } else if (entity != null) {
             type = ENTITY_TYPE;
-        if (effect != null)
+            id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
+        } else if (effect != null) {
             type = EFFECT_TYPE;
-        if (enchantment != null)
+            id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
+        } else if (enchantment != null) {
             type = ENCHANTMENT_TYPE;
-        if (type == -1)
+            id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
+        }
+
+        if (type == -1 || id == null) {
             return null;
+        }
+
+        ConcurrentHashMap<String, Integer> visionKeyMap;
+        CopyOnWriteArrayList<JsonObject> visionCache;
+
         switch (type) {
-            case ITEM_TYPE:
-                // items
-                mainVision = VminusModVariables.main_item_vision;
-                if (itemstack.hasTag() && itemstack.getOrCreateTag().contains("vision")) {
-                    id = itemstack.getOrCreateTag().getString("vision");
-                } else {
-                    id = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
-                }
-
-                if (ITEM_VISION_KEY.containsKey(id))
-                    return ITEM_VISION_CACHE.get(ITEM_VISION_KEY.get(id));
-                break;
-            case BLOCK_TYPE:
-                // blocks
-                mainVision = VminusModVariables.main_block_vision;
-                id = ForgeRegistries.BLOCKS.getKey(block).toString();
-
-                if (BLOCK_VISION_KEY.containsKey(id))
-                    return BLOCK_VISION_CACHE.get(BLOCK_VISION_KEY.get(id));
-                break;
-            case ENTITY_TYPE:
-                // entities
-                mainVision = VminusModVariables.main_entity_vision;
-                id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
-
-                if (ENTITY_VISION_KEY.containsKey(id))
-                    return ENTITY_VISION_CACHE.get(ENTITY_VISION_KEY.get(id));
-                break;
-            case EFFECT_TYPE:
-                // effects
-                mainVision = VminusModVariables.main_effect_vision;
-                id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
-
-                if (EFFECT_VISION_KEY.containsKey(id))
-                    return EFFECT_VISION_CACHE.get(EFFECT_VISION_KEY.get(id));
-                break;
-            case ENCHANTMENT_TYPE:
-                // enchantments
-                mainVision = VminusModVariables.main_enchantment_vision;
-                id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-
-                if (ENCHANTMENT_VISION_KEY.containsKey(id))
-                    return ENCHANTMENT_VISION_CACHE.get(ENCHANTMENT_VISION_KEY.get(id));
-                break;
-            default:
+            case ITEM_TYPE -> {
+                visionKeyMap = ITEM_VISION_KEY;
+                visionCache = ITEM_VISION_CACHE;
+            }
+            case BLOCK_TYPE -> {
+                visionKeyMap = BLOCK_VISION_KEY;
+                visionCache = BLOCK_VISION_CACHE;
+            }
+            case ENTITY_TYPE -> {
+                visionKeyMap = ENTITY_VISION_KEY;
+                visionCache = ENTITY_VISION_CACHE;
+            }
+            case EFFECT_TYPE -> {
+                visionKeyMap = EFFECT_VISION_KEY;
+                visionCache = EFFECT_VISION_CACHE;
+            }
+            case ENCHANTMENT_TYPE -> {
+                visionKeyMap = ENCHANTMENT_VISION_KEY;
+                visionCache = ENCHANTMENT_VISION_CACHE;
+            }
+            default -> {
                 VMinusMod.LOGGER.warn("Vision type could not be found.");
                 return null;
+            }
         }
+
+        Integer index = visionKeyMap.get(id);
+        if (index != null && index >= 0 && index < visionCache.size()) {
+            JsonObject cachedData = visionCache.get(index);
+            if (cachedData != null) {
+                return cachedData;
+            }
+        }
+
+        JsonObject mainVision = getMainVisionByType(type);
         if (mainVision == null) {
             VMinusMod.LOGGER.warn("Main vision could not be found: " + id);
             return null;
         }
+
         JsonObject mergedData = new JsonObject();
-        // merge all data
-        for (String key : mainVision.keySet())
+        for (String key : mainVision.keySet()) {
             mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
-        // cache any uncached data
-        boolean validConditions;
-        boolean wasNull = false;
+        }
+
         if (mergedData == null) {
-            wasNull = true;
             mergedData = new JsonObject();
         }
-        validConditions = VisionValueHelper.checkConditions(mergedData, itemstack, block, entity);
-        //if (!mergedData.entrySet().isEmpty()) {
-            if (itemstack != null) {
-                cacheVision(ITEM_VISION_KEY, ITEM_VISION_CACHE, mergedData, id);
-            } else if (block != null) {
-                cacheVision(BLOCK_VISION_KEY, BLOCK_VISION_CACHE, mergedData, id);
-            } else if (entity != null) {
-                cacheVision(ENTITY_VISION_KEY, ENTITY_VISION_CACHE, mergedData, id);
-            } else if (effect != null) {
-                cacheVision(EFFECT_VISION_KEY, EFFECT_VISION_CACHE, mergedData, id);
-            } else if (enchantment != null) {
-                cacheVision(ENCHANTMENT_VISION_KEY, ENCHANTMENT_VISION_CACHE, mergedData, id);
-            }
-        //}
-        if (!validConditions || wasNull) {
-            return null;
+
+        int newIndex = visionCache.size();
+        visionKeyMap.put(id, newIndex);
+        visionCache.add(mergedData);
+
+        if (!VisionValueHelper.checkConditions(mergedData, itemstack, block, entity)) {
+            return new JsonObject();
         }
 
         return mergedData;
+    }
+
+    private static JsonObject getMainVisionByType(byte type) {
+        return switch (type) {
+            case ITEM_TYPE -> VminusModVariables.main_item_vision;
+            case BLOCK_TYPE -> VminusModVariables.main_block_vision;
+            case ENTITY_TYPE -> VminusModVariables.main_entity_vision;
+            case EFFECT_TYPE -> VminusModVariables.main_effect_vision;
+            case ENCHANTMENT_TYPE -> VminusModVariables.main_enchantment_vision;
+            default -> null;
+        };
     }
 
     private static ResourceLocation getOrCreateResourceLocation(String tagNamespace) {
