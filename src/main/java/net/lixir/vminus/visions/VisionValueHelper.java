@@ -339,7 +339,6 @@ public class VisionValueHelper {
     public static boolean checkConditions(JsonObject conditionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         boolean conditionsMet = true;
         if (conditionData.has("conditions")) {
-            System.out.println("has condition");
             JsonElement conditionsElement = conditionData.get("conditions");
             if (conditionsElement.isJsonArray()) {
                 JsonArray conditions = conditionsElement.getAsJsonArray();
