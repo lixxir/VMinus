@@ -12,6 +12,8 @@
     "blocks.BlockStateBaseMixin",
     "blocks.CocaoBlockMixin",
     "blocks.PowderSnowBlockMixin",
+    "commands.SummonCommandMixin",
+    "commands.SummonCommandAccessor",
     "enchantments.ArrowDamageEnchantmentMixin",
     "enchantments.ArrowKnockbackEnchantmentMixin",
     "enchantments.ArrowPiercingEnchantmentMixin",
