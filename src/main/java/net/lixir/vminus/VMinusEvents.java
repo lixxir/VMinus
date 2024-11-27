@@ -9,9 +9,11 @@ import net.lixir.vminus.init.VminusModAttributes;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.network.capes.SetCapePacket;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
+import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
 import net.lixir.vminus.visions.ResourceVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -60,24 +62,18 @@ public class VMinusEvents {
         return net.minecraftforge.fml.ModList.get().isLoaded(modId);
     }
 
-    @SubscribeEvent
-    public static void onNonClientWorldLoad(LevelEvent.Load event) {
-        LevelAccessor world = event.getLevel();
-        if (world.isClientSide())
-            return;
-        ResourceVisionHelper.generateItemVisionsFile(world);
-        ResourceVisionHelper.generateBlockVisionsFile(world);
-        ResourceVisionHelper.generateEntityVisionsFile(world);
-        ResourceVisionHelper.generateEffectVisionsFile(world);
-        ResourceVisionHelper.generateEnchantmentVisionsFile(world);
-    }
-
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void onWorldLoad(LevelEvent.Load event) {
-        // Loading all visions for optimization
+        LevelAccessor world = event.getLevel();
         VisionHandler.clearCaches();
+        if (world instanceof ServerLevel _serverlevel) {
+            ResourceVisionHelper.generateItemVisionsFile(_serverlevel);
+            ResourceVisionHelper.generateBlockVisionsFile(_serverlevel);
+            ResourceVisionHelper.generateEntityVisionsFile(_serverlevel);
+            ResourceVisionHelper.generateEffectVisionsFile(_serverlevel);
+            ResourceVisionHelper.generateEnchantmentVisionsFile(_serverlevel);
+        }
         VisionHandler.loadVisions();
-        LevelAccessor level = event.getLevel();
     }
 
     @SubscribeEvent
