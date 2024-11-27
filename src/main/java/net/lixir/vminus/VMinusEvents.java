@@ -93,7 +93,7 @@ public class VMinusEvents {
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
 
         Entity entity = event.getEntity();
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
 
         if (visionData != null && visionData.has("variants")) {
             final String chosenVariant = MobVariantHelper.setOrGetVariant(entity, visionData);

@@ -11,7 +11,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,10 +21,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import javax.json.Json;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -100,12 +97,12 @@ public class VisionHandler {
         return getVisionData(null, debug, block, null, null, null);
     }
 
-    public static JsonObject getVisionData(Entity entity, Boolean debug) {
-        return getVisionData(null, debug, null, entity, null, null);
+    public static JsonObject getVisionData(EntityType<?> entityType, Boolean debug) {
+        return getVisionData(null, debug, null, entityType, null, null);
     }
 
-    public static JsonObject getVisionData(Entity entity) {
-        return getVisionData(null, false, null, entity, null, null);
+    public static JsonObject getVisionData(EntityType<?> entityType) {
+        return getVisionData(null, false, null, entityType, null, null);
     }
 
     public static void loadVisions() {
@@ -151,12 +148,12 @@ public class VisionHandler {
     }
 
     private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
-                                            @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
+                                            @Nullable ItemStack itemstack, @Nullable Block block, @Nullable EntityType<?> entityType) {
         final String originalKey = key;
 
         if (!isLikelyList(key)) {
             key = key.trim();
-            return processSingleKey(mainVision, key, id, mergedData, itemstack, block, entity);
+            return processSingleKey(mainVision, key, id, mergedData, itemstack, block, entityType);
         }
 
         List<String> parts = processKeyString(key);
@@ -176,7 +173,7 @@ public class VisionHandler {
             } else if (matchKey.startsWith("#")) {
                 found = (itemstack != null && isItemTagged(itemstack, matchKey)) ||
                         (block != null && isBlockTagged(block, matchKey)) ||
-                        (entity != null && isEntityTagged(entity, matchKey));
+                        (entityType != null && isEntityTagged(entityType, matchKey));
             }
 
             if (inverted) found = !found;
@@ -211,7 +208,7 @@ public class VisionHandler {
     }
 
     private static JsonObject processSingleKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
-                                               @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
+                                               @Nullable ItemStack itemstack, @Nullable Block block, @Nullable EntityType<?> entityType) {
         boolean found = false;
         boolean inverted = key.startsWith("!");
         boolean required = key.startsWith("&");
@@ -224,7 +221,7 @@ public class VisionHandler {
         } else if (key.startsWith("#")) {
             found = (itemstack != null && isItemTagged(itemstack, key)) ||
                     (block != null && isBlockTagged(block, key)) ||
-                    (entity != null && isEntityTagged(entity, key));
+                    (entityType != null && isEntityTagged(entityType, key));
         }
 
         if (inverted) found = !found;
@@ -241,7 +238,8 @@ public class VisionHandler {
     }
 
 
-    public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable Entity entity, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
+
+    public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable EntityType<?> entityType, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
         String id = null;
         byte type = -1;
 
@@ -257,9 +255,9 @@ public class VisionHandler {
         } else if (block != null) {
             type = BLOCK_TYPE;
             id = ForgeRegistries.BLOCKS.getKey(block).toString();
-        } else if (entity != null) {
+        } else if (entityType != null) {
             type = ENTITY_TYPE;
-            id = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString();
+            id = ForgeRegistries.ENTITY_TYPES.getKey(entityType).toString();
         } else if (effect != null) {
             type = EFFECT_TYPE;
             id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
@@ -318,7 +316,7 @@ public class VisionHandler {
 
         JsonObject mergedData = new JsonObject();
         for (String key : mainVision.keySet()) {
-            mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entity);
+            mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entityType);
         }
 
         if (mergedData == null) {
@@ -329,12 +327,9 @@ public class VisionHandler {
         visionKeyMap.put(id, newIndex);
         visionCache.add(mergedData);
 
-        if (!VisionValueHelper.checkConditions(mergedData, itemstack, block, entity)) {
-            return new JsonObject();
-        }
-
         return mergedData;
     }
+
 
     private static JsonObject getMainVisionByType(byte type) {
         return switch (type) {
@@ -364,14 +359,17 @@ public class VisionHandler {
         return blockstate.is(blockTag);
     }
 
-    private static boolean isEntityTagged(Entity entity, String tag) {
+    private static boolean isEntityTagged(EntityType<?> entity, String tag) {
+        if (!tag.startsWith("#")) {
+            return false;
+        }
         String tagNamespace = tag.substring(1);
         TagKey<EntityType<?>> entityTag = ENTITY_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> TagKey.create(Registries.ENTITY_TYPE, getOrCreateResourceLocation(ns)));
-        return entity.getType().is(entityTag);
+        return entity.is(entityTag);
     }
 
+
     public static JsonObject mergeJsonObjects(@Nullable JsonObject target, JsonObject source) {
-        //Merging similar json objects as to not cause overwriting / conflicts with mods that affect the same object
         if (target == null)
             target = new JsonObject();
         for (String key : source.keySet()) {

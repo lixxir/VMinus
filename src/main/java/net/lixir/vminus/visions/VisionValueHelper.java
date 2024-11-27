@@ -14,6 +14,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -173,28 +174,31 @@ public class VisionValueHelper {
     }
 
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor) {
-        return isBooleanMet(itemData, checkFor, null, "value", null, null);
+        return isBooleanMet(itemData, checkFor, null, "value", null, null, null);
     }
 
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, ItemStack itemstack) {
-        return isBooleanMet(itemData, checkFor, itemstack, "value", null, null);
+        return isBooleanMet(itemData, checkFor, itemstack, "value", null, null, null);
     }
 
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, ItemStack itemstack, String param) {
-        return isBooleanMet(itemData, checkFor, itemstack, param, null, null);
+        return isBooleanMet(itemData, checkFor, itemstack, param, null, null, null);
     }
 
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, Block block) {
-        return isBooleanMet(itemData, checkFor, null, "value", block, null);
+        return isBooleanMet(itemData, checkFor, null, "value", block, null, null);
     }
 
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, Entity entity) {
-        return isBooleanMet(itemData, checkFor, null, "value", null, entity);
+        return isBooleanMet(itemData, checkFor, null, "value", null, entity, null);
+    }
+    public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, EntityType<?> entityType) {
+        return isBooleanMet(itemData, checkFor, null, "value", null, null, entityType);
     }
 
-    public static boolean isBooleanMet(@Nullable JsonObject visionData, String checkFor, @Nullable ItemStack itemstack, @Nullable String param, @Nullable Block block, @Nullable Entity entity) {
+    public static boolean isBooleanMet(@Nullable JsonObject visionData, String checkFor, @Nullable ItemStack itemstack, @Nullable String param, @Nullable Block block, @Nullable Entity entity, @Nullable EntityType<?> entityType) {
         boolean booleanResult = false;
-        visionData = getVisionData(visionData, itemstack, block, entity);
+        visionData = getVisionData(visionData, itemstack, block, entity, entityType);
         if (checkValidParams(visionData, checkFor)) {
             JsonArray jsonData = visionData.getAsJsonArray(checkFor);
             for (JsonElement element : jsonData) {
@@ -207,16 +211,21 @@ public class VisionValueHelper {
         }
         return booleanResult;
     }
-
     public static @Nullable JsonObject getVisionData(@Nullable JsonObject visionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
+        return getVisionData(visionData, itemstack, block, entity, null);
+    }
+    public static @Nullable JsonObject getVisionData(@Nullable JsonObject visionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity, @Nullable EntityType<?> entityType) {
         if (visionData != null)
             return visionData;
         if (itemstack != null)
             visionData = VisionHandler.getVisionData(itemstack);
         if (block != null)
             visionData = VisionHandler.getVisionData(block);
-        if (entity != null)
-            visionData = VisionHandler.getVisionData(entity);
+        if (entity != null) {
+            visionData = VisionHandler.getVisionData(entity.getType());
+        } else if (entityType != null)
+            visionData = VisionHandler.getVisionData(entityType);
+
         return visionData;
     }
 

@@ -138,7 +138,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "isSensitiveToWater", at = @At("HEAD"), cancellable = true)
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("water_sensitive")) {
             cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "water_sensitive", entity));
         }
@@ -146,7 +146,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "canDisableShield", at = @At("HEAD"), cancellable = true)
     private void canDisableShield(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("disable_shields")) {
             System.out.println("DISABLING SHIELDS!");
             cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "disable_shields", entity));
@@ -155,7 +155,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "canBreatheUnderwater", at = @At("HEAD"), cancellable = true)
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("underwater_breathing")) {
             cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "underwater_breathing", entity));
         }
@@ -163,7 +163,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "getSoundVolume", at = @At("HEAD"), cancellable = true)
     private void getSoundVolume(CallbackInfoReturnable<Float> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("volume")) {
             float defaultVolume = 1f;
             float totalVolume = VisionValueHelper.isNumberMet(visionData, "volume", defaultVolume, entity);
@@ -175,7 +175,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
     private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("experience")) {
             int experience = VisionValueHelper.isNumberMet(visionData, "experience", 0, entity);
             System.out.println("DROPPING NEW XP: " + experience);
@@ -186,7 +186,7 @@ public abstract class LivingEntityMixin {
     @Nullable
     @Inject(method = "getDeathSound", at = @At("HEAD"), cancellable = true)
     private void getDeathSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("death_sound")) {
             System.out.println("Trying deathsound");
             String soundString = VisionValueHelper.getFirstValidString(visionData, "death_sound", entity);
@@ -199,7 +199,7 @@ public abstract class LivingEntityMixin {
     @Nullable
     @Inject(method = "getHurtSound", at = @At("HEAD"), cancellable = true)
     private void getHurtSound(DamageSource p_219440_, CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("hurt_sound")) {
             String soundString = VisionValueHelper.getFirstValidString(visionData, "hurt_sound", entity);
             SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);

@@ -25,7 +25,7 @@ public class BannedEntitySpawnProcedure {
     private static void execute(@Nullable Event event, Entity entity) {
         if (entity == null)
             return;
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (VisionValueHelper.isBooleanMet(visionData, "banned", entity)) {
             if (event != null && event.isCancelable()) {
                 event.setCanceled(true);

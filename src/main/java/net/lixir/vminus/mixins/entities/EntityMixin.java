@@ -17,17 +17,17 @@ public class EntityMixin {
 
     @Inject(method = "isSilent", at = @At("HEAD"), cancellable = true)
     private void isSilent(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("silent")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "silent", entity));
+            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "silent", entity.getType()));
         }
     }
 
     @Inject(method = "dampensVibrations", at = @At("HEAD"), cancellable = true)
     private void dampensVibrations(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("dampens_vibrations")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "dampens_vibrations", entity));
+            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "dampens_vibrations", entity.getType()));
         }
     }
 }

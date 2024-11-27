@@ -31,7 +31,7 @@ public class EntityBaseAttributeProcedure {
     private static void execute(@Nullable Event event, Entity entity) {
         if (entity == null || !(entity instanceof LivingEntity))
             return;
-        JsonObject visionData = VisionHandler.getVisionData(entity);
+        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null) {
             if (visionData.has("base_attributes")) {
                 JsonArray baseAttributesArray = visionData.getAsJsonArray("base_attributes");
