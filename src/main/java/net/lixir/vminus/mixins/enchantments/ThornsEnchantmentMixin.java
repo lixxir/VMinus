@@ -14,7 +14,7 @@ public abstract class ThornsEnchantmentMixin {
     @Unique
     private final Enchantment enchantment = (Enchantment) (Object) this;
 
-    @Inject(method = "getMaxLevel", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getMaxLevel", at = @At("RETURN"), cancellable = true)
     private void getMaxLevel(CallbackInfoReturnable<Integer> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.getMaxLevel(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : 1));
     }
