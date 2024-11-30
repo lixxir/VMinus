@@ -21,7 +21,13 @@ public class CapeHelper {
             "HoeNail",
             "ClephLeSDF",
             "BrianIsBro",
-            "IzzyBizzy45");
+            "IzzyBizzy45",
+            "Simonisnear",
+            "TheScarletRot",
+            "uuRETCH",
+            "Astolfo_oflotsA",
+            "DariusZeBaguette",
+            "Cap_Keys");
     private static final List<String> BOOSTERS = Arrays.asList(
             "lixir_guy",
             "Jackdedestroyer",
@@ -35,7 +41,9 @@ public class CapeHelper {
             "reindawn",
             "Simonisnear",
             "miloq__",
-            "Stallman1111");
+            "Stallman1111",
+            "DariusZeBaguette",
+            "IdiotErich");
     private static final List<String> DEVELOPERS = Arrays.asList(
             "lixir_guy",
             "Jackdedestroyer",
