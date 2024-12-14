@@ -145,7 +145,9 @@ public class RecipeManagerMixin {
         }
         if (resultElement != null) {
             if (resultElement.isJsonPrimitive() && resultElement.getAsJsonPrimitive().isString()) {
-                String itemId = resultElement.getAsString();
+                String itemId;
+                itemId  = resultElement.getAsString();
+
                 return isItemBanned(itemId);
             } else if (resultElement.isJsonObject()) {
                 String itemId = extractItemId(resultElement.getAsJsonObject());
@@ -180,9 +182,12 @@ public class RecipeManagerMixin {
 
     private boolean isIngredientBanned(JsonObject ingredient) {
         if (ingredient.has("item")) {
-            String itemId = ingredient.get("item").getAsString();
-            JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
-            return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
+            JsonElement ingredientElement = ingredient.get("item");
+            if (ingredientElement.isJsonPrimitive() && ingredient.getAsJsonPrimitive().isString()) {
+                String itemId = ingredient.get("item").getAsString();
+                JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
+                return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
+            }
         }
         return false;
     }
