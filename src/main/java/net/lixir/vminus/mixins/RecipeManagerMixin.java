@@ -127,6 +127,46 @@ public class RecipeManagerMixin {
             LOGGER.error("Error replacing ingredient: {}", ingredient, e);
         }
     }
+    private String extractItemId(JsonObject itemObject) {
+        if (itemObject.has("item")) {
+            return itemObject.get("item").getAsString();
+        } else if (itemObject.has("id")) {
+            return itemObject.get("id").getAsString();
+        }
+        return null;
+    }
+    private boolean isResultBanned(JsonObject jsonObject) {
+        JsonElement resultElement = jsonObject.get("result");
+        if (resultElement == null) {
+            resultElement = jsonObject.get("output");
+        }
+
+        if (resultElement != null) {
+            if (resultElement.isJsonPrimitive() && resultElement.getAsJsonPrimitive().isString()) {
+                String itemId = resultElement.getAsString();
+                return isItemBanned(itemId);
+            } else if (resultElement.isJsonObject()) {
+                String itemId = extractItemId(resultElement.getAsJsonObject());
+                return isItemBanned(itemId);
+            } else if (resultElement.isJsonArray()) {
+                for (JsonElement element : resultElement.getAsJsonArray()) {
+                    if (element.isJsonObject()) {
+                        String itemId = extractItemId(element.getAsJsonObject());
+                        if (isItemBanned(itemId)) {
+                            return true;
+                        }
+                    } else if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+                        String itemId = element.getAsString();
+                        if (isItemBanned(itemId)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 
     private boolean isRecipeBanned(JsonObject jsonObject) {
         try {
@@ -135,6 +175,13 @@ public class RecipeManagerMixin {
             LOGGER.error("Error checking if recipe is banned: {}", jsonObject, e);
             return false;
         }
+    }
+    private boolean isItemBanned(String itemId) {
+        JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
+        return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
+    }
+    private boolean isModLoaded(String modId) {
+        return net.minecraftforge.fml.ModList.get().isLoaded(modId);
     }
 
     private boolean isAnyIngredientBanned(JsonObject jsonObject) {
