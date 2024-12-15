@@ -35,14 +35,21 @@ public class RecipeManagerMixin {
             ResourceLocation resourceLocation = entry.getKey();
             JsonElement jsonElement = entry.getValue();
             try {
-                JsonObject jsonObject = GsonHelper.convertToJsonObject(jsonElement, "top element");
+                if (!jsonElement.isJsonObject()) {
+                    LOGGER.warn("Skipping recipe {} as it is not a JsonObject", resourceLocation);
+                    filteredMap.put(resourceLocation, jsonElement);
+                    continue;
+                }
+
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
                 replaceRecipeIngredients(jsonObject);
                 if (isRecipeBanned(jsonObject)) {
+                    LOGGER.info("Recipe {} is banned and will be skipped", resourceLocation);
                     continue;
                 }
                 filteredMap.put(resourceLocation, jsonElement);
             } catch (IllegalArgumentException | JsonParseException e) {
-                VMinusMod.LOGGER.error("Parsing error loading recipe {}", resourceLocation, e);
+                LOGGER.error("Parsing error loading recipe {}", resourceLocation, e);
                 filteredMap.put(resourceLocation, jsonElement);
             }
         }
@@ -51,154 +58,125 @@ public class RecipeManagerMixin {
     }
 
     private void replaceRecipeIngredients(JsonObject jsonObject) {
-        if (jsonObject.has("ingredients")) {
-            JsonElement ingredientsElement = jsonObject.get("ingredients");
-            if (ingredientsElement.isJsonArray()) {
-                JsonArray ingredients = ingredientsElement.getAsJsonArray();
-                for (int i = 0; i < ingredients.size(); i++) {
-                    JsonElement ingredientElement = ingredients.get(i);
-                    processIngredientElement(ingredientElement);
+        try {
+            if (jsonObject.has("ingredients")) {
+                JsonElement ingredientsElement = jsonObject.get("ingredients");
+                if (ingredientsElement.isJsonArray()) {
+                    JsonArray ingredients = ingredientsElement.getAsJsonArray();
+                    for (int i = 0; i < ingredients.size(); i++) {
+                        JsonElement ingredientElement = ingredients.get(i);
+                        processIngredientElement(ingredientElement);
+                    }
+                } else {
+                    LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
                 }
-            } else {
-                VMinusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
             }
-        }
-        if (jsonObject.has("key")) {
-            JsonObject key = jsonObject.getAsJsonObject("key");
-            for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
-                JsonElement ingredientElement = entry.getValue();
-                processIngredientElement(ingredientElement);
+            if (jsonObject.has("key")) {
+                JsonObject key = jsonObject.getAsJsonObject("key");
+                for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
+                    processIngredientElement(entry.getValue());
+                }
             }
+        } catch (Exception e) {
+            LOGGER.error("Error replacing recipe ingredients: {}", jsonObject, e);
         }
     }
 
     private void processIngredientElement(JsonElement ingredientElement) {
-        if (ingredientElement.isJsonObject()) {
-            JsonObject ingredient = ingredientElement.getAsJsonObject();
-            replaceIngredient(ingredient);
-        } else if (ingredientElement.isJsonArray()) {
-            JsonArray ingredientArray = ingredientElement.getAsJsonArray();
-            for (JsonElement nestedElement : ingredientArray) {
-                processIngredientElement(nestedElement);
+        try {
+            if (ingredientElement.isJsonObject()) {
+                replaceIngredient(ingredientElement.getAsJsonObject());
+            } else if (ingredientElement.isJsonArray()) {
+                JsonArray ingredientArray = ingredientElement.getAsJsonArray();
+                for (JsonElement nestedElement : ingredientArray) {
+                    processIngredientElement(nestedElement);
+                }
+            } else {
+                LOGGER.warn("Unexpected ingredient format: {}", ingredientElement.getClass().getSimpleName());
             }
-        } else {
-            VMinusMod.LOGGER.warn("Unexpected ingredient format: {}", ingredientElement.getClass().getSimpleName());
+        } catch (Exception e) {
+            LOGGER.error("Error processing ingredient element: {}", ingredientElement, e);
         }
     }
 
     private void replaceIngredient(JsonObject ingredient) {
-        if (ingredient.has("item")) {
-            String itemId = ingredient.get("item").getAsString();
-            ItemStack itemstack = createItemStack(itemId);
-            JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            if (itemData != null) {
-                if (VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace") && !itemData.has("replace")) {
-                    ingredient.addProperty("item", "minecraft:air");
-                }
-                if (itemData.has("recipe_replace") || itemData.has("replace")) {
-                    String replacementId = VisionValueHelper.getFirstValidString(itemData, "recipe_replace", itemstack);
-                    if (!itemData.has("recipe_replace")) {
-                        replacementId = VisionValueHelper.getFirstValidString(itemData, "replace", itemstack);
-                        if (isValidResourceLocation(replacementId)) {
-                            ingredient.addProperty("item", replacementId);
+        try {
+            if (ingredient.has("item")) {
+                String itemId = ingredient.get("item").getAsString();
+                if (isValidResourceLocation(itemId)) {
+                    ItemStack itemstack = createItemStack(itemId);
+                    JsonObject itemData = VisionHandler.getVisionData(itemstack);
+                    if (itemData != null) {
+                        if (VisionValueHelper.isBooleanMet(itemData, "banned", itemstack) && !itemData.has("recipe_replace") && !itemData.has("replace")) {
+                            ingredient.addProperty("item", "minecraft:air");
+                        } else if (itemData.has("recipe_replace") || itemData.has("replace")) {
+                            String replacementId = VisionValueHelper.getFirstValidString(itemData, "recipe_replace", itemstack);
+                            if (!itemData.has("recipe_replace")) {
+                                replacementId = VisionValueHelper.getFirstValidString(itemData, "replace", itemstack);
+                            }
+                            if (isValidResourceLocation(replacementId)) {
+                                ingredient.addProperty("item", replacementId);
+                            }
                         }
                     }
+                } else {
+                    LOGGER.warn("Invalid item ID for ingredient: {}", itemId);
                 }
             }
+        } catch (Exception e) {
+            LOGGER.error("Error replacing ingredient: {}", ingredient, e);
         }
     }
 
     private boolean isRecipeBanned(JsonObject jsonObject) {
-        return isAnyIngredientBanned(jsonObject) || isResultBanned(jsonObject);
+        try {
+            return isAnyIngredientBanned(jsonObject) || isResultBanned(jsonObject);
+        } catch (Exception e) {
+            LOGGER.error("Error checking if recipe is banned: {}", jsonObject, e);
+            return false;
+        }
     }
 
     private boolean isAnyIngredientBanned(JsonObject jsonObject) {
-        if (jsonObject.has("ingredients")) {
-            JsonElement ingredientsElement = jsonObject.get("ingredients");
-            if (ingredientsElement.isJsonArray()) {
-                JsonArray ingredients = ingredientsElement.getAsJsonArray();
-                for (JsonElement ingredientElement : ingredients) {
-                    if (ingredientElement.isJsonObject() && isIngredientBanned(ingredientElement.getAsJsonObject())) {
+        try {
+            if (jsonObject.has("ingredients")) {
+                JsonElement ingredientsElement = jsonObject.get("ingredients");
+                if (ingredientsElement.isJsonArray()) {
+                    JsonArray ingredients = ingredientsElement.getAsJsonArray();
+                    for (JsonElement ingredientElement : ingredients) {
+                        if (ingredientElement.isJsonObject() && isIngredientBanned(ingredientElement.getAsJsonObject())) {
+                            return true;
+                        }
+                    }
+                } else {
+                    LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
+                }
+            }
+            if (jsonObject.has("key")) {
+                JsonObject key = jsonObject.getAsJsonObject("key");
+                for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
+                    if (entry.getValue().isJsonObject() && isIngredientBanned(entry.getValue().getAsJsonObject())) {
                         return true;
                     }
                 }
-            } else {
-                VMinusMod.LOGGER.warn("Expected 'ingredients' to be a JsonArray but found {}", ingredientsElement.getClass().getSimpleName());
             }
-        }
-        if (jsonObject.has("key")) {
-            JsonObject key = jsonObject.getAsJsonObject("key");
-            for (Map.Entry<String, JsonElement> entry : key.entrySet()) {
-                JsonElement ingredientElement = entry.getValue();
-                if (ingredientElement.isJsonObject() && isIngredientBanned(ingredientElement.getAsJsonObject())) {
-                    return true;
-                }
-            }
+        } catch (Exception e) {
+            LOGGER.error("Error checking if any ingredient is banned: {}", jsonObject, e);
         }
         return false;
-    }
-
-    private boolean isResultBanned(JsonObject jsonObject) {
-        JsonElement resultElement = jsonObject.get("result");
-        if (resultElement == null) {
-            resultElement = jsonObject.get("output");
-        }
-        if (resultElement != null) {
-            if (resultElement.isJsonPrimitive() && resultElement.getAsJsonPrimitive().isString()) {
-                String itemId;
-                itemId  = resultElement.getAsString();
-
-                return isItemBanned(itemId);
-            } else if (resultElement.isJsonObject()) {
-                String itemId = extractItemId(resultElement.getAsJsonObject());
-                return isItemBanned(itemId);
-            } else if (resultElement.isJsonArray()) {
-                for (JsonElement element : resultElement.getAsJsonArray()) {
-                    if (element.isJsonObject()) {
-                        String itemId = extractItemId(element.getAsJsonObject());
-                        if (isItemBanned(itemId)) {
-                            return true;
-                        }
-                    } else if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-                        String itemId = element.getAsString();
-                        if (isItemBanned(itemId)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean isItemBanned(String itemId) {
-        JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
-        return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
-    }
-
-    private boolean isModLoaded(String modId) {
-        return net.minecraftforge.fml.ModList.get().isLoaded(modId);
     }
 
     private boolean isIngredientBanned(JsonObject ingredient) {
-        if (ingredient.has("item")) {
-            JsonElement ingredientElement = ingredient.get("item");
-            if (ingredientElement.isJsonPrimitive() && ingredient.getAsJsonPrimitive().isString()) {
+        try {
+            if (ingredient.has("item")) {
                 String itemId = ingredient.get("item").getAsString();
                 JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
                 return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
             }
+        } catch (Exception e) {
+            LOGGER.error("Error checking if ingredient is banned: {}", ingredient, e);
         }
         return false;
-    }
-
-    private String extractItemId(JsonObject itemObject) {
-        if (itemObject.has("item")) {
-            return itemObject.get("item").getAsString();
-        } else if (itemObject.has("id")) {
-            return itemObject.get("id").getAsString();
-        }
-        return null;
     }
 
     private boolean isValidResourceLocation(String resourceLocation) {
@@ -206,16 +184,18 @@ public class RecipeManagerMixin {
             new ResourceLocation(resourceLocation);
             return true;
         } catch (IllegalArgumentException e) {
-            VMinusMod.LOGGER.warn("Invalid ResourceLocation: {}", resourceLocation);
+            LOGGER.warn("Invalid ResourceLocation: {}", resourceLocation);
             return false;
         }
     }
 
     private ItemStack createItemStack(String itemId) {
-        if (itemId != null && !itemId.contains("#")) {
+        try {
             if (isValidResourceLocation(itemId)) {
                 return new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemId)));
             }
+        } catch (Exception e) {
+            LOGGER.error("Error creating ItemStack for item ID: {}", itemId, e);
         }
         return ItemStack.EMPTY;
     }
