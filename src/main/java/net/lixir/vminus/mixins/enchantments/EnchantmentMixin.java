@@ -24,12 +24,12 @@ public abstract class EnchantmentMixin {
         cir.setReturnValue(EnchantmentVisionHelper.getMaxLevel(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : 1));
     }
 
-    @Inject(method = "isTreasureOnly", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isTreasureOnly", at = @At("RETURN"), cancellable = true)
     private void isTreasureOnly(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isTreasure(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
 
-    @Inject(method = "isCurse", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isCurse", at = @At("RETURN"), cancellable = true)
     private void isCurse(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isCurse(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
@@ -39,17 +39,17 @@ public abstract class EnchantmentMixin {
         cir.setReturnValue(EnchantmentVisionHelper.canEnchant(enchantment, itemstack, cir.getReturnValue()));
     }
 
-    @Inject(method = "isCompatibleWith", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isCompatibleWith", at = @At("RETURN"), cancellable = true)
     private void isCompatibleWith(Enchantment otherEnchantment, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isCompatible(enchantment, otherEnchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
 
-    @Inject(method = "isTradeable", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isTradeable", at = @At("RETURN"), cancellable = true)
     private void isTradeable(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isTradeable(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
 
-    @Inject(method = "isDiscoverable", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isDiscoverable", at = @At("RETURN"), cancellable = true)
     private void isDiscoverable(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isDiscoverable(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
