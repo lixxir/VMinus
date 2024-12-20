@@ -3,11 +3,12 @@ package net.lixir.vminus.mixins.items;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.*;
+import net.lixir.vminus.IconHandler;
 import net.lixir.vminus.helpers.DurabilityHelper;
+import net.lixir.vminus.helpers.EnchantAndCurseHelper;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
-import net.lixir.vminus.init.VminusModAttributes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -289,7 +290,7 @@ public abstract class ItemstackTooltipMixin {
                     }
                     if (modifierComponent != null) {
                         Boolean dontRenderAttribute = false;
-                        if (attribute == VminusModAttributes.MININGSPEED.get() && itemstack.is(ItemTags.create(new ResourceLocation("vminus:tooltip/hide_mining_speed"))))
+                        if (attribute == VMinusAttributes.MININGSPEED.get() && itemstack.is(ItemTags.create(new ResourceLocation("vminus:tooltip/hide_mining_speed"))))
                             dontRenderAttribute = true;
                         if (!dontRenderAttribute) {
                             tempList.add(iconComponent.append(modifierComponent));

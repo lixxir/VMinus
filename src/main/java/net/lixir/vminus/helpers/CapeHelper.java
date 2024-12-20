@@ -82,22 +82,22 @@ public class CapeHelper {
             L_ORION,
             DARKLORD6323,
             TEALOTL);
-        private static final List<UUID> BOOSTERS = Arrays.asList(
-                LIXIR,
-                JACKDEDESTROYER,
-                KRELOX,
+    private static final List<UUID> BOOSTERS = Arrays.asList(
+            LIXIR,
+            JACKDEDESTROYER,
+            KRELOX,
             _AJGOR_,
-                AZVALEN,
-                MOOREGAMING1324,
-                MEME___MAN,
-                REINDAWN,
-                SIMON_IS_NEAR,
-                MILOQ__,
-                STALLMAN1111,
+            AZVALEN,
+            MOOREGAMING1324,
+            MEME___MAN,
+            REINDAWN,
+            SIMON_IS_NEAR,
+            MILOQ__,
+            STALLMAN1111,
             DARIUSZEBAGUETTE,
-                IDIOTERICH,
-                TUXXIC202,
-                EFFORT_A);
+            IDIOTERICH,
+            TUXXIC202,
+            EFFORT_A);
     private static final List<UUID> DEVELOPERS = Arrays.asList(
             LIXIR,
             JACKDEDESTROYER,
@@ -122,7 +122,7 @@ public class CapeHelper {
     public static ResourceLocation getCapeTexture(AbstractClientPlayer player) {
         String capeId = player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).map(capability -> capability.cape_id).orElse("");
         if (ownsCape(player, capeId)) {
-            switch(capeId) {
+            switch (capeId) {
                 case "beeper":
                     return BEEPER_CAPE;
                 case "ghost":

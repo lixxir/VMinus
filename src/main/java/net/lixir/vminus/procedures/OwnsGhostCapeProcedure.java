@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.helpers.CapeHelper;
 import net.lixir.vminus.VMinusMod;
+import net.lixir.vminus.helpers.CapeHelper;
 import net.minecraft.world.entity.Entity;
 
 public class OwnsGhostCapeProcedure {

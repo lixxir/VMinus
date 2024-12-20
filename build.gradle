@@ -5,8 +5,8 @@ plugins {
 }
 
 version = '1.0'
-group = 'com.yourname.modid'
-archivesBaseName = 'modid'
+group = 'net.lixir.vminus'
+archivesBaseName = 'vminus'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -25,7 +25,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }
@@ -38,7 +38,24 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             mods {
-                examplemod {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                "${mod_id}" {
                     source sourceSets.main
                 }
             }

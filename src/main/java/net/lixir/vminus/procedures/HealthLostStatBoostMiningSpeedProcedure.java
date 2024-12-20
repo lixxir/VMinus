@@ -1,6 +1,6 @@
 package net.lixir.vminus.procedures;
 
-import net.lixir.vminus.init.VminusModAttributes;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,7 +38,7 @@ public class HealthLostStatBoostMiningSpeedProcedure {
                 ItemStack itemStack = livingEntity.getItemBySlot(slot);
                 if (!itemStack.isEmpty()) {
                     for (int i = (int) livingEntity.getMaxHealth(); i > livingEntity.getHealth(); i--) {
-                        modifierSum += getAttributeValueFromItem(itemStack, slot, VminusModAttributes.HEALTHLOSTSTATBOOST.get());
+                        modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTHLOSTSTATBOOST.get());
                     }
                 }
             }

@@ -1,8 +1,8 @@
 package net.lixir.vminus.procedures;
 
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.visions.VisionHandler;
 
 public class PrintItemVisionFileProcedure {
     public static void execute() {

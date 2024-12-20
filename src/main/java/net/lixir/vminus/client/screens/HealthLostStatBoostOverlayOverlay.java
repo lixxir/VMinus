@@ -2,7 +2,7 @@ package net.lixir.vminus.client.screens;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.lixir.vminus.init.VminusModAttributes;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -36,7 +36,7 @@ public class HealthLostStatBoostOverlayOverlay {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack itemStack = entity.getItemBySlot(slot);
                 if (!itemStack.isEmpty()) {
-                    modifierSum += getAttributeValueFromItem(itemStack, slot, VminusModAttributes.HEALTHLOSTSTATBOOST.get());
+                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTHLOSTSTATBOOST.get());
                 }
             }
             if (modifierSum > 0) {

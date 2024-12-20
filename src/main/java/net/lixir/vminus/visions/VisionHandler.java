@@ -53,18 +53,23 @@ public class VisionHandler {
     public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
         return ITEM_VISION_KEY;
     }
+
     public static CopyOnWriteArrayList<JsonObject> getItemVisionCache() {
         return ITEM_VISION_CACHE;
     }
+
     public static ConcurrentHashMap<String, Integer> getBlockVisionKey() {
         return BLOCK_VISION_KEY;
     }
+
     public static CopyOnWriteArrayList<JsonObject> getBlockVisionCache() {
         return BLOCK_VISION_CACHE;
     }
+
     public static ConcurrentHashMap<String, Integer> getEntityVisionKey() {
         return ENTITY_VISION_KEY;
     }
+
     public static CopyOnWriteArrayList<JsonObject> getEntityVisionCache() {
         return ENTITY_VISION_CACHE;
     }
@@ -130,6 +135,8 @@ public class VisionHandler {
         //Entities are not preloaded due to errors.
     }
 
+
+    // Clears the caches and their associated keys
     public static void clearCaches() {
         ITEM_VISION_KEY.clear();
         ITEM_VISION_CACHE.clear();
@@ -147,54 +154,63 @@ public class VisionHandler {
         ENCHANTMENT_VISION_CACHE.clear();
     }
 
+    /**
+     * @param mainVision The combined cached file of every resource file of that specific vision type.
+     * @param key        The key identifier of the passed vision.
+     * @param id         The id of the passed.
+     * @param itemstack  An optionally passed itemstack.
+     * @param block      An optionally passed block.
+     * @param entityType An optionally passed entity type.
+     * @return Merged vision or initially provided vision dependent on if the id matches correctly.
+     * <p>
+     * <br></br>
+     * Scans all visions from the main vision to see if the provided id matches with the provided vision key.
+     * </p>
+     */
     private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
                                             @Nullable ItemStack itemstack, @Nullable Block block, @Nullable EntityType<?> entityType) {
         final String originalKey = key;
-
-        if (!isLikelyList(key)) {
-            key = key.trim();
-            return processSingleKey(mainVision, key, id, mergedData, itemstack, block, entityType);
-        }
+        key = key.trim();
 
         List<String> parts = processKeyString(key);
-        boolean matchExplicitlyAllowed = false;
-        boolean requiredFailed = false;
+        boolean invalidMatch = false;
+        boolean validMatchFound = false;
 
         for (String matchKey : parts) {
-            boolean found = false;
             boolean inverted = matchKey.startsWith("!");
-            boolean required = matchKey.startsWith("&");
-
             if (inverted) matchKey = matchKey.substring(1);
-            if (required) matchKey = matchKey.substring(1);
+
+            boolean found = false;
+            boolean isTag = matchKey.startsWith("#");
 
             if (matchKey.equals(id) || matchKey.equals("global")) {
                 found = true;
-            } else if (matchKey.startsWith("#")) {
+            } else if (isTag) {
                 found = (itemstack != null && isItemTagged(itemstack, matchKey)) ||
                         (block != null && isBlockTagged(block, matchKey)) ||
                         (entityType != null && isEntityTagged(entityType, matchKey));
             }
 
             if (inverted) found = !found;
-            if (required && !found) {
-                requiredFailed = true;
+
+            if (!inverted && found) {
+                validMatchFound = true;
+            } else if (inverted && !found) {
+                invalidMatch = true;
                 break;
             }
-            if (found && !inverted) matchExplicitlyAllowed = true;
         }
 
-        if (requiredFailed || !matchExplicitlyAllowed) {
+        if (invalidMatch || !validMatchFound) {
             return mergedData;
         }
 
         JsonObject matchedData = mainVision.getAsJsonObject(originalKey);
-        return matchedData != null ? mergeJsonObjects(mergedData, matchedData) : mergedData;
-    }
+        if (matchedData != null) {
+            return mergeJsonObjects(mergedData, matchedData);
+        }
 
-    private static boolean isLikelyList(String key) {
-        key = key.trim();
-        return key.endsWith(",") || (key.endsWith(" ") && key.charAt(key.length() - 2) == ',');
+        return mergedData;
     }
 
     private static List<String> processKeyString(String key) {
@@ -206,37 +222,6 @@ public class VisionHandler {
                 .map(String::trim)
                 .toList();
     }
-
-    private static JsonObject processSingleKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
-                                               @Nullable ItemStack itemstack, @Nullable Block block, @Nullable EntityType<?> entityType) {
-        boolean found = false;
-        boolean inverted = key.startsWith("!");
-        boolean required = key.startsWith("&");
-
-        if (inverted) key = key.substring(1);
-        if (required) key = key.substring(1);
-
-        if (key.equals(id) || key.equals("global")) {
-            found = true;
-        } else if (key.startsWith("#")) {
-            found = (itemstack != null && isItemTagged(itemstack, key)) ||
-                    (block != null && isBlockTagged(block, key)) ||
-                    (entityType != null && isEntityTagged(entityType, key));
-        }
-
-        if (inverted) found = !found;
-
-        if (required && !found) {
-            return mergedData;
-        }
-        if (!required && !found) {
-            return mergedData;
-        }
-
-        JsonObject matchedData = mainVision.getAsJsonObject(key);
-        return matchedData != null ? mergeJsonObjects(mergedData, matchedData) : mergedData;
-    }
-
 
 
     public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable EntityType<?> entityType, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
@@ -300,34 +285,30 @@ public class VisionHandler {
             }
         }
 
-        Integer index = visionKeyMap.get(id);
-        if (index != null && index >= 0 && index < visionCache.size()) {
-            JsonObject cachedData = visionCache.get(index);
-            if (cachedData != null) {
-                return cachedData;
-            }
-        }
-
         JsonObject mainVision = getMainVisionByType(type);
-        if (mainVision == null) {
-            VMinusMod.LOGGER.warn("Main vision could not be found: " + id);
-            return null;
-        }
-
         JsonObject mergedData = new JsonObject();
         for (String key : mainVision.keySet()) {
             mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entityType);
         }
 
-        if (mergedData == null) {
-            mergedData = new JsonObject();
+
+        int existingIndex = -1;
+        for (int i = 0; i < visionCache.size(); i++) {
+            if (visionCache.get(i).equals(mergedData)) {
+                existingIndex = i;
+                break;
+            }
         }
 
-        int newIndex = visionCache.size();
-        visionKeyMap.put(id, newIndex);
-        visionCache.add(mergedData);
-
-        return mergedData;
+        if (existingIndex != -1) {
+            visionKeyMap.put(id, existingIndex);
+            return visionCache.get(existingIndex);
+        } else {
+            int newIndex = visionCache.size();
+            visionKeyMap.put(id, newIndex);
+            visionCache.add(mergedData);
+            return mergedData;
+        }
     }
 
 

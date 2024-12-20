@@ -1,6 +1,7 @@
 {
-  "#vminus:rarity/uncommon": {
-    "priority": 600,
-    "rarity": "uncommon"
-  }
+  "items": [
+    "#vminus:rarity/epic"
+  ],
+  "priority": 600,
+  "rarity": "uncommon"
 }

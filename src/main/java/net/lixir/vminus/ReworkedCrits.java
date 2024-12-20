@@ -1,6 +1,6 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.init.VminusModAttributes;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -29,7 +29,7 @@ public class ReworkedCrits {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack itemStack = entity.getItemBySlot(slot);
             if (!itemStack.isEmpty()) {
-                modifierSum += getCritValueFromItem(itemStack, slot, VminusModAttributes.CRITICALDAMAGE.get());
+                modifierSum += getCritValueFromItem(itemStack, slot, VMinusAttributes.CRITICALDAMAGE.get());
             }
         }
         if (ModList.get().isLoaded("detour")) {

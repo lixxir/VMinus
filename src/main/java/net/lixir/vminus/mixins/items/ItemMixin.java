@@ -3,9 +3,9 @@ package net.lixir.vminus.mixins.items;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
+import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionPropertyHelper;
 import net.lixir.vminus.visions.VisionValueHelper;
-import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
@@ -14,23 +14,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(Item.class)
 public abstract class ItemMixin {
     @Unique
     private final Item item = (Item) (Object) this;
-    @Shadow
-    @Final
-    @Nullable
-    private FoodProperties foodProperties;
     @Shadow
     private Rarity rarity;
 
@@ -63,7 +60,7 @@ public abstract class ItemMixin {
                 if (visionData != null && visionData.has("banned")) {
                     continue;
                 } else {
-                    modifiedFoodProperties.effect(effectInstance.getFirst(),effectInstance.getSecond());
+                    modifiedFoodProperties.effect(effectInstance.getFirst(), effectInstance.getSecond());
                 }
             }
 

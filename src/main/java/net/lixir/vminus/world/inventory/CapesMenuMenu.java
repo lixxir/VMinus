@@ -1,6 +1,6 @@
 package net.lixir.vminus.world.inventory;
 
-import net.lixir.vminus.init.VminusModMenus;
+import net.lixir.vminus.registry.VMinusMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
@@ -24,16 +24,16 @@ public class CapesMenuMenu extends AbstractContainerMenu implements Supplier<Map
     public final Level world;
     public final Player entity;
     private final Map<Integer, Slot> customSlots = new HashMap<>();
-    public int x, y, z;
-    private ContainerLevelAccess access = ContainerLevelAccess.NULL;
     private final IItemHandler internal;
     private final boolean bound = false;
     private final Supplier<Boolean> boundItemMatcher = null;
     private final Entity boundEntity = null;
     private final BlockEntity boundBlockEntity = null;
+    public int x, y, z;
+    private ContainerLevelAccess access = ContainerLevelAccess.NULL;
 
     public CapesMenuMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        super(VminusModMenus.CAPES_MENU.get(), id);
+        super(VMinusMenus.CAPES_MENU.get(), id);
         this.entity = inv.player;
         this.world = inv.player.level();
         this.internal = new ItemStackHandler(0);

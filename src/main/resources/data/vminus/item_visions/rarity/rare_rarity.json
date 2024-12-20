@@ -1,6 +1,7 @@
 {
-  "#vminus:rarity/rare": {
-    "priority": 600,
-    "rarity": "rare"
-  }
+  "items": [
+    "#vminus:rarity/rare"
+  ],
+  "priority": 600,
+  "rarity": "rare"
 }

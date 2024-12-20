@@ -3,12 +3,13 @@ package net.lixir.vminus.mixins.items;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.*;
+import net.lixir.vminus.SoundHelper;
+import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.helpers.DurabilityHelper;
+import net.lixir.vminus.visions.EnchantmentVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionPropertyHelper;
 import net.lixir.vminus.visions.VisionValueHelper;
-import net.lixir.vminus.procedures.IsBannedEnchantmentProcedure;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -225,8 +226,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "enchant", at = @At("HEAD"), cancellable = true)
     public void enchant(Enchantment enchantment, int level, CallbackInfo ci) {
-        String enchantmentRegistry = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-        if (IsBannedEnchantmentProcedure.execute(enchantmentRegistry)) {
+        if (EnchantmentVisionHelper.isBanned(enchantment)) {
             ci.cancel();
             return;
         }

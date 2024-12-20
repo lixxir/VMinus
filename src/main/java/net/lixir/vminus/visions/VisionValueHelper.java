@@ -192,6 +192,7 @@ public class VisionValueHelper {
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, Entity entity) {
         return isBooleanMet(itemData, checkFor, null, "value", null, entity, null);
     }
+
     public static boolean isBooleanMet(@Nullable JsonObject itemData, String checkFor, EntityType<?> entityType) {
         return isBooleanMet(itemData, checkFor, null, "value", null, null, entityType);
     }
@@ -211,9 +212,11 @@ public class VisionValueHelper {
         }
         return booleanResult;
     }
+
     public static @Nullable JsonObject getVisionData(@Nullable JsonObject visionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity) {
         return getVisionData(visionData, itemstack, block, entity, null);
     }
+
     public static @Nullable JsonObject getVisionData(@Nullable JsonObject visionData, @Nullable ItemStack itemstack, @Nullable Block block, @Nullable Entity entity, @Nullable EntityType<?> entityType) {
         if (visionData != null)
             return visionData;
@@ -366,7 +369,6 @@ public class VisionValueHelper {
         }
         return conditionsMet;
     }
-
 
 
     public static boolean checkInverted(JsonObject conditions) {
@@ -871,9 +873,11 @@ public class VisionValueHelper {
         }
         return values;
     }
+
     public static List<String> getListOfStrings(JsonObject itemData, String checkFor, @Nullable Entity entity) {
-        return getListOfStrings(itemData,checkFor,"value",entity);
+        return getListOfStrings(itemData, checkFor, "value", entity);
     }
+
     public static List<String> getListOfStrings(JsonObject itemData, String checkFor, String valueString, @Nullable Entity entity) {
         JsonArray jsonArray = itemData.getAsJsonArray(checkFor);
         List<String> validValues = new ArrayList<>();

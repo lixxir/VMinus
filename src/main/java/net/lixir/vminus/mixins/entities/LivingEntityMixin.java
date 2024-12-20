@@ -2,9 +2,9 @@ package net.lixir.vminus.mixins.entities;
 
 import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -126,9 +126,9 @@ public abstract class LivingEntityMixin {
             }
 
             if (flag && i > 0) {
-                double d0 = (double)(i >> 16 & 255) / 255.0D;
-                double d1 = (double)(i >> 8 & 255) / 255.0D;
-                double d2 = (double)(i >> 0 & 255) / 255.0D;
+                double d0 = (double) (i >> 16 & 255) / 255.0D;
+                double d1 = (double) (i >> 8 & 255) / 255.0D;
+                double d2 = (double) (i >> 0 & 255) / 255.0D;
                 entity.level().addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT,
                         entity.getRandomX(0.5D), entity.getRandomY(), entity.getRandomZ(0.5D), d0, d1, d2);
             }

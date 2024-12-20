@@ -1,6 +1,6 @@
 package net.lixir.vminus.entity;
 
-import net.lixir.vminus.init.VminusModEntities;
+import net.lixir.vminus.registry.VMinusEntities;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +25,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class DefaultEntityEntity extends Monster {
     public DefaultEntityEntity(PlayMessages.SpawnEntity packet, Level world) {
-        this(VminusModEntities.DEFAULT_ENTITY.get(), world);
+        this(VMinusEntities.DEFAULT_ENTITY.get(), world);
     }
 
     public DefaultEntityEntity(EntityType<DefaultEntityEntity> type, Level world) {

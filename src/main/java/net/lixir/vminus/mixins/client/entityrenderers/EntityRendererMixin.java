@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins.client.entityrenderers;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionValueHelper;
-import net.lixir.vminus.visions.VisionPropertyHelper;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionPropertyHelper;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;

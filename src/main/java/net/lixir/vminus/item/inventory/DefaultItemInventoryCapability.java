@@ -1,7 +1,7 @@
 package net.lixir.vminus.item.inventory;
 
 import net.lixir.vminus.client.gui.DefaultGuiScreen;
-import net.lixir.vminus.init.VminusModItems;
+import net.lixir.vminus.registry.VMinusItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,7 +27,7 @@ public class DefaultItemInventoryCapability implements ICapabilitySerializable<C
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
     public static void onItemDropped(ItemTossEvent event) {
-        if (event.getEntity().getItem().getItem() == VminusModItems.DEFAULT_ITEM.get()) {
+        if (event.getEntity().getItem().getItem() == VMinusItems.DEFAULT_ITEM.get()) {
             if (Minecraft.getInstance().screen instanceof DefaultGuiScreen) {
                 Minecraft.getInstance().player.closeContainer();
             }
@@ -58,7 +58,7 @@ public class DefaultItemInventoryCapability implements ICapabilitySerializable<C
 
             @Override
             public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                return stack.getItem() != VminusModItems.DEFAULT_ITEM.get();
+                return stack.getItem() != VMinusItems.DEFAULT_ITEM.get();
             }
 
             @Override

@@ -1,5 +1,6 @@
 {
-  "#vminus:banned": {
-    "banned": true
-  }
+  "items": [
+    "#vminus:banned"
+  ],
+  "banned": true
 }

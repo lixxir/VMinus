@@ -1,5 +1,6 @@
 {
-  "#vminus:unenchantable": {
-    "enchantable": false
-  }
+  "items": [
+    "#vminus:unenchantable"
+  ],
+  "enchantable": false
 }

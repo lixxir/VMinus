@@ -1,15 +1,13 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.init.VminusModBlocks;
-import net.lixir.vminus.init.VminusModEntities;
-import net.lixir.vminus.init.VminusModItems;
-import net.lixir.vminus.init.VminusModMenus;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacketHandler;
+import net.lixir.vminus.registry.VMinusBlocks;
+import net.lixir.vminus.registry.VMinusEntities;
+import net.lixir.vminus.registry.VMinusItems;
+import net.lixir.vminus.registry.VMinusMenus;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -19,7 +17,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,22 +47,13 @@ public class VMinusMod {
     public VMinusMod() {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        VminusModBlocks.REGISTRY.register(bus);
-        VminusModItems.REGISTRY.register(bus);
-        VminusModEntities.REGISTRY.register(bus);
-        VminusModMenus.REGISTRY.register(bus);
+        VMinusBlocks.REGISTRY.register(bus);
+        VMinusItems.REGISTRY.register(bus);
+        VMinusEntities.REGISTRY.register(bus);
+        VMinusMenus.REGISTRY.register(bus);
 
         // Register network messages
         registerNetworkMessages();
-    }
-
-    private void registerNetworkMessages() {
-        addNetworkMessage(
-                MobVariantSyncPacket.class,
-                MobVariantSyncPacket::encode,
-                MobVariantSyncPacket::decode,
-                MobVariantSyncPacketHandler::handle
-        );
     }
 
     public static <T> void addNetworkMessage(Class<T> messageType,
@@ -79,6 +67,15 @@ public class VMinusMod {
     public static void queueServerWork(int tick, Runnable action) {
         if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER)
             workQueue.add(new AbstractMap.SimpleEntry<>(action, tick));
+    }
+
+    private void registerNetworkMessages() {
+        addNetworkMessage(
+                MobVariantSyncPacket.class,
+                MobVariantSyncPacket::encode,
+                MobVariantSyncPacket::decode,
+                MobVariantSyncPacketHandler::handle
+        );
     }
 
     @SubscribeEvent

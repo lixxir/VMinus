@@ -1,9 +1,9 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.VisionValueHelper;
-import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -33,6 +33,7 @@ public class VMinusClientEvents {
             VMinusMod.PACKET_HANDLER.sendToServer(new RequestFileGenerationPacket());
         }
     }
+
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         Entity player = event.getEntity();

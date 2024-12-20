@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

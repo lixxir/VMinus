@@ -31,6 +31,7 @@ public class VisionPropertyHelper {
                 "stack_size", "stacks_to", "max_stack", "max_stack_size"
         ));
     }};
+
     public static String propertyMet(JsonObject visionData, String propertyList) {
         if (visionData != null) {
             for (String key : PROPERTY_NAME_KEY.get(propertyList)) {

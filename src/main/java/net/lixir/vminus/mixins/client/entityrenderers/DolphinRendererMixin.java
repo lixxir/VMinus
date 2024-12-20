@@ -1,12 +1,11 @@
 package net.lixir.vminus.mixins.client.entityrenderers;
 
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.Mixin;
-
-import net.minecraft.world.entity.animal.Dolphin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.animal.Dolphin;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(net.minecraft.client.renderer.entity.DolphinRenderer.class)
 public abstract class DolphinRendererMixin {

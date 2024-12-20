@@ -63,7 +63,7 @@ public class SendJsonFilesPacketHandler {
             if (jsonObject == null || jsonObject.isJsonNull())
                 throw new IOException("Invalid JSON received.");
             switch (type) {
-                case VisionHandler.ITEM_TYPE :
+                case VisionHandler.ITEM_TYPE:
                     VminusModVariables.main_item_vision = jsonObject;
                     break;
                 case VisionHandler.BLOCK_TYPE:

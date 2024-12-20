@@ -4,12 +4,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.visions.VisionValueHelper;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.VisionValueHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -127,6 +125,7 @@ public class RecipeManagerMixin {
             LOGGER.error("Error replacing ingredient: {}", ingredient, e);
         }
     }
+
     private String extractItemId(JsonObject itemObject) {
         if (itemObject.has("item")) {
             return itemObject.get("item").getAsString();
@@ -135,6 +134,7 @@ public class RecipeManagerMixin {
         }
         return null;
     }
+
     private boolean isResultBanned(JsonObject jsonObject) {
         JsonElement resultElement = jsonObject.get("result");
         if (resultElement == null) {
@@ -176,10 +176,12 @@ public class RecipeManagerMixin {
             return false;
         }
     }
+
     private boolean isItemBanned(String itemId) {
         JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
         return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
     }
+
     private boolean isModLoaded(String modId) {
         return net.minecraftforge.fml.ModList.get().isLoaded(modId);
     }

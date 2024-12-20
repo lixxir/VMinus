@@ -41,8 +41,6 @@
     "enchantments.VanishingCurseEnchantmentMixin",
     "enchantments.WaterWalkerEnchantmentMixin",
     "enchantments.functions.EnchantmentHelperMixin",
-    "enchantments.functions.EnchantRandomlyMixin",
-    "enchantments.functions.EnchantWithLevelsMixin",
     "entities.EntityMixin",
     "entities.ItemEntityMixin",
     "entities.LivingEntityAccessor",
@@ -59,6 +57,7 @@
     "items.MilkBucketItemMixin",
     "items.RecordItemMixin",
     "items.SolidBucketItemMixin",
+    "items.EnchantedBookItemMixin",
     "level.LevelChunkSectionMixin",
     "level.LevelMixin"
   ],

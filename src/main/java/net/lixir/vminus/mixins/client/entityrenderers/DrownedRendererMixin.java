@@ -1,7 +1,6 @@
 package net.lixir.vminus.mixins.client.entityrenderers;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.monster.Drowned;
 import net.minecraft.world.entity.monster.Zombie;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

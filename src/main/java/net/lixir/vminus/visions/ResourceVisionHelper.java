@@ -1,6 +1,9 @@
 package net.lixir.vminus.visions;
 
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.resources.ResourceLocation;
@@ -12,10 +15,9 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ResourceVisionHelper {
@@ -61,6 +63,7 @@ public class ResourceVisionHelper {
 
     public static JsonObject mergeModifiersFromResourcePacks(ServerLevel srvlvl_, String folderName) {
         JsonObject jsonObject = new JsonObject();
+
         class Output implements PackResources.ResourceOutput {
             private final JsonObject jsonObject;
 
@@ -71,25 +74,33 @@ public class ResourceVisionHelper {
             @Override
             public void accept(ResourceLocation resourceLocation, IoSupplier<InputStream> ioSupplier) {
                 try {
-
-                    String jsonString = new java.io.BufferedReader(new java.io.InputStreamReader(ioSupplier.get(), java.nio.charset.StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
-                    JsonObject newJsonObject = new Gson().fromJson(jsonString, JsonObject.class);
+                    String jsonString = new BufferedReader(new InputStreamReader(ioSupplier.get(), StandardCharsets.UTF_8))
+                            .lines().collect(Collectors.joining("\n"));
+                    JsonObject newJsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
                     if (newJsonObject == null) {
-                        VMinusMod.LOGGER.warn("Failed to parse JSON from resource vision: " + resourceLocation);
+                        VMinusMod.LOGGER.warn("Failed to parse JSON from resource: " + resourceLocation);
                         return;
                     }
+
+                    String listType = switch (folderName) {
+                        case "item_visions" -> "items";
+                        case "block_visions" -> "blocks";
+                        case "entity_visions" -> "entities";
+                        case "enchantment_visions" -> "enchantments";
+                        case "effect_visions" -> "effects";
+                        default -> "";
+                    };
+
+                    if (!listType.isEmpty()) {
+                        newJsonObject = transformArrayKeyJson(newJsonObject, listType);
+                    }
+
                     for (String key : newJsonObject.keySet()) {
                         JsonElement newElement = newJsonObject.get(key);
                         JsonElement wrappedElement = wrapPrimitive(key, newElement);
 
                         if (this.jsonObject.has(key)) {
                             JsonObject existingObject = this.jsonObject.getAsJsonObject(key);
-
-                            for (String key3 : existingObject.keySet()) {
-                                JsonElement element = existingObject.get(key3);
-                                wrapPrimitive(key3, element);
-                            }
-
                             int existingPriority = getPriorityFromWrapped(existingObject);
                             int newPriority = getPriorityFromWrapped(wrappedElement.getAsJsonObject());
 
@@ -104,11 +115,11 @@ public class ResourceVisionHelper {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    VMinusMod.LOGGER.error("Error processing resource vision vision: " + resourceLocation, e);
+                    VMinusMod.LOGGER.error("Error processing resource: " + resourceLocation, e);
                 }
             }
         }
+
         Output output = new Output(jsonObject);
         ResourceManager rm = srvlvl_.getServer().getResourceManager();
         rm.listPacks().forEach(resource -> {
@@ -116,41 +127,70 @@ public class ResourceVisionHelper {
                 resource.listResources(PackType.SERVER_DATA, namespace, folderName, output);
             }
         });
+
         File configDir = new File("config/vminus/" + folderName);
-        if (!configDir.exists()) {
-            if (configDir.mkdirs()) {
-                VMinusMod.LOGGER.info("Created directory: " + configDir.getPath());
-            } else {
-                VMinusMod.LOGGER.error("Failed to create directory: " + configDir.getPath());
-            }
+        if (!configDir.exists() && !configDir.mkdirs()) {
+            VMinusMod.LOGGER.error("Failed to create directory: " + configDir.getPath());
         }
+
         if (configDir.exists() && configDir.isDirectory()) {
             File[] jsonFiles = configDir.listFiles((dir, name) -> name.endsWith(".json"));
             if (jsonFiles != null) {
                 for (File file : jsonFiles) {
                     try (FileReader reader = new FileReader(file)) {
                         JsonObject configJson = JsonParser.parseReader(reader).getAsJsonObject();
+                        String listType = switch (folderName) {
+                            case "item_visions" -> "items";
+                            case "block_visions" -> "blocks";
+                            case "entity_visions" -> "entities";
+                            case "enchantment_visions" -> "enchantments";
+                            case "effect_visions" -> "effects";
+                            default -> "";
+                        };
+
+                        if (!listType.isEmpty()) {
+                            configJson = transformArrayKeyJson(configJson, listType);
+                        }
+
                         for (String key : configJson.keySet()) {
                             if (jsonObject.has(key)) {
-                                for (String key2 : configJson.getAsJsonObject(key).keySet()) {
-                                    wrapPrimitive(key2, configJson.getAsJsonObject(key2));
-                                }
-                                for (String key3 : jsonObject.getAsJsonObject(key).keySet()) {
-                                    wrapPrimitive(key3, jsonObject.getAsJsonObject(key3));
-                                }
                                 mergeJsonObjects(jsonObject.getAsJsonObject(key), configJson.getAsJsonObject(key), 0);
                             } else {
-                                JsonElement wrappedElement = wrapPrimitive(key, configJson.get(key));
-                                jsonObject.add(key, wrappedElement);
+                                jsonObject.add(key, wrapPrimitive(key, configJson.get(key)));
                             }
                         }
                     } catch (IOException e) {
-                        VMinusMod.LOGGER.error("Error reading config vision: " + file.getName(), e);
+                        VMinusMod.LOGGER.error("Error reading config: " + file.getName(), e);
                     }
                 }
             }
         }
         return jsonObject;
+    }
+
+    public static JsonObject transformArrayKeyJson(JsonObject inputJson, String listType) {
+        if (inputJson.has(listType) && inputJson.get(listType).isJsonArray()) {
+            JsonArray listArray = inputJson.getAsJsonArray(listType);
+            StringBuilder combinedKey = new StringBuilder();
+
+            for (int i = 0; i < listArray.size(); i++) {
+                combinedKey.append(listArray.get(i).getAsString());
+                if (i < listArray.size() - 1) {
+                    combinedKey.append(",");
+                }
+            }
+            JsonObject wrappedContent = new JsonObject();
+            for (Map.Entry<String, JsonElement> entry : inputJson.entrySet()) {
+                if (!entry.getKey().equals(listType)) {
+                    wrappedContent.add(entry.getKey(), entry.getValue());
+                }
+            }
+
+            JsonObject resultObject = new JsonObject();
+            resultObject.add(combinedKey.toString(), wrappedContent);
+            return resultObject;
+        }
+        return inputJson;
     }
 
     private static int getPriorityFromWrapped(JsonObject wrappedObject) {
@@ -174,7 +214,6 @@ public class ResourceVisionHelper {
         }
         return 0;
     }
-
 
 
     public static JsonElement wrapPrimitive(String key, @Nullable JsonElement element) {
@@ -228,6 +267,7 @@ public class ResourceVisionHelper {
             }
         }
     }
+
     private static int getPriority(JsonObject jsonObject) {
         if (jsonObject.has("value")) {
             JsonElement valueElement = jsonObject.get("value");

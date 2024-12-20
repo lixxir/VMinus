@@ -1,6 +1,6 @@
 package net.lixir.vminus.world.inventory;
 
-import net.lixir.vminus.init.VminusModMenus;
+import net.lixir.vminus.registry.VMinusMenus;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,7 +36,7 @@ public class DefaultGuiMenu extends AbstractContainerMenu implements Supplier<Ma
     private BlockEntity boundBlockEntity = null;
 
     public DefaultGuiMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        super(VminusModMenus.DEFAULT_GUI.get(), id);
+        super(VMinusMenus.DEFAULT_GUI.get(), id);
         this.entity = inv.player;
         this.world = inv.player.level();
         this.internal = new ItemStackHandler(3);
