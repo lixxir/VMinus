@@ -153,15 +153,15 @@ public class CapeHelper {
             String playerName = player.getGameProfile().getName();
             if ((PATREONS.contains(playerUUID) || BOOSTERS.contains(playerUUID) || playerName.equals("Dev")) && "beeper".equals(capeId)) {
                 return true;
-            } else if (BOOSTERS.contains(playerUUID) || playerName.equals("Dev") && "ghost".equals(capeId)) {
+            } else if ((BOOSTERS.contains(playerUUID) || playerName.equals("Dev")) && "ghost".equals(capeId)) {
                 return true;
-            } else if (PATREONS.contains(playerUUID) || playerName.equals("Dev") && "marrow".equals(capeId)) {
+            } else if ((PATREONS.contains(playerUUID) || playerName.equals("Dev")) && "marrow".equals(capeId)) {
                 return true;
-            } else if (PATREONS.contains(playerUUID) || playerName.equals("Dev") && "shroud".equals(capeId)) {
+            } else if ((PATREONS.contains(playerUUID) || playerName.equals("Dev")) && "shroud".equals(capeId)) {
                 return true;
-            } else if (DEVELOPERS.contains(playerUUID) || playerName.equals("Dev") && "prototype".equals(capeId)) {
+            } else if ((DEVELOPERS.contains(playerUUID) || playerName.equals("Dev")) && "prototype".equals(capeId)) {
                 return true;
-            } else return CONTRIBUTORS.contains(playerUUID) || playerName.equals("Dev") && "troll".equals(capeId);
+            } else return (CONTRIBUTORS.contains(playerUUID) || playerName.equals("Dev")) && "troll".equals(capeId);
         }
         return false;
     }
