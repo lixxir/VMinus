@@ -30,15 +30,15 @@ public class VMinusEntities {
         event.enqueueWork(() -> {
             DefaultEntityEntity.init();
         });
-    }    public static final RegistryObject<EntityType<DefaultEntityEntity>> DEFAULT_ENTITY = register("default_entity",
-            EntityType.Builder.<DefaultEntityEntity>of(DefaultEntityEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3).setCustomClientFactory(DefaultEntityEntity::new)
-
-                    .sized(0.6f, 1.8f));
+    }
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(DEFAULT_ENTITY.get(), DefaultEntityEntity.createAttributes().build());
-    }
+    }    public static final RegistryObject<EntityType<DefaultEntityEntity>> DEFAULT_ENTITY = register("default_entity",
+            EntityType.Builder.<DefaultEntityEntity>of(DefaultEntityEntity::new, MobCategory.MONSTER).setShouldReceiveVelocityUpdates(true).setTrackingRange(64).setUpdateInterval(3).setCustomClientFactory(DefaultEntityEntity::new)
+
+                    .sized(0.6f, 1.8f));
 
 
 

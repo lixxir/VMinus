@@ -19,17 +19,17 @@ public abstract class SoulSpeedEnchantmentMixin {
         cir.setReturnValue(EnchantmentVisionHelper.getMaxLevel(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : 1));
     }
 
-    @Inject(method = "isTreasureOnly", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isTreasureOnly", at = @At("RETURN"), cancellable = true)
     private void isTreasureOnly(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isTreasure(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
 
-    @Inject(method = "isTradeable", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isTradeable", at = @At("RETURN"), cancellable = true)
     private void isTradeable(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isTradeable(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
 
-    @Inject(method = "isDiscoverable", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isDiscoverable", at = @At("RETURN"), cancellable = true)
     private void isDiscoverable(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isDiscoverable(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
