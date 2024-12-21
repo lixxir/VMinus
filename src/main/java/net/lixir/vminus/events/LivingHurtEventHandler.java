@@ -39,7 +39,6 @@ public class LivingHurtEventHandler {
                 }
             }
         }
-        float healthLostAttributeDamageBonus = amount + (amount * modifierSum);
 
         damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fire_protection", "vminus:protection/fire");
         damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blast_protection", "vminus:protection/blast");
@@ -47,7 +46,7 @@ public class LivingHurtEventHandler {
         damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fall_protection", "vminus:protection/fall");
         damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blunt_protection", "vminus:protection/blast");
 
-        event.setAmount(damage + healthLostAttributeDamageBonus);
+        event.setAmount(damage + (amount * modifierSum));
     }
 
     private static float getAttributeValueFromItem(ItemStack itemStack, EquipmentSlot slot, Attribute attribute) {
