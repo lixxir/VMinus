@@ -54,6 +54,9 @@ public class CapeHelper {
     private static final UUID IDIOTERICH = UUID.fromString("843c0ace-acc1-4d37-bca8-29d9b6c10dca");
     private static final UUID TUXXIC202 = UUID.fromString("80feac50-9b09-4076-9d21-cdfea015edd4");
     private static final UUID EFFORT_A = UUID.fromString("0330aaaf-b69e-4036-8eaf-9e23e73861cb");
+    private static final UUID CAMRIOD_CORE = UUID.fromString("53e58cfb-d3db-4c0c-8d5e-c104f0139e86");
+    private static final UUID NUCLEARDIAMOND = UUID.fromString("31b718d8-f76a-4868-a56c-b79a363ff0a9");
+    private static final UUID SHARKYTHENARWHAL = UUID.fromString("c6e73dcd-ace9-4c13-99a1-76ab218a72ad");
     //Name lists
     private static final List<UUID> PATREONS = Arrays.asList(
             LIXIR,
@@ -81,7 +84,10 @@ public class CapeHelper {
             SPOILED_ROTTEN,
             L_ORION,
             DARKLORD6323,
-            TEALOTL);
+            TEALOTL,
+            CAMRIOD_CORE,
+            NUCLEARDIAMOND,
+            SHARKYTHENARWHAL);
     private static final List<UUID> BOOSTERS = Arrays.asList(
             LIXIR,
             JACKDEDESTROYER,
@@ -97,7 +103,8 @@ public class CapeHelper {
             DARIUSZEBAGUETTE,
             IDIOTERICH,
             TUXXIC202,
-            EFFORT_A);
+            EFFORT_A,
+            UURETCH);
     private static final List<UUID> DEVELOPERS = Arrays.asList(
             LIXIR,
             JACKDEDESTROYER,
