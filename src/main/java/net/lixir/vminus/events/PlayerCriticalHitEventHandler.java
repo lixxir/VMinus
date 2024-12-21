@@ -1,4 +1,4 @@
-package net.lixir.vminus;
+package net.lixir.vminus.events;
 
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Collection;
 
 @Mod.EventBusSubscriber
-public class ReworkedCrits {
+public class PlayerCriticalHitEventHandler {
     private static final float DEFAULT_DAMAGE_MODIFIER = 1.5f;
     private static final float DETOUR_DAMAGE_MODIFIER = 1.15f;
 
