@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +21,7 @@ public abstract class MobEffectMixin {
     private void getColor(CallbackInfoReturnable<Integer> cir) {
         JsonObject visionData = VisionHandler.getVisionData(effect);
         if (visionData != null && visionData.has("color")) {
-            String color = VisionValueHelper.getFirstValidString(visionData, "color");
+            String color = VisionValueHandler.getFirstValidString(visionData, "color");
             if (color.startsWith("#")) {
                 int colorInt = Integer.parseInt(color.substring(1), 16);
                 cir.setReturnValue(colorInt);
@@ -35,7 +35,7 @@ public abstract class MobEffectMixin {
     public void getCategory(CallbackInfoReturnable<MobEffectCategory> cir) {
         JsonObject visionData = VisionHandler.getVisionData(effect);
         if (visionData != null && visionData.has("category")) {
-            String category = VisionValueHelper.getFirstValidString(visionData, "category");
+            String category = VisionValueHandler.getFirstValidString(visionData, "category");
             MobEffectCategory customCategory = getCategoryFromString(category);
             if (customCategory != null) {
                 cir.setReturnValue(customCategory);

@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +18,7 @@ public class ItemEntityMixin {
         ItemStack itemstack = item.getItem();
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
         if (itemData != null && itemData.has("fire_resistant")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, "fire_resistant", itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, "fire_resistant", itemstack));
         }
     }
 }

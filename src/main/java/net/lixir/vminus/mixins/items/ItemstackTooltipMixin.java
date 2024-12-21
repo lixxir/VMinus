@@ -8,7 +8,7 @@ import net.lixir.vminus.helpers.DurabilityHelper;
 import net.lixir.vminus.helpers.EnchantAndCurseHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -140,7 +140,7 @@ public abstract class ItemstackTooltipMixin {
         list.add(mutablecomponent);
         stack.getItem().appendHoverText(itemstack, player == null ? null : player.level(), list, flag);
         if (itemData != null) {
-            List<String> tooltips = VisionValueHelper.getTooltips(itemData, itemstack, true);
+            List<String> tooltips = VisionValueHandler.getTooltips(itemData, itemstack, true);
             for (String tooltipD : tooltips) {
                 list.add(Component.literal((tooltipD)));
             }
@@ -404,7 +404,7 @@ public abstract class ItemstackTooltipMixin {
             list.add(Component.literal(genericStatsString));
         }
         if (itemData != null) {
-            List<String> tooltips = VisionValueHelper.getTooltips(itemData, itemstack, false);
+            List<String> tooltips = VisionValueHandler.getTooltips(itemData, itemstack, false);
             for (String tooltipD : tooltips) {
                 list.add(Component.literal((tooltipD)));
             }

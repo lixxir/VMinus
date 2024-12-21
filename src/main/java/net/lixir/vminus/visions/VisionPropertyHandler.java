@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class VisionPropertyHelper {
+public class VisionPropertyHandler {
     private static final HashMap<String, List<String>> PROPERTY_NAME_KEY = new HashMap<String, List<String>>() {{
         put("hides_nametag", Arrays.asList(
                 "hide_nametag", "hides_nametag", "hide_nametags", "hides_nametags",

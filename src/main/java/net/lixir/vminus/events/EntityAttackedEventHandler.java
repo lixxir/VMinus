@@ -3,7 +3,7 @@ package net.lixir.vminus.events;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -128,7 +128,7 @@ public class EntityAttackedEventHandler {
                             if (visionData != null) {
                                 if (visionData.has("particle")) {
                                     // getting the string and resource location to add to the particle list
-                                    String particleString = VisionValueHelper.getFirstValidString(visionData, "particle");
+                                    String particleString = VisionValueHandler.getFirstValidString(visionData, "particle");
                                     if (!particleString.isEmpty() && particleString != null) {
                                         ResourceLocation particleLocation = new ResourceLocation(particleString);
                                         if (particleLocation != null)
@@ -136,7 +136,7 @@ public class EntityAttackedEventHandler {
                                     }
                                 }
                                 if (visionData.has("sound")) {
-                                    String soundString = VisionValueHelper.getFirstValidString(visionData, "sound");
+                                    String soundString = VisionValueHandler.getFirstValidString(visionData, "sound");
                                     if (!world.isClientSide())
                                         world.playSound(null, BlockPos.containing(sourceentity.getX(),
                                                         sourceentity.getY() + 1,

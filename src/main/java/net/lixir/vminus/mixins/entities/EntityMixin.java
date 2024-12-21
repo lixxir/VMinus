@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,7 +19,7 @@ public class EntityMixin {
     private void isSilent(CallbackInfoReturnable<Boolean> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("silent")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "silent", entity.getType()));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "silent", entity.getType()));
         }
     }
 
@@ -27,7 +27,7 @@ public class EntityMixin {
     private void dampensVibrations(CallbackInfoReturnable<Boolean> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("dampens_vibrations")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "dampens_vibrations", entity.getType()));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "dampens_vibrations", entity.getType()));
         }
     }
 }

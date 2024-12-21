@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.blocks;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -26,7 +26,7 @@ public abstract class BlockStateBaseMixin {
         Block block = state.getBlock();
         JsonObject blockData = VisionHandler.getVisionData(block);
         if (blockData != null && blockData.has("light_level")) {
-            int lightLevel = VisionValueHelper.isNumberMet(blockData, "light_level", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
+            int lightLevel = VisionValueHandler.isNumberMet(blockData, "light_level", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
             cir.setReturnValue(Math.min(Math.max(lightLevel, 0), 15));
         }
     }
@@ -36,7 +36,7 @@ public abstract class BlockStateBaseMixin {
         Block block = state.getBlock();
         JsonObject blockData = VisionHandler.getVisionData(block);
         if (blockData != null && blockData.has("emissive_rendering")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(blockData, "emissive_rendering", block));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "emissive_rendering", block));
         }
     }
 
@@ -45,7 +45,7 @@ public abstract class BlockStateBaseMixin {
         Block block = state.getBlock();
         JsonObject blockData = VisionHandler.getVisionData(block);
         if (blockData != null && blockData.has("can_occlude")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(blockData, "can_occlude", block));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "can_occlude", block));
         }
     }
 
@@ -54,7 +54,7 @@ public abstract class BlockStateBaseMixin {
         Block block = state.getBlock();
         JsonObject blockData = VisionHandler.getVisionData(block);
         if (blockData != null && blockData.has("redstone_conductor")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(blockData, "redstone_conductor", block));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "redstone_conductor", block));
         }
     }
 
@@ -63,7 +63,7 @@ public abstract class BlockStateBaseMixin {
         Block block = state.getBlock();
         JsonObject blockData = VisionHandler.getVisionData(block);
         if (blockData != null && blockData.has("destroy_time")) {
-            float destroyTime = VisionValueHelper.isNumberMet(blockData, "destroy_time", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
+            float destroyTime = VisionValueHandler.isNumberMet(blockData, "destroy_time", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
             cir.setReturnValue(Math.max(-1, destroyTime));
         }
     }

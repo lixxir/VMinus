@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.level;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.helpers.DirectionHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -27,19 +27,19 @@ public abstract class LevelChunkSectionMixin {
         JsonObject visionData = VisionHandler.getVisionData(block);
         // Replace takes priority over banning.
         if (visionData != null && visionData.has("replace")) {
-            String decoString = VisionValueHelper.getFirstValidString(visionData, "replace", block);
+            String decoString = VisionValueHandler.getFirstValidString(visionData, "replace", block);
             ResourceLocation resourceLocation = new ResourceLocation(decoString);
             Block replacingBlock = ForgeRegistries.BLOCKS.getValue(resourceLocation);
             if (replacingBlock != null) {
                 cir.setReturnValue(setBlockState(x, y, z, replacingBlock.defaultBlockState(), flag));
             }
         } else if (visionData != null && visionData.has("banned")) {
-            boolean banned = VisionValueHelper.isBooleanMet(visionData, "banned", block);
+            boolean banned = VisionValueHandler.isBooleanMet(visionData, "banned", block);
             if (banned)
                 cir.cancel();
         }
         if (visionData != null && visionData.has("constant_direction")) {
-            String directionString = VisionValueHelper.getFirstValidString(visionData, "constant_direction", block);
+            String directionString = VisionValueHandler.getFirstValidString(visionData, "constant_direction", block);
             Direction direction = DirectionHelper.getDirectionFromString(directionString);
             if (direction != null) {
                 BlockState currentState = state;

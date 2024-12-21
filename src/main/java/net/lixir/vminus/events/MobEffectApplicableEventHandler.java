@@ -2,7 +2,7 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -19,7 +19,7 @@ public class MobEffectApplicableEventHandler {
                 return;
             JsonObject visionData = VisionHandler.getVisionData(effect);
             if (visionData != null && visionData.has("banned")) {
-                boolean banned = VisionValueHelper.isBooleanMet(visionData, "banned");
+                boolean banned = VisionValueHandler.isBooleanMet(visionData, "banned");
                 if (banned) {
                     if (event != null && event.hasResult()) {
                         event.setResult(Event.Result.DENY);

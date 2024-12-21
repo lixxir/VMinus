@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ResourceVisionHelper {
+public class ResourceVisionLoader {
     public static void generateItemVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;

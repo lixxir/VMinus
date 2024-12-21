@@ -2,7 +2,7 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -95,7 +95,7 @@ public class LivingTickEventHandler {
         }
         JsonObject visionData = VisionHandler.getVisionData(mobEffect);
         if (visionData != null && visionData.has("particle")) {
-            String effectString = VisionValueHelper.getFirstValidString(visionData, "particle");
+            String effectString = VisionValueHandler.getFirstValidString(visionData, "particle");
             ResourceLocation particleLocation = new ResourceLocation(effectString);
             ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(particleLocation);
             if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {

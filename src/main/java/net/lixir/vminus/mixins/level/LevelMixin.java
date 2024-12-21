@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.level;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.helpers.DirectionHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +34,7 @@ public abstract class LevelMixin {
         Block block = state.getBlock();
         JsonObject visionData = VisionHandler.getVisionData(block);
         if (visionData != null && visionData.has("replace")) {
-            String replaceString = VisionValueHelper.getFirstValidString(visionData, "replace", block);
+            String replaceString = VisionValueHandler.getFirstValidString(visionData, "replace", block);
             ResourceLocation resourceLocation = new ResourceLocation(replaceString);
             Block replacingBlock = ForgeRegistries.BLOCKS.getValue(resourceLocation);
             if (replacingBlock != null) {
@@ -43,12 +43,12 @@ public abstract class LevelMixin {
                 world.scheduleTick(pos, replacingBlock, 1);
             }
         } else if (visionData != null && visionData.has("banned")) {
-            boolean banned = VisionValueHelper.isBooleanMet(visionData, "banned", block);
+            boolean banned = VisionValueHandler.isBooleanMet(visionData, "banned", block);
             if (banned)
                 cir.cancel();
         }
         if (visionData != null && visionData.has("constant_direction")) {
-            String directionString = VisionValueHelper.getFirstValidString(visionData, "constant_direction", block);
+            String directionString = VisionValueHandler.getFirstValidString(visionData, "constant_direction", block);
             Direction direction = DirectionHelper.getDirectionFromString(directionString);
             if (direction != null) {
                 BlockState currentState = state;

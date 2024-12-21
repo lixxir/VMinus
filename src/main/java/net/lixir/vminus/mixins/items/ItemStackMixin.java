@@ -6,10 +6,10 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.helpers.DurabilityHelper;
-import net.lixir.vminus.visions.EnchantmentVisionHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionPropertyHelper;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionPropertyHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -89,7 +89,7 @@ public abstract class ItemStackMixin {
     @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
     public void hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
-            String replaceId = VisionValueHelper.getFirstValidString(null, "break_replacement", itemstack);
+            String replaceId = VisionValueHandler.getFirstValidString(null, "break_replacement", itemstack);
             if (replaceId != null && !replaceId.isEmpty()) {
                 final ItemStack findItem = itemstack;
                 CompoundTag tag = findItem.getOrCreateTag();
@@ -111,7 +111,7 @@ public abstract class ItemStackMixin {
                 }
                 player.awardStat(Stats.ITEM_BROKEN.get(findItem.getItem()));
                 if (slotIndex != -1) {
-                    if (VisionValueHelper.isBooleanMet(null, "break_replacement", itemstack, "carry_nbt")) {
+                    if (VisionValueHandler.isBooleanMet(null, "break_replacement", itemstack, "carry_nbt")) {
                         replacementStack.setTag(tag);
                     }
                     if (slotIndex < 100) {
@@ -164,14 +164,14 @@ public abstract class ItemStackMixin {
             int startColor = 4384126;
             int endColor = 2186818;
             try {
-                String startColorString = VisionValueHelper.getFirstValidString(itemData, "bar", itemstack, "start_color");
+                String startColorString = VisionValueHandler.getFirstValidString(itemData, "bar", itemstack, "start_color");
                 if (startColorString != null)
                     startColor = Integer.decode(startColorString.trim());
             } catch (NumberFormatException e) {
                 VMinusMod.LOGGER.error("Invalid start_color format: " + itemData.get("start_color").getAsString());
             }
             try {
-                String endColorString = VisionValueHelper.getFirstValidString(itemData, "bar", itemstack, "end_color");
+                String endColorString = VisionValueHandler.getFirstValidString(itemData, "bar", itemstack, "end_color");
                 if (endColorString != null)
                     endColor = Integer.decode(endColorString.trim());
             } catch (NumberFormatException e) {
@@ -274,7 +274,7 @@ public abstract class ItemStackMixin {
         CompoundTag tag = itemstack.getTag();
         if (itemData != null && itemData.has("min_damage")) {
             int dealtDamage = itemstack.getDamageValue();
-            int minDamage = VisionValueHelper.isNumberMet(itemData, "min_damage", 0, itemstack);
+            int minDamage = VisionValueHandler.isNumberMet(itemData, "min_damage", 0, itemstack);
             if (dealtDamage < minDamage) {
                 itemstack.getOrCreateTag().putInt("Damage", minDamage);
                 ci.cancel();
@@ -299,9 +299,9 @@ public abstract class ItemStackMixin {
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "durability");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "durability");
         if (!propertyMet.isEmpty()) {
-            int maxDurability = VisionValueHelper.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, itemstack);
+            int maxDurability = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, itemstack);
             cir.setReturnValue(maxDurability);
         }
     }
@@ -309,18 +309,18 @@ public abstract class ItemStackMixin {
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "damageable");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
     @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "damageable");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
@@ -357,9 +357,9 @@ public abstract class ItemStackMixin {
     @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "foil");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "foil");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
         }
     }
 
@@ -388,10 +388,10 @@ public abstract class ItemStackMixin {
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "use_duration");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "use_duration");
         if (!propertyMet.isEmpty()) {
             int defaultDuration = 32;
-            int calculatedDuration = VisionValueHelper.isNumberMet(itemData, propertyMet, defaultDuration, itemstack);
+            int calculatedDuration = VisionValueHandler.isNumberMet(itemData, propertyMet, defaultDuration, itemstack);
             if (calculatedDuration != defaultDuration) {
                 cir.setReturnValue(calculatedDuration);
             }

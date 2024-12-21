@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -105,12 +105,12 @@ public class RecipeManagerMixin {
                     ItemStack itemstack = createItemStack(itemId);
                     JsonObject itemData = VisionHandler.getVisionData(itemstack);
                     if (itemData != null) {
-                        if (VisionValueHelper.isBooleanMet(itemData, "banned", itemstack) && !itemData.has("recipe_replace") && !itemData.has("replace")) {
+                        if (VisionValueHandler.isBooleanMet(itemData, "banned", itemstack) && !itemData.has("recipe_replace") && !itemData.has("replace")) {
                             ingredient.addProperty("item", "minecraft:air");
                         } else if (itemData.has("recipe_replace") || itemData.has("replace")) {
-                            String replacementId = VisionValueHelper.getFirstValidString(itemData, "recipe_replace", itemstack);
+                            String replacementId = VisionValueHandler.getFirstValidString(itemData, "recipe_replace", itemstack);
                             if (!itemData.has("recipe_replace")) {
-                                replacementId = VisionValueHelper.getFirstValidString(itemData, "replace", itemstack);
+                                replacementId = VisionValueHandler.getFirstValidString(itemData, "replace", itemstack);
                             }
                             if (isValidResourceLocation(replacementId)) {
                                 ingredient.addProperty("item", replacementId);
@@ -179,7 +179,7 @@ public class RecipeManagerMixin {
 
     private boolean isItemBanned(String itemId) {
         JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
-        return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
+        return itemData != null && VisionValueHandler.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
     }
 
     private boolean isModLoaded(String modId) {
@@ -220,7 +220,7 @@ public class RecipeManagerMixin {
             if (ingredient.has("item")) {
                 String itemId = ingredient.get("item").getAsString();
                 JsonObject itemData = VisionHandler.getVisionData(createItemStack(itemId));
-                return itemData != null && VisionValueHelper.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
+                return itemData != null && VisionValueHandler.isBooleanMet(itemData, "banned", createItemStack(itemId)) && !itemData.has("recipe_replace");
             }
         } catch (Exception e) {
             LOGGER.error("Error checking if ingredient is banned: {}", ingredient, e);

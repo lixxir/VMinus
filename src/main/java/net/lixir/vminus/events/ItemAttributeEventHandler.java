@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -155,7 +155,7 @@ public class ItemAttributeEventHandler {
             }
         }
         if (itemData != null && itemData.has("nbt")) {
-            ItemStack copyStack = VisionValueHelper.setNBTs(itemData, itemstack.copy());
+            ItemStack copyStack = VisionValueHandler.setNBTs(itemData, itemstack.copy());
             //System.out.println(itemData);
             CompoundTag copyTag = copyStack.getOrCreateTag();
             if (copyTag != null && !copyTag.isEmpty()) {

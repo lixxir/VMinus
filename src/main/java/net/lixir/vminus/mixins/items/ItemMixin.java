@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionPropertyHelper;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionPropertyHandler;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
@@ -35,9 +35,9 @@ public abstract class ItemMixin {
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         ItemStack itemstack = new ItemStack(item);
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHelper.propertyMet(itemData, "stack_size");
+        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "stack_size");
         if (!propertyMet.isEmpty()) {
-            int newStackSize = VisionValueHelper.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 64, itemstack);
+            int newStackSize = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 64, itemstack);
             cir.setReturnValue(Math.max(newStackSize, 1));
         }
     }
@@ -72,7 +72,7 @@ public abstract class ItemMixin {
                 modifiedFoodProperties.fast();
         }
         if (itemData != null && itemData.has("food_properties")) {
-            cir.setReturnValue(VisionValueHelper.getFoodProperties(itemData, itemstack, modifiedFoodProperties != null ? modifiedFoodProperties.build() : originalProperties));
+            cir.setReturnValue(VisionValueHandler.getFoodProperties(itemData, itemstack, modifiedFoodProperties != null ? modifiedFoodProperties.build() : originalProperties));
         } else if (modifiedFoodProperties != null) {
             cir.setReturnValue(modifiedFoodProperties.build());
         }
@@ -83,7 +83,7 @@ public abstract class ItemMixin {
         ItemStack itemstack = new ItemStack(item);
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
         if (itemData != null && itemData.has("fire_resistant")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(itemData, "fire_resistant", itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, "fire_resistant", itemstack));
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class ItemMixin {
         JsonObject itemData = VisionHandler.getVisionData(p_41402_);
         if (itemData != null && itemData.has("repair_item")) {
             JsonArray repairMaterialsJsonArray = itemData.getAsJsonArray("repair_item");
-            List<String> repairMaterials = VisionValueHelper.getStringListFromJsonArray(repairMaterialsJsonArray);
+            List<String> repairMaterials = VisionValueHandler.getStringListFromJsonArray(repairMaterialsJsonArray);
             String repairItemId = ForgeRegistries.ITEMS.getKey(p_41403_.getItem()).toString();
             if (repairMaterials.contains(repairItemId)) {
                 cir.setReturnValue(true);
@@ -106,7 +106,7 @@ public abstract class ItemMixin {
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
         if (itemData != null && itemData.has("use_duration")) {
             int defaultDuration = 32;
-            int calculatedDuration = VisionValueHelper.isNumberMet(itemData, "use_duration", defaultDuration, itemstack);
+            int calculatedDuration = VisionValueHandler.isNumberMet(itemData, "use_duration", defaultDuration, itemstack);
             if (calculatedDuration != defaultDuration) {
                 cir.setReturnValue(calculatedDuration);
             }
@@ -127,7 +127,7 @@ public abstract class ItemMixin {
         ItemStack itemstack = new ItemStack(item);
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
         if (itemData != null && itemData.has("enchantability")) {
-            cir.setReturnValue(VisionValueHelper.isNumberMet(itemData, "enchantability", cir.getReturnValue(), itemstack));
+            cir.setReturnValue(VisionValueHandler.isNumberMet(itemData, "enchantability", cir.getReturnValue(), itemstack));
         }
     }
 
@@ -150,7 +150,7 @@ public abstract class ItemMixin {
         }
         JsonObject itemData = VisionHandler.getVisionData(itemstack);
         if (itemData != null && itemData.has("rarity")) {
-            rarityString = VisionValueHelper.getRarity(itemData, itemstack, rarityString).toLowerCase();
+            rarityString = VisionValueHandler.getRarity(itemData, itemstack, rarityString).toLowerCase();
         }
         switch (rarityString) {
             case "uncommon":

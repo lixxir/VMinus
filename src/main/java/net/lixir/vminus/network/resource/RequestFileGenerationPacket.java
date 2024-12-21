@@ -2,7 +2,7 @@ package net.lixir.vminus.network.resource;
 
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
-import net.lixir.vminus.visions.ResourceVisionHelper;
+import net.lixir.vminus.visions.ResourceVisionLoader;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,15 +25,15 @@ public class RequestFileGenerationPacket {
         contextSupplier.get().enqueueWork(() -> {
             LevelAccessor world = player.level();
             if (VminusModVariables.main_item_vision.entrySet().isEmpty())
-                ResourceVisionHelper.generateItemVisionsFile(world);
+                ResourceVisionLoader.generateItemVisionsFile(world);
             if (VminusModVariables.main_block_vision.entrySet().isEmpty())
-                ResourceVisionHelper.generateBlockVisionsFile(world);
+                ResourceVisionLoader.generateBlockVisionsFile(world);
             if (VminusModVariables.main_entity_vision.entrySet().isEmpty())
-                ResourceVisionHelper.generateEntityVisionsFile(world);
+                ResourceVisionLoader.generateEntityVisionsFile(world);
             if (VminusModVariables.main_effect_vision.entrySet().isEmpty())
-                ResourceVisionHelper.generateEffectVisionsFile(world);
+                ResourceVisionLoader.generateEffectVisionsFile(world);
             if (VminusModVariables.main_enchantment_vision.entrySet().isEmpty())
-                ResourceVisionHelper.generateEnchantmentVisionsFile(world);
+                ResourceVisionLoader.generateEnchantmentVisionsFile(world);
             sendFilesToClient(player);
         });
         contextSupplier.get().setPacketHandled(true);

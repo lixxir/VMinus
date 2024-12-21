@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +43,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "breakItem", at = @At("HEAD"), cancellable = true)
     private void breakItem(ItemStack itemstack, CallbackInfo ci) {
-        String soundString = VisionValueHelper.getFirstValidString(null, "break_sound", itemstack);
+        String soundString = VisionValueHandler.getFirstValidString(null, "break_sound", itemstack);
         if (soundString != null && !soundString.isEmpty()) {
             if (!itemstack.isEmpty()) {
                 if (!((LivingEntity) (Object) this).isSilent()) {
@@ -52,7 +52,7 @@ public abstract class LivingEntityMixin {
                     ((LivingEntity) (Object) this).level().playLocalSound(((LivingEntity) (Object) this).getX(), ((LivingEntity) (Object) this).getY(), ((LivingEntity) (Object) this).getZ(), customSoundEvent,
                             ((LivingEntity) (Object) this).getSoundSource(), 0.8F, 0.8F + ((LivingEntity) (Object) this).level().random.nextFloat() * 0.4F, false);
                 }
-                if (!VisionValueHelper.isBooleanMet(null, "no_break_particles", itemstack))
+                if (!VisionValueHandler.isBooleanMet(null, "no_break_particles", itemstack))
                     this.spawnItemParticles(itemstack, 5);
             }
             ci.cancel();
@@ -140,7 +140,7 @@ public abstract class LivingEntityMixin {
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("water_sensitive")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "water_sensitive", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "water_sensitive", entity));
         }
     }
 
@@ -149,7 +149,7 @@ public abstract class LivingEntityMixin {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("disable_shields")) {
             System.out.println("DISABLING SHIELDS!");
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "disable_shields", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "disable_shields", entity));
         }
     }
 
@@ -157,7 +157,7 @@ public abstract class LivingEntityMixin {
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("underwater_breathing")) {
-            cir.setReturnValue(VisionValueHelper.isBooleanMet(visionData, "underwater_breathing", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "underwater_breathing", entity));
         }
     }
 
@@ -166,7 +166,7 @@ public abstract class LivingEntityMixin {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("volume")) {
             float defaultVolume = 1f;
-            float totalVolume = VisionValueHelper.isNumberMet(visionData, "volume", defaultVolume, entity);
+            float totalVolume = VisionValueHandler.isNumberMet(visionData, "volume", defaultVolume, entity);
             if (totalVolume != defaultVolume) {
                 cir.setReturnValue(Math.max(totalVolume, 0.0f));
             }
@@ -177,7 +177,7 @@ public abstract class LivingEntityMixin {
     private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("experience")) {
-            int experience = VisionValueHelper.isNumberMet(visionData, "experience", 0, entity);
+            int experience = VisionValueHandler.isNumberMet(visionData, "experience", 0, entity);
             System.out.println("DROPPING NEW XP: " + experience);
             cir.setReturnValue(Math.max(experience, 0));
         }
@@ -189,7 +189,7 @@ public abstract class LivingEntityMixin {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("death_sound")) {
             System.out.println("Trying deathsound");
-            String soundString = VisionValueHelper.getFirstValidString(visionData, "death_sound", entity);
+            String soundString = VisionValueHandler.getFirstValidString(visionData, "death_sound", entity);
             SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
             if (sound != null)
                 cir.setReturnValue(sound);
@@ -201,7 +201,7 @@ public abstract class LivingEntityMixin {
     private void getHurtSound(DamageSource p_219440_, CallbackInfoReturnable<SoundEvent> cir) {
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         if (visionData != null && visionData.has("hurt_sound")) {
-            String soundString = VisionValueHelper.getFirstValidString(visionData, "hurt_sound", entity);
+            String soundString = VisionValueHandler.getFirstValidString(visionData, "hurt_sound", entity);
             SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
             if (sound != null)
                 cir.setReturnValue(sound);

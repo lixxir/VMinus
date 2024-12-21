@@ -7,7 +7,8 @@ import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.helpers.MobVariantHelper;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.ItemVisionHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -38,7 +39,7 @@ public class EntitySpawnedEventHandler {
 
         JsonObject visionData = VisionHandler.getVisionData(entity.getType());
         // Banning banned entities
-        if (VisionValueHelper.isBooleanMet(visionData, "banned", entity)) {
+        if (VisionValueHandler.isBooleanMet(visionData, "banned", entity)) {
             if (event != null && event.isCancelable()) {
                 event.setCanceled(true);
             } else if (event != null && event.hasResult()) {
@@ -73,13 +74,13 @@ public class EntitySpawnedEventHandler {
 
         // Attempts to replace an in-world item entity if it needs to be, or bans if it needs to be.
         if (entity instanceof ItemEntity) {
-            ItemStack itemStack = (entity instanceof ItemEntity _itemEnt ? _itemEnt.getItem() : ItemStack.EMPTY);
-            JsonObject itemData = VisionHandler.getVisionData(itemStack);
+            ItemStack itemstack = (entity instanceof ItemEntity _itemEnt ? _itemEnt.getItem() : ItemStack.EMPTY);
+            JsonObject itemData = VisionHandler.getVisionData(itemstack);
             if (itemData != null) {
                 if (itemData.has("drop_replace") || itemData.has("replace")) {
-                    String replaceString = VisionValueHelper.getFirstValidString(itemData, "replace", itemStack);
+                    String replaceString = VisionValueHandler.getFirstValidString(itemData, "replace", itemstack);
                     if (replaceString == null || replaceString.isEmpty())
-                        replaceString = VisionValueHelper.getFirstValidString(itemData, "drop_replace", itemStack);
+                        replaceString = VisionValueHandler.getFirstValidString(itemData, "drop_replace", itemstack);
                     ResourceLocation replaceLocation = new ResourceLocation(replaceString);
                     Item replacementItem = ForgeRegistries.ITEMS.getValue(replaceLocation);
                     if (replacementItem != null) {
@@ -93,7 +94,7 @@ public class EntitySpawnedEventHandler {
                         ItemEntity newItemEntity = new ItemEntity(world, entity.getX(), entity.getY(), entity.getZ(), newItemStack);
                         world.addFreshEntity(newItemEntity);
                     }
-                } else if (itemData.has("banned") && VisionValueHelper.isBooleanMet(itemData, "banned", itemStack)) {
+                } else if (ItemVisionHelper.isBanned(itemstack)) {
                     if (event != null && event.isCancelable()) {
                         event.setCanceled(true);
                     } else if (event != null && event.hasResult()) {

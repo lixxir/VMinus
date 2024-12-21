@@ -1,6 +1,6 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.visions.ResourceVisionHelper;
+import net.lixir.vminus.visions.ResourceVisionLoader;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -17,11 +17,11 @@ public class LevelLoadEventHandler {
         LevelAccessor world = event.getLevel();
         VisionHandler.clearCaches();
         if (world instanceof ServerLevel _serverlevel) {
-            ResourceVisionHelper.generateItemVisionsFile(_serverlevel);
-            ResourceVisionHelper.generateBlockVisionsFile(_serverlevel);
-            ResourceVisionHelper.generateEntityVisionsFile(_serverlevel);
-            ResourceVisionHelper.generateEffectVisionsFile(_serverlevel);
-            ResourceVisionHelper.generateEnchantmentVisionsFile(_serverlevel);
+            ResourceVisionLoader.generateItemVisionsFile(_serverlevel);
+            ResourceVisionLoader.generateBlockVisionsFile(_serverlevel);
+            ResourceVisionLoader.generateEntityVisionsFile(_serverlevel);
+            ResourceVisionLoader.generateEffectVisionsFile(_serverlevel);
+            ResourceVisionLoader.generateEnchantmentVisionsFile(_serverlevel);
             // Required for vision recipe changes.
             MinecraftServer server = _serverlevel.getServer();
             if (server != null) {

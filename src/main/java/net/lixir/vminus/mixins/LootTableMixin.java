@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.lixir.vminus.LootTableAccessor;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
@@ -54,7 +54,7 @@ public abstract class LootTableMixin {
         List<Integer> availableSlots = this.getAvailableSlots(container, randomSource);
         ObjectArrayList<ItemStack> filteredItems = itemStacks.stream().filter(itemstack -> {
             JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            return !VisionValueHelper.isBooleanMet(itemData, "banned", itemstack);
+            return !VisionValueHandler.isBooleanMet(itemData, "banned", itemstack);
         }).collect(Collectors.toCollection(ObjectArrayList::new));
         this.shuffleAndSplitItems(filteredItems, availableSlots.size(), randomSource);
         for (ItemStack itemstack : filteredItems) {

@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.commands;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHelper;
+import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -37,7 +37,7 @@ public abstract class SummonCommandMixin {
                             BuiltInRegistries.ENTITY_TYPE.stream()
                                     .filter(entityType -> {
                                         JsonObject visionData = VisionHandler.getVisionData(entityType);
-                                        return !VisionValueHelper.isBooleanMet(visionData, "banned", entityType);
+                                        return !VisionValueHandler.isBooleanMet(visionData, "banned", entityType);
                                     }),
                             builder,
                             EntityType::getKey,

@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisionValueHelper {
+public class VisionValueHandler {
     private static boolean isModLoaded(String modId) {
         return net.minecraftforge.fml.ModList.get().isLoaded(modId);
     }

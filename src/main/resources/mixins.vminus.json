@@ -11,6 +11,8 @@
     "blocks.BlockRealMixin",
     "blocks.BlockStateBaseMixin",
     "blocks.CocaoBlockMixin",
+    "world.InventoryMixin",
+    "world.SimpleContainerMixin",
     "blocks.PowderSnowBlockMixin",
     "commands.SummonCommandMixin",
     "commands.SummonCommandAccessor",

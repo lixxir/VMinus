@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.visions.EnchantmentVisionHelper;
+import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
