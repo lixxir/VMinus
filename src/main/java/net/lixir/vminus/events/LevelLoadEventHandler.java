@@ -33,7 +33,6 @@ public class LevelLoadEventHandler {
             ResourceVisionLoader.generateEnchantmentVisionsFile(serverLevel);
             MinecraftServer server = serverLevel.getServer();
             if (server != null) {
-                VMinusMod.LOGGER.info("RELOADED RESOURCES.");
                 server.reloadResources(server.getPackRepository().getSelectedIds());
             }
         }
