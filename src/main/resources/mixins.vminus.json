@@ -8,6 +8,7 @@
     "LootTableMixin",
     "MobEffectMixin",
     "RecipeManagerMixin",
+    "ChatFormattingMixin",
     "blocks.BlockRealMixin",
     "blocks.BlockStateBaseMixin",
     "blocks.CocaoBlockMixin",
