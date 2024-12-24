@@ -293,12 +293,14 @@ public class VisionHandler {
 
 
         int existingIndex = -1;
-        for (int i = 0; i < visionCache.size(); i++) {
-            if (visionCache.get(i).equals(mergedData)) {
-                existingIndex = i;
-                break;
+        if (visionCache.size() > 0) {
+            for (int i = 0; i < visionCache.size(); i++) {
+                if (visionCache.get(i).equals(mergedData)) {
+                    existingIndex = i;
+                    break;
+                }
             }
-        }
+         }
 
         if (existingIndex != -1) {
             visionKeyMap.put(id, existingIndex);
