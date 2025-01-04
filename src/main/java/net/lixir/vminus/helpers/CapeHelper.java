@@ -118,7 +118,7 @@ public class CapeHelper {
             STALLMAN1111,
             VECTORV,
             PONDEROSA);
-    //Cape textures
+    //Cape texture
     private static final ResourceLocation BEEPER_CAPE = new ResourceLocation("vminus", "textures/cape/beeper_cape.png");
     private static final ResourceLocation GHOST_CAPE = new ResourceLocation("vminus", "textures/cape/ghost_cape.png");
     private static final ResourceLocation SHROUD_CAPE = new ResourceLocation("vminus", "textures/cape/shroud_cape.png");
