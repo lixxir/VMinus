@@ -26,10 +26,11 @@ public abstract class ChatFormattingMixin {
     private static final ChatFormatting PINE = addFormatting("PINE", 'n', hexToInt("629646"));
     private static final ChatFormatting PLUM = addFormatting("PLUM", 'z', hexToInt("4d3b7f"));
     private static final ChatFormatting TOOTHPASTE = addFormatting("TOOTHPASTE", 'h', hexToInt("2afcd2"));
-    private static final ChatFormatting TRUE_YELLOW = addFormatting("TRUE_YELLOW", 'y', hexToInt("fce305"));
+    private static final ChatFormatting NEON_YELLOW = addFormatting("NEON_YELLOW", 'y', hexToInt("fce305"));
     private static final ChatFormatting BROWN = addFormatting("BROWN", 'j', hexToInt("82522e"));
     private static final ChatFormatting DARK_BROWN = addFormatting("DARK_BROWN", 'u', hexToInt("3a2b1f"));
-    private static final ChatFormatting TRUE_RED = addFormatting("TRUE_RED", 'x', hexToInt("fc0521"));
+    private static final ChatFormatting NEON_RED = addFormatting("NEON_RED", 'x', hexToInt("fc0521"));
+    private static final ChatFormatting COBALT = addFormatting("COBALT", 'C', hexToInt("0059ff"));
     @Invoker(value = "<init>")
     public static ChatFormatting chatFormattingInit(String internalName, int internalId, String p_12667_, char p_12668_, int p_12669_, @Nullable Integer p_12630_) {
         throw new AssertionError();
