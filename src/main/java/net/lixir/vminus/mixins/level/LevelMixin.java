@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.level;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.helpers.DirectionHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -33,28 +33,32 @@ public abstract class LevelMixin {
     private void setBlock(BlockPos pos, BlockState state, int i, CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
         JsonObject visionData = VisionHandler.getVisionData(block);
-        if (visionData != null && visionData.has("replace")) {
-            String replaceString = VisionValueHandler.getFirstValidString(visionData, "replace", block);
-            ResourceLocation resourceLocation = new ResourceLocation(replaceString);
-            Block replacingBlock = ForgeRegistries.BLOCKS.getValue(resourceLocation);
-            if (replacingBlock != null) {
-                LevelAccessor world = (LevelAccessor) this;
-                cir.setReturnValue(setBlock(pos, replacingBlock.defaultBlockState(), i));
-                world.scheduleTick(pos, replacingBlock, 1);
+        if (visionData != null) {
+            if (visionData.has("replace")) {
+                String replaceString = VisionValueHandler.getFirstValidString(visionData, "replace", block);
+                ResourceLocation resourceLocation = new ResourceLocation(replaceString);
+                Block replacingBlock = ForgeRegistries.BLOCKS.getValue(resourceLocation);
+                if (replacingBlock != null) {
+                    LevelAccessor world = (LevelAccessor) this;
+                    cir.setReturnValue(setBlock(pos, replacingBlock.defaultBlockState(), i));
+                    world.scheduleTick(pos, replacingBlock, 1);
+                }
+            } else if (visionData.has("banned")) {
+                boolean banned = VisionValueHandler.isBooleanMet(visionData, "banned", block);
+                if (banned) {
+                    cir.cancel();
+                    return;
+                }
             }
-        } else if (visionData != null && visionData.has("banned")) {
-            boolean banned = VisionValueHandler.isBooleanMet(visionData, "banned", block);
-            if (banned)
-                cir.cancel();
-        }
-        if (visionData != null && visionData.has("constant_direction")) {
-            String directionString = VisionValueHandler.getFirstValidString(visionData, "constant_direction", block);
-            Direction direction = DirectionHelper.getDirectionFromString(directionString);
-            if (direction != null) {
-                BlockState currentState = state;
-                BlockState updatedState = DirectionHelper.applyDirectionToBlockState(currentState, direction);
-                if (updatedState != null && !currentState.equals(updatedState)) {
-                    cir.setReturnValue(setBlock(pos, updatedState, i));
+            if (visionData.has("constant_direction")){
+                String directionString = VisionValueHandler.getFirstValidString(visionData, "constant_direction", block);
+                Direction direction = DirectionHelper.getDirectionFromString(directionString);
+                if (direction != null) {
+                    BlockState currentState = state;
+                    BlockState updatedState = DirectionHelper.applyDirectionToBlockState(currentState, direction);
+                    if (updatedState != null && !currentState.equals(updatedState)) {
+                        cir.setReturnValue(setBlock(pos, updatedState, i));
+                    }
                 }
             }
         }
