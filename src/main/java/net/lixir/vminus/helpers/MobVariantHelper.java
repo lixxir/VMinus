@@ -1,7 +1,7 @@
 package net.lixir.vminus.helpers;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
