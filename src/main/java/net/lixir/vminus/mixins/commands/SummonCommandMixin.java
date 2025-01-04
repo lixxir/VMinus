@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.commands;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
