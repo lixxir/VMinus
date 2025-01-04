@@ -2,7 +2,6 @@ package net.lixir.vminus.visions.util;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraftforge.fml.common.Mod;

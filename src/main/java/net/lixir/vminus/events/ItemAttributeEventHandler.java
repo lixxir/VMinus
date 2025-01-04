@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;

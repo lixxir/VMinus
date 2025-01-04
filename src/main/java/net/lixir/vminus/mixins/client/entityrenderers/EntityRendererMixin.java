@@ -2,8 +2,8 @@ package net.lixir.vminus.mixins.client.entityrenderers;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionPropertyHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionPropertyNameHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,7 +20,7 @@ public abstract class EntityRendererMixin<T extends Entity> {
         if (p_114504_ instanceof LivingEntity _livingentity) {
             ItemStack helmet = _livingentity.getItemBySlot(EquipmentSlot.HEAD);
             JsonObject itemData = VisionHandler.getVisionData(helmet);
-            String propertyMet = VisionPropertyHandler.propertyMet(itemData, "hides_nametag");
+            String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "hides_nametag");
             if (!propertyMet.isEmpty()) {
                 if (VisionValueHandler.isBooleanMet(itemData, propertyMet, helmet))
                     cir.setReturnValue(false);
