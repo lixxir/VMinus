@@ -4,38 +4,43 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionPropertyHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionPropertyNameHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.Objects;
 
 @Mixin(Item.class)
 public abstract class ItemMixin {
     @Unique
-    private final Item item = (Item) (Object) this;
+    private final Item vminus$item = (Item) (Object) this;
+    @Final
     @Shadow
     private Rarity rarity;
 
+    @Unique
+    private int vminus$key = VisionHandler.EMPTY_KEY;
+
     @Inject(method = "getMaxStackSize", at = @At("HEAD"), cancellable = true)
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "stack_size");
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "stack_size");
         if (!propertyMet.isEmpty()) {
             int newStackSize = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 64, itemstack);
             cir.setReturnValue(Math.max(newStackSize, 1));
@@ -44,8 +49,13 @@ public abstract class ItemMixin {
 
     @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
     private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        // Sometimes with other mods an air item instance can exist which can cause crashes.
+        if (vminus$item == null || vminus$item.equals(Items.AIR))
+            return;
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         FoodProperties originalProperties = cir.getReturnValue();
         FoodProperties.Builder modifiedFoodProperties = null;
         if (originalProperties != null) {
@@ -80,20 +90,24 @@ public abstract class ItemMixin {
 
     @Inject(method = "isFireResistant", at = @At("HEAD"), cancellable = true)
     public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         if (itemData != null && itemData.has("fire_resistant")) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, "fire_resistant", itemstack));
         }
     }
 
     @Inject(method = "isValidRepairItem", at = @At("HEAD"), cancellable = true)
-    public void isValidRepairItem(ItemStack p_41402_, ItemStack p_41403_, CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(p_41402_);
+    public void isValidRepairItem(ItemStack p_41402_, ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(itemStack, vminus$key);
         if (itemData != null && itemData.has("repair_item")) {
             JsonArray repairMaterialsJsonArray = itemData.getAsJsonArray("repair_item");
             List<String> repairMaterials = VisionValueHandler.getStringListFromJsonArray(repairMaterialsJsonArray);
-            String repairItemId = ForgeRegistries.ITEMS.getKey(p_41403_.getItem()).toString();
+            String repairItemId = Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(itemStack.getItem())).toString();
             if (repairMaterials.contains(repairItemId)) {
                 cir.setReturnValue(true);
             }
@@ -102,8 +116,10 @@ public abstract class ItemMixin {
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         if (itemData != null && itemData.has("use_duration")) {
             int defaultDuration = 32;
             int calculatedDuration = VisionValueHandler.isNumberMet(itemData, "use_duration", defaultDuration, itemstack);
@@ -115,8 +131,10 @@ public abstract class ItemMixin {
 
     @Inject(method = "isEdible", at = @At("HEAD"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         if (itemData != null && itemData.has("food_properties")) {
             cir.setReturnValue(true);
         }
@@ -124,8 +142,10 @@ public abstract class ItemMixin {
 
     @Inject(method = "getEnchantmentValue", at = @At("HEAD"), cancellable = true)
     private void getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
-        ItemStack itemstack = new ItemStack(item);
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        ItemStack itemstack = new ItemStack(vminus$item);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         if (itemData != null && itemData.has("enchantability")) {
             cir.setReturnValue(VisionValueHandler.isNumberMet(itemData, "enchantability", cir.getReturnValue(), itemstack));
         }
@@ -133,7 +153,7 @@ public abstract class ItemMixin {
 
     /**
      * @author lixir
-     * @Reason To allow for customized rarities and more dynamic rarity changing
+     * @reason To allow for customized rarities and more dynamic rarity changing
      */
     @Overwrite
     public Rarity getRarity(ItemStack itemstack) {
@@ -148,35 +168,19 @@ public abstract class ItemMixin {
         } else if (currentRarity == Rarity.EPIC) {
             rarityString = "epic";
         }
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(itemstack);
+        JsonObject itemData = VisionHandler.getVisionData(itemstack, vminus$key);
         if (itemData != null && itemData.has("rarity")) {
             rarityString = VisionValueHandler.getRarity(itemData, itemstack, rarityString).toLowerCase();
         }
-        switch (rarityString) {
-            case "uncommon":
-                rarityLevel = 1;
-                break;
-            case "rare":
-                rarityLevel = 2;
-                break;
-            case "epic":
-                rarityLevel = 3;
-                break;
-            case "common":
-            default:
-                rarityLevel = 0;
-                break;
-        }
+        rarityLevel = switch (rarityString) {
+            case "uncommon" -> 1;
+            case "rare" -> 2;
+            case "epic" -> 3;
+            default -> 0;
+        };
         if (tag != null) {
-			/*
-				double reinforced = tag.getDouble("reinforced");
-				double shimmer = tag.getDouble("shimmer");
-				if (reinforced >= 4 || shimmer >= 4) {
-					rarityLevel += 2;
-				} else if (reinforced > 0 || shimmer > 0) {
-					rarityLevel++;
-				}
-				*/
             if (itemstack.isEnchanted()) {
                 if (ModList.get().isLoaded("detour")) {
                     rarityLevel++;
@@ -185,15 +189,11 @@ public abstract class ItemMixin {
                 }
             }
         }
-        switch (rarityLevel) {
-            case 1:
-                return Rarity.UNCOMMON;
-            case 2:
-                return Rarity.RARE;
-            case 3:
-                return Rarity.EPIC;
-            default:
-                return Rarity.COMMON;
-        }
+        return switch (rarityLevel) {
+            case 1 -> Rarity.UNCOMMON;
+            case 2 -> Rarity.RARE;
+            case 3 -> Rarity.EPIC;
+            default -> Rarity.COMMON;
+        };
     }
 }

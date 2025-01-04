@@ -6,12 +6,11 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.helpers.DurabilityHelper;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionPropertyHandler;
+import net.lixir.vminus.visions.util.VisionPropertyNameHandler;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -19,7 +18,6 @@ import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -35,67 +33,35 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
     @Unique
-    private final ItemStack itemstack = (ItemStack) (Object) this;
-    @Shadow
-    @Nullable
-    private CompoundTag tag;
-    @Shadow
-    @Nullable
-    private Entity entityRepresentation;
-
-    @Shadow
-    protected static Collection<Component> expandBlockState(String string) {
-        return null;
-    }
-
-    private static String formatDoubleSafely(Double value) {
-        if (value == null) {
-            return null;
-        }
-        NumberFormat formatter = new DecimalFormat("#.#");
-        return formatter.format(value);
-    }
+    private final ItemStack vminus$itemStack = (ItemStack) (Object) this;
 
     @Shadow
     public abstract Item getItem();
 
     @Shadow
-    protected abstract int getHideFlags();
-
-    @Shadow
-    public abstract int getDamageValue();
-
-    @Shadow
-    public abstract int getMaxDamage();
-
-    @Shadow
-    public abstract int getBarColor();
-
-    @Shadow
     public abstract Rarity getRarity();
 
-    @Shadow
-    public abstract boolean isDamageableItem();
+    @Unique
+    private int vminus$key = VisionHandler.EMPTY_KEY;
 
     @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
-    public void hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
+    public void vminus$hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
-            String replaceId = VisionValueHandler.getFirstValidString(null, "break_replacement", itemstack);
+            if (vminus$key == -1)
+                vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+            JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+            String replaceId = VisionValueHandler.getFirstValidString(itemData, "break_replacement", vminus$itemStack);
             if (replaceId != null && !replaceId.isEmpty()) {
-                final ItemStack findItem = itemstack;
+                final ItemStack findItem = vminus$itemStack;
                 CompoundTag tag = findItem.getOrCreateTag();
-                ItemStack replacementStack = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(replaceId)));
-                int slotIndex = -1;
-                slotIndex = player.getInventory().findSlotMatchingItem(findItem);
+                ItemStack replacementStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(replaceId))));
+                int slotIndex = player.getInventory().findSlotMatchingItem(findItem);
                 if (slotIndex == -1) {
                     for (int j = 0; j < player.getInventory().armor.size(); j++) {
                         if (player.getInventory().armor.get(j).equals(findItem)) {
@@ -111,7 +77,7 @@ public abstract class ItemStackMixin {
                 }
                 player.awardStat(Stats.ITEM_BROKEN.get(findItem.getItem()));
                 if (slotIndex != -1) {
-                    if (VisionValueHandler.isBooleanMet(null, "break_replacement", itemstack, "carry_nbt")) {
+                    if (VisionValueHandler.isBooleanMet(null, "break_replacement", vminus$itemStack, "carry_nbt")) {
                         replacementStack.setTag(tag);
                     }
                     if (slotIndex < 100) {
@@ -122,7 +88,7 @@ public abstract class ItemStackMixin {
                         player.getInventory().offhand.set(0, replacementStack);
                     }
                 } else {
-                    itemstack.shrink(1);
+                    vminus$itemStack.shrink(1);
                 }
                 cir.setReturnValue(false);
                 cir.cancel();
@@ -132,9 +98,8 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
     public void getBarWidth(CallbackInfoReturnable<Integer> cir) {
-        ItemStack itemstack = ((ItemStack) (Object) this);
-        if (itemstack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-            itemstack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
+        if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
+            vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
                 int numberOfSlots = capability.getSlots();
                 double amount = 0;
                 for (int i = 0; i < numberOfSlots; i++) {
@@ -146,12 +111,12 @@ public abstract class ItemStackMixin {
                 cir.setReturnValue(Math.min(barWidth, 13));
             });
         }
-        if (itemstack.hasTag() && itemstack.getTag().contains("reinforcement")) {
-            float durabilityRatio = (float) itemstack.getTag().getInt("reinforcement") / (float) itemstack.getTag().getInt("max_reinforcement");
+        if (vminus$itemStack.hasTag() && vminus$itemStack.getTag().contains("reinforcement")) {
+            float durabilityRatio = (float) vminus$itemStack.getTag().getInt("reinforcement") / (float) vminus$itemStack.getTag().getInt("max_reinforcement");
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
-        } else if (itemstack.isDamageableItem()) {
-            float durabilityRatio = (float) DurabilityHelper.getDurability(itemstack) / (float) DurabilityHelper.getDurability(true, itemstack);
+        } else if (vminus$itemStack.isDamageableItem()) {
+            float durabilityRatio = (float) DurabilityHelper.getDurability(vminus$itemStack) / (float) DurabilityHelper.getDurability(true, vminus$itemStack);
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
         }
@@ -159,31 +124,33 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
     public void getBarColor(CallbackInfoReturnable<Integer> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
         if (itemData != null && itemData.has("bar")) {
             int startColor = 4384126;
             int endColor = 2186818;
             try {
-                String startColorString = VisionValueHandler.getFirstValidString(itemData, "bar", itemstack, "start_color");
+                String startColorString = VisionValueHandler.getFirstValidString(itemData, "bar", vminus$itemStack, "start_color");
                 if (startColorString != null)
                     startColor = Integer.decode(startColorString.trim());
             } catch (NumberFormatException e) {
                 VMinusMod.LOGGER.error("Invalid start_color format: " + itemData.get("start_color").getAsString());
             }
             try {
-                String endColorString = VisionValueHandler.getFirstValidString(itemData, "bar", itemstack, "end_color");
+                String endColorString = VisionValueHandler.getFirstValidString(itemData, "bar", vminus$itemStack, "end_color");
                 if (endColorString != null)
                     endColor = Integer.decode(endColorString.trim());
             } catch (NumberFormatException e) {
                 VMinusMod.LOGGER.error("Invalid end_color format: " + itemData.get("end_color").getAsString());
             }
-            float durabilityRatio = (float) DurabilityHelper.getDurability(itemstack) / (float) DurabilityHelper.getDurability(true, itemstack);
-            int transitionColor = interpolateColor(endColor, startColor, durabilityRatio);
+            float durabilityRatio = (float) DurabilityHelper.getDurability(vminus$itemStack) / (float) DurabilityHelper.getDurability(true, vminus$itemStack);
+            int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
             cir.setReturnValue(transitionColor);
             cir.cancel();
         } else {
-            if (itemstack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-                itemstack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(capability -> {
+            if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
+                vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(capability -> {
                     int numberOfSlots = capability.getSlots();
                     int totalItems = 0;
                     int maxCapacity = 0;
@@ -193,31 +160,31 @@ public abstract class ItemStackMixin {
                         maxCapacity += itemStackInSlot.getMaxStackSize();
                     }
                     float fullness = maxCapacity > 0 ? (float) totalItems / maxCapacity : 0;
-                    int containerItemColor = rgbToColor(0.4F, 0.4F, 1.0F);
+                    int containerItemColor = vminus$rgbToColor(0.4F, 0.4F, 1.0F);
                     cir.setReturnValue(containerItemColor);
                 });
             }
-            if (itemstack.isDamageableItem()) {
-                if (itemstack.getTag().getBoolean("broken")) {
+            if (vminus$itemStack.isDamageableItem()) {
+                if (vminus$itemStack.getTag().getBoolean("broken")) {
                     cir.setReturnValue(Mth.hsvToRgb(0.01F, 0.0F, 0.35F));
-                } else if (itemstack.hasTag() && itemstack.getTag().contains("reinforcement")) {
+                } else if (vminus$itemStack.hasTag() && vminus$itemStack.getTag().contains("reinforcement")) {
                     int startColor = 0x55FFFF;
                     int endColor = 0x22a53f;
-                    float durabilityRatio = (float) itemstack.getTag().getInt("reinforcement") / (float) itemstack.getTag().getInt("max_reinforcement");
-                    int transitionColor = interpolateColor(endColor, startColor, durabilityRatio);
+                    float durabilityRatio = (float) vminus$itemStack.getTag().getInt("reinforcement") / (float) vminus$itemStack.getTag().getInt("max_reinforcement");
+                    int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
                     cir.setReturnValue(transitionColor);
                 } else {
                     int startColor;
                     int endColor;
-                    float durabilityRatio = (float) DurabilityHelper.getDurability(itemstack) / (float) DurabilityHelper.getDurability(true, itemstack);
-                    if (itemstack.getTag().getBoolean("death_durability")) {
+                    float durabilityRatio = (float) DurabilityHelper.getDurability(vminus$itemStack) / (float) DurabilityHelper.getDurability(true, vminus$itemStack);
+                    if (vminus$itemStack.getTag().getBoolean("death_durability")) {
                         startColor = 0xFF00FF;
                         endColor = 0x550055;
                     } else {
                         startColor = 0x69fc2a;
                         endColor = 0xe22626;
                     }
-                    int transitionColor = interpolateColor(endColor, startColor, durabilityRatio);
+                    int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
                     cir.setReturnValue(transitionColor);
                 }
             }
@@ -246,9 +213,8 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "isBarVisible", at = @At("HEAD"), cancellable = true)
     public void isBarVisible(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        if (itemstack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-            itemstack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
+        if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
+            vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
                 boolean hasItems = false;
                 for (int i = 0; i < capability.getSlots(); i++) {
                     if (capability.getStackInSlot(i).getCount() > 0) {
@@ -259,24 +225,26 @@ public abstract class ItemStackMixin {
                 cir.setReturnValue(hasItems);
             });
         }
-        if (itemstack.hasTag() && itemstack.getTag().contains("reinforcement")) {
-            if (itemstack.getTag().getInt("reinforcement") < itemstack.getTag().getInt("max_reinforcement")) {
+        if (vminus$itemStack.hasTag() && vminus$itemStack.getTag().contains("reinforcement")) {
+            if (vminus$itemStack.getTag().getInt("reinforcement") < vminus$itemStack.getTag().getInt("max_reinforcement")) {
                 cir.setReturnValue(true);
             }
-        } else if (DurabilityHelper.getDurability(itemstack) < DurabilityHelper.getDurability(true, itemstack)) {
+        } else if (DurabilityHelper.getDurability(vminus$itemStack) < DurabilityHelper.getDurability(true, vminus$itemStack)) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "setDamageValue", at = @At(value = "HEAD"), cancellable = true)
     public void setDamageValue(int damage, CallbackInfo ci) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        CompoundTag tag = itemstack.getTag();
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        CompoundTag tag = vminus$itemStack.getTag();
         if (itemData != null && itemData.has("min_damage")) {
-            int dealtDamage = itemstack.getDamageValue();
-            int minDamage = VisionValueHandler.isNumberMet(itemData, "min_damage", 0, itemstack);
+            int dealtDamage = vminus$itemStack.getDamageValue();
+            int minDamage = VisionValueHandler.isNumberMet(itemData, "min_damage", 0, vminus$itemStack);
             if (dealtDamage < minDamage) {
-                itemstack.getOrCreateTag().putInt("Damage", minDamage);
+                vminus$itemStack.getOrCreateTag().putInt("Damage", minDamage);
                 ci.cancel();
             }
         }
@@ -290,7 +258,7 @@ public abstract class ItemStackMixin {
                     tag.remove("max_reinforcement");
                 }
                 if (stillDamage > 0)
-                    itemstack.getOrCreateTag().putInt("Damage", itemstack.getDamageValue() + stillDamage);
+                    vminus$itemStack.getOrCreateTag().putInt("Damage", vminus$itemStack.getDamageValue() + stillDamage);
                 ci.cancel();
             }
         }
@@ -298,35 +266,43 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "durability");
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "durability");
         if (!propertyMet.isEmpty()) {
-            int maxDurability = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, itemstack);
+            int maxDurability = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, vminus$itemStack);
             cir.setReturnValue(maxDurability);
         }
     }
 
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "damageable");
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
         }
     }
 
     @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "damageable");
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
         }
     }
 
     @Inject(method = "isEdible", at = @At("HEAD"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
         if (itemData != null && itemData.has("food_properties")) {
             cir.setReturnValue(true);
         }
@@ -334,7 +310,9 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getDrinkingSound", at = @At("HEAD"), cancellable = true)
     private void getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
         if (itemData != null && itemData.has("food_properties")) {
             JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
             for (JsonElement element : foodPropertiesArray) {
@@ -356,16 +334,20 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "foil");
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "foil");
         if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, itemstack));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
         }
     }
 
     @Inject(method = "getEatingSound", at = @At("HEAD"), cancellable = true)
     private void getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
         if (itemData != null && itemData.has("food_properties")) {
             JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
             for (JsonElement element : foodPropertiesArray) {
@@ -387,25 +369,29 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
-        String propertyMet = VisionPropertyHandler.propertyMet(itemData, "use_duration");
+        if (vminus$key == -1)
+            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "use_duration");
         if (!propertyMet.isEmpty()) {
             int defaultDuration = 32;
-            int calculatedDuration = VisionValueHandler.isNumberMet(itemData, propertyMet, defaultDuration, itemstack);
+            int calculatedDuration = VisionValueHandler.isNumberMet(itemData, propertyMet, defaultDuration, vminus$itemStack);
             if (calculatedDuration != defaultDuration) {
                 cir.setReturnValue(calculatedDuration);
             }
         }
     }
 
-    private int rgbToColor(float red, float green, float blue) {
+    @Unique
+    private int vminus$rgbToColor(float red, float green, float blue) {
         int r = Math.round(red * 255);
         int g = Math.round(green * 255);
         int b = Math.round(blue * 255);
         return (r << 16) | (g << 8) | b;
     }
 
-    private int interpolateColor(int startColor, int endColor, float ratio) {
+    @Unique
+    private int vminus$interpolateColor(int startColor, int endColor, float ratio) {
         int r1 = (startColor >> 16) & 0xFF;
         int g1 = (startColor >> 8) & 0xFF;
         int b1 = startColor & 0xFF;
@@ -415,7 +401,6 @@ public abstract class ItemStackMixin {
         int r = Math.max(0, Math.min(255, (int) (r1 + (r2 - r1) * ratio)));
         int g = Math.max(0, Math.min(255, (int) (g1 + (g2 - g1) * ratio)));
         int b = Math.max(0, Math.min(255, (int) (b1 + (b2 - b1) * ratio)));
-        int transitionColor = (r << 16) | (g << 8) | b;
-        return transitionColor;
+        return (r << 16) | (g << 8) | b;
     }
 }
