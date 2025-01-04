@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.util.VisionType;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -22,34 +23,34 @@ public class SendJsonFilesPacketHandler {
     public static void handle(SendJsonFilesPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
-            if (packet.type() == VisionHandler.ITEM_TYPE) {
+            if (packet.type() == VisionType.ITEM.getId()) {
                 itemJsonAccumulator.append(packet.itemJsonChunk());
                 if (packet.isLastChunk()) {
-                    processReceivedJson(itemJsonAccumulator.toString(), VisionHandler.ITEM_TYPE);
+                    processReceivedJson(itemJsonAccumulator.toString(), VisionType.ITEM.getId());
                     itemJsonAccumulator.setLength(0);
                 }
-            } else if (packet.type() == VisionHandler.BLOCK_TYPE) {
+            } else if (packet.type() == VisionType.BLOCK.getId()) {
                 blockJsonAccumulator.append(packet.blockJsonChunk());
                 if (packet.isLastChunk()) {
-                    processReceivedJson(blockJsonAccumulator.toString(), VisionHandler.BLOCK_TYPE);
+                    processReceivedJson(blockJsonAccumulator.toString(), VisionType.BLOCK.getId());
                     blockJsonAccumulator.setLength(0);
                 }
-            } else if (packet.type() == VisionHandler.ENTITY_TYPE) {
+            } else if (packet.type() == VisionType.ENTITY.getId()) {
                 entityJsonAccumulator.append(packet.entityJsonChunk());
                 if (packet.isLastChunk()) {
-                    processReceivedJson(entityJsonAccumulator.toString(), VisionHandler.ENTITY_TYPE);
+                    processReceivedJson(entityJsonAccumulator.toString(), VisionType.ENTITY.getId());
                     blockJsonAccumulator.setLength(0);
                 }
-            } else if (packet.type() == VisionHandler.EFFECT_TYPE) {
+            } else if (packet.type() == VisionType.EFFECT.getId()) {
                 effectJsonAccumulator.append(packet.effectJsonChunk());
                 if (packet.isLastChunk()) {
-                    processReceivedJson(effectJsonAccumulator.toString(), VisionHandler.EFFECT_TYPE);
+                    processReceivedJson(effectJsonAccumulator.toString(), VisionType.EFFECT.getId());
                     effectJsonAccumulator.setLength(0);
                 }
-            } else if (packet.type() == VisionHandler.ENCHANTMENT_TYPE) {
+            } else if (packet.type() == VisionType.ENCHANTMENT.getId()) {
                 enchantmentJsonAccumulator.append(packet.enchantmentJsonChunk());
                 if (packet.isLastChunk()) {
-                    processReceivedJson(enchantmentJsonAccumulator.toString(), VisionHandler.ENCHANTMENT_TYPE);
+                    processReceivedJson(enchantmentJsonAccumulator.toString(),VisionType.ENCHANTMENT.getId());
                     enchantmentJsonAccumulator.setLength(0);
                 }
             }
@@ -63,21 +64,26 @@ public class SendJsonFilesPacketHandler {
             if (jsonObject == null || jsonObject.isJsonNull())
                 throw new IOException("Invalid JSON received.");
             switch (type) {
-                case VisionHandler.ITEM_TYPE:
+                case 0: {
                     VminusModVariables.main_item_vision = jsonObject;
                     break;
-                case VisionHandler.BLOCK_TYPE:
+                }
+                case 1: {
                     VminusModVariables.main_block_vision = jsonObject;
                     break;
-                case VisionHandler.ENTITY_TYPE:
+                }
+                case 2: {
                     VminusModVariables.main_entity_vision = jsonObject;
                     break;
-                case VisionHandler.EFFECT_TYPE:
+                }
+                case 3: {
                     VminusModVariables.main_effect_vision = jsonObject;
                     break;
-                case VisionHandler.ENCHANTMENT_TYPE:
+                }
+                case 4: {
                     VminusModVariables.main_enchantment_vision = jsonObject;
                     break;
+                }
             }
         } catch (IOException e) {
             VMinusMod.LOGGER.error("Error processing received JSON: ", e);

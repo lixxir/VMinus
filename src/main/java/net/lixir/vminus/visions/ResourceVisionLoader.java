@@ -11,53 +11,57 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.LevelAccessor;
 
 import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 public class ResourceVisionLoader {
     public static void generateItemVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;
-        if (world instanceof ServerLevel srvlvl_) {
-            VminusModVariables.main_item_vision = mergeModifiersFromResourcePacks(srvlvl_, "item_visions");
+        if (world instanceof ServerLevel serverLevel_) {
+            VminusModVariables.main_item_vision = mergeModifiersFromResourcePacks(serverLevel_, "item_visions");
         }
     }
 
     public static void generateBlockVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;
-        if (world instanceof ServerLevel srvlvl_) {
-            VminusModVariables.main_block_vision = mergeModifiersFromResourcePacks(srvlvl_, "block_visions");
+        if (world instanceof ServerLevel serverLevel_) {
+            VminusModVariables.main_block_vision = mergeModifiersFromResourcePacks(serverLevel_, "block_visions");
         }
     }
 
     public static void generateEntityVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;
-        if (world instanceof ServerLevel srvlvl_) {
-            VminusModVariables.main_entity_vision = mergeModifiersFromResourcePacks(srvlvl_, "entity_visions");
+        if (world instanceof ServerLevel serverLevel_) {
+            VminusModVariables.main_entity_vision = mergeModifiersFromResourcePacks(serverLevel_, "entity_visions");
         }
     }
 
     public static void generateEffectVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;
-        if (world instanceof ServerLevel srvlvl_) {
-            VminusModVariables.main_effect_vision = mergeModifiersFromResourcePacks(srvlvl_, "effect_visions");
+        if (world instanceof ServerLevel serverLevel_) {
+            VminusModVariables.main_effect_vision = mergeModifiersFromResourcePacks(serverLevel_, "effect_visions");
         }
     }
 
     public static void generateEnchantmentVisionsFile(LevelAccessor world) {
         if (world.isClientSide())
             return;
-        if (world instanceof ServerLevel srvlvl_) {
-            VminusModVariables.main_enchantment_vision = mergeModifiersFromResourcePacks(srvlvl_, "enchantment_visions");
+        if (world instanceof ServerLevel serverLevel_) {
+            VminusModVariables.main_enchantment_vision = mergeModifiersFromResourcePacks(serverLevel_, "enchantment_visions");
         }
     }
 
@@ -280,5 +284,7 @@ public class ResourceVisionLoader {
         }
         return 500;
     }
+
+
 
 }
