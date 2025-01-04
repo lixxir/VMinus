@@ -6,9 +6,16 @@ plugins {
 
 version = '1.0'
 group = 'net.lixir.vminus'
-archivesBaseName = 'vminus'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+    mavenCentral()
+}
 
 minecraft {
     mappings channel: 'official', version: '1.20.1'
@@ -51,7 +58,6 @@ minecraft {
 
             property 'forge.logging.console.level', 'debug'
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
