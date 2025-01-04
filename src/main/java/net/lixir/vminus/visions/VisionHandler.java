@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.visions.util.VisionType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -21,19 +22,17 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class VisionHandler {
-    public static final byte ITEM_TYPE = 0;
-    public static final byte BLOCK_TYPE = 1;
-    public static final byte ENTITY_TYPE = 2;
-    public static final byte EFFECT_TYPE = 3;
-    public static final byte ENCHANTMENT_TYPE = 4;
-    // json caches & keys for optimization
+    public static final int EMPTY_KEY = -1;
+
     private static final ConcurrentHashMap<String, Integer> ITEM_VISION_KEY = new ConcurrentHashMap<>();
     private static final CopyOnWriteArrayList<JsonObject> ITEM_VISION_CACHE = new CopyOnWriteArrayList<>();
     private static final ConcurrentHashMap<String, Integer> BLOCK_VISION_KEY = new ConcurrentHashMap<>();
@@ -44,70 +43,51 @@ public class VisionHandler {
     private static final CopyOnWriteArrayList<JsonObject> EFFECT_VISION_CACHE = new CopyOnWriteArrayList<>();
     private static final ConcurrentHashMap<String, Integer> ENCHANTMENT_VISION_KEY = new ConcurrentHashMap<>();
     private static final CopyOnWriteArrayList<JsonObject> ENCHANTMENT_VISION_CACHE = new CopyOnWriteArrayList<>();
+
     // tag & resource location caches
     private static final ConcurrentHashMap<String, ResourceLocation> RESOURCE_LOCATION_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TagKey<EntityType<?>>> ENTITY_TAG_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TagKey<Block>> BLOCK_TAG_CACHE = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, TagKey<Item>> ITEM_TAG_CACHE = new ConcurrentHashMap<>();
 
-    public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
-        return ITEM_VISION_KEY;
-    }
-
     public static CopyOnWriteArrayList<JsonObject> getItemVisionCache() {
         return ITEM_VISION_CACHE;
-    }
-
-    public static ConcurrentHashMap<String, Integer> getBlockVisionKey() {
-        return BLOCK_VISION_KEY;
     }
 
     public static CopyOnWriteArrayList<JsonObject> getBlockVisionCache() {
         return BLOCK_VISION_CACHE;
     }
 
-    public static ConcurrentHashMap<String, Integer> getEntityVisionKey() {
-        return ENTITY_VISION_KEY;
-    }
-
     public static CopyOnWriteArrayList<JsonObject> getEntityVisionCache() {
         return ENTITY_VISION_CACHE;
     }
 
-    public static JsonObject getVisionData(ItemStack itemstack) {
-        return getVisionData(itemstack, false, null, null, null, null);
+    public static CopyOnWriteArrayList<JsonObject> getEffectVisionCache() {
+        return EFFECT_VISION_CACHE;
     }
 
-    public static JsonObject getVisionData(MobEffect effect) {
-        return getVisionData(null, false, null, null, effect, null);
+    public static CopyOnWriteArrayList<JsonObject> getEnchantmentVisionCache() {
+        return ENCHANTMENT_VISION_CACHE;
     }
 
-    public static JsonObject getVisionData(Enchantment enchantment) {
-        return getVisionData(null, false, null, null, null, enchantment);
+    public static ConcurrentHashMap<String, Integer> getItemVisionKey() {
+        return ITEM_VISION_KEY;
     }
 
-    public static JsonObject getVisionData(Enchantment enchantment, boolean debug) {
-        return getVisionData(null, debug, null, null, null, enchantment);
+    public static ConcurrentHashMap<String, Integer> getBlockVisionKey() {
+        return BLOCK_VISION_KEY;
     }
 
-    public static JsonObject getVisionData(ItemStack itemstack, Boolean debug) {
-        return getVisionData(itemstack, debug, null, null, null, null);
+    public static ConcurrentHashMap<String, Integer> getEntityVisionKey() {
+        return ENTITY_VISION_KEY;
     }
 
-    public static JsonObject getVisionData(Block block) {
-        return getVisionData(null, false, block, null, null, null);
+    public static ConcurrentHashMap<String, Integer> getEffectVisionKey() {
+        return EFFECT_VISION_KEY;
     }
 
-    public static JsonObject getVisionData(Block block, Boolean debug) {
-        return getVisionData(null, debug, block, null, null, null);
-    }
-
-    public static JsonObject getVisionData(EntityType<?> entityType, Boolean debug) {
-        return getVisionData(null, debug, null, entityType, null, null);
-    }
-
-    public static JsonObject getVisionData(EntityType<?> entityType) {
-        return getVisionData(null, false, null, entityType, null, null);
+    public static ConcurrentHashMap<String, Integer> getEnchantmentVisionKey() {
+        return ENCHANTMENT_VISION_KEY;
     }
 
     public static void loadVisions() {
@@ -132,43 +112,35 @@ public class VisionHandler {
                 VisionHandler.getVisionData(enchantment);
             }
         }
+        if (VminusModVariables.main_enchantment_vision != null) {
+            for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS.getValues()) {
+                VisionHandler.getVisionData(enchantment);
+            }
+        }
         //Entities are not preloaded due to errors.
     }
 
 
     // Clears the caches and their associated keys
     public static void clearCaches() {
-        ITEM_VISION_KEY.clear();
-        ITEM_VISION_CACHE.clear();
+        VisionType.ITEM.getVisionKey().clear();
+        VisionType.ITEM.getVisionCache().clear();
 
-        BLOCK_VISION_KEY.clear();
-        BLOCK_VISION_CACHE.clear();
+        VisionType.BLOCK.getVisionKey().clear();
+        VisionType.BLOCK.getVisionCache().clear();
 
-        ENTITY_VISION_KEY.clear();
-        ENTITY_VISION_CACHE.clear();
+        VisionType.ENTITY.getVisionKey().clear();
+        VisionType.ENTITY.getVisionCache().clear();
 
-        EFFECT_VISION_KEY.clear();
-        EFFECT_VISION_CACHE.clear();
+        VisionType.EFFECT.getVisionKey().clear();
+        VisionType.EFFECT.getVisionCache().clear();
 
-        ENCHANTMENT_VISION_KEY.clear();
-        ENCHANTMENT_VISION_CACHE.clear();
+        VisionType.ENCHANTMENT.getVisionKey().clear();
+        VisionType.ENCHANTMENT.getVisionCache().clear();
     }
 
-    /**
-     * @param mainVision The combined cached file of every resource file of that specific vision type.
-     * @param key        The key identifier of the passed vision.
-     * @param id         The id of the passed.
-     * @param itemstack  An optionally passed itemstack.
-     * @param block      An optionally passed block.
-     * @param entityType An optionally passed entity type.
-     * @return Merged vision or initially provided vision dependent on if the id matches correctly.
-     * <p>
-     * <br></br>
-     * Scans all visions from the main vision to see if the provided id matches with the provided vision key.
-     * </p>
-     */
-    private static JsonObject scanVisionKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
-                                            @Nullable ItemStack itemstack, @Nullable Block block, @Nullable EntityType<?> entityType) {
+    private static JsonObject scanVisionJsonKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
+                                                @Nullable Object object) {
         final String originalKey = key;
         key = key.trim();
 
@@ -186,9 +158,13 @@ public class VisionHandler {
             if (matchKey.equals(id) || matchKey.equals("global")) {
                 found = true;
             } else if (isTag) {
-                found = (itemstack != null && isItemTagged(itemstack, matchKey)) ||
-                        (block != null && isBlockTagged(block, matchKey)) ||
-                        (entityType != null && isEntityTagged(entityType, matchKey));
+                if (object instanceof ItemStack itemstack) {
+                    found = isItemTagged(itemstack, matchKey);
+                } else if (object instanceof Block block) {
+                    found = isBlockTagged(block, matchKey);
+                } else if (object instanceof EntityType<?> entityType) {
+                    found = isEntityTagged(entityType, matchKey);
+                }
             }
 
             if (inverted) found = !found;
@@ -223,107 +199,264 @@ public class VisionHandler {
                 .toList();
     }
 
+    public static @Nullable JsonObject getVisionData(@Nullable ItemStack itemstack) {
+        return getVisionData(itemstack, false, -1);
+    }
 
-    public static JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, @Nullable Block block, @Nullable EntityType<?> entityType, @Nullable MobEffect effect, @Nullable Enchantment enchantment) {
-        String id = null;
-        byte type = -1;
+    public static @Nullable JsonObject getVisionData(@Nullable ItemStack itemstack, int key) {
+        return getVisionData(itemstack, false, key);
+    }
 
-        if (debug) {
-            VMinusMod.LOGGER.info("______________DEBUGGING______________");
-        }
+    public static @Nullable JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug) {
+        return getVisionData(itemstack, debug, -1);
+    }
 
-        if (itemstack != null) {
-            type = ITEM_TYPE;
-            id = itemstack.hasTag() && itemstack.getOrCreateTag().contains("vision")
-                    ? itemstack.getOrCreateTag().getString("vision")
-                    : ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
-        } else if (block != null) {
-            type = BLOCK_TYPE;
-            id = ForgeRegistries.BLOCKS.getKey(block).toString();
-        } else if (entityType != null) {
-            type = ENTITY_TYPE;
-            id = ForgeRegistries.ENTITY_TYPES.getKey(entityType).toString();
-        } else if (effect != null) {
-            type = EFFECT_TYPE;
-            id = ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();
-        } else if (enchantment != null) {
-            type = ENCHANTMENT_TYPE;
-            id = ForgeRegistries.ENCHANTMENTS.getKey(enchantment).toString();
-        }
+    public static @Nullable JsonObject getVisionData(@Nullable ItemStack itemstack, @Nullable Boolean debug, int key) {
+        if (itemstack == null)
+            return null;
+        String id = attemptGetObjectId(itemstack);
+        if (id == null || id.isEmpty())
+            return null;
+        VisionType visionType = getVisionType(itemstack);
+        if (visionType == null)
+            return null;
+        return processVisionData(visionType, id, itemstack, key);
+    }
 
-        if (type == -1 || id == null) {
+    public static @Nullable JsonObject getVisionData(@Nullable Block block, int key) {
+        return getVisionData(block, false, key);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Block block) {
+        return getVisionData(block, false, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Block block, @Nullable Boolean debug) {
+        return getVisionData(block, debug, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Block block, @Nullable Boolean debug, int key) {
+
+        String id = attemptGetObjectId(block);
+        if (id == null || id.isEmpty())
+            return null;
+        VisionType visionType = getVisionType(block);
+        if (visionType == null)
+            return null;
+        return processVisionData(visionType, id, block, key);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable EntityType<?> entityType) {
+        return getVisionData(entityType, false, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable EntityType<?> entityType, @Nullable Boolean debug) {
+        return getVisionData(entityType, debug, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable EntityType<?> entityType, @Nullable Boolean debug, int key) {
+        String id = attemptGetObjectId(entityType);
+        if (id == null || id.isEmpty())
+            return null;
+        VisionType visionType = getVisionType(entityType);
+        if (visionType == null)
+            return null;
+        return processVisionData(visionType, id, entityType, key);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable MobEffect mobEffect) {
+        return getVisionData(mobEffect, false, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable MobEffect mobEffect, @Nullable Boolean debug) {
+        return getVisionData(mobEffect, debug, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable MobEffect mobEffect, @Nullable Boolean debug, int key) {
+        String id = attemptGetObjectId(mobEffect);
+        if (id == null || id.isEmpty())
+            return null;
+        VisionType visionType = getVisionType(mobEffect);
+        if (visionType == null)
+            return null;
+        return processVisionData(visionType, id, mobEffect, key);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Enchantment enchantment) {
+        return getVisionData(enchantment, false, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Enchantment enchantment, @Nullable Boolean debug) {
+        return getVisionData(enchantment, debug, -1);
+    }
+
+    public static @Nullable JsonObject getVisionData(@Nullable Enchantment enchantment, @Nullable Boolean debug, int key) {
+        String id = attemptGetObjectId(enchantment);
+        if (id == null || id.isEmpty())
+            return null;
+        VisionType visionType = getVisionType(enchantment);
+        if (visionType == null)
+            return null;
+        return processVisionData(visionType, id, enchantment, key);
+    }
+
+    private static @Nullable String attemptGetObjectId(@Nullable ItemStack itemStack) {
+        if (itemStack == null) {
             return null;
         }
-
-        ConcurrentHashMap<String, Integer> visionKeyMap;
-        CopyOnWriteArrayList<JsonObject> visionCache;
-
-        switch (type) {
-            case ITEM_TYPE -> {
-                visionKeyMap = ITEM_VISION_KEY;
-                visionCache = ITEM_VISION_CACHE;
-            }
-            case BLOCK_TYPE -> {
-                visionKeyMap = BLOCK_VISION_KEY;
-                visionCache = BLOCK_VISION_CACHE;
-            }
-            case ENTITY_TYPE -> {
-                visionKeyMap = ENTITY_VISION_KEY;
-                visionCache = ENTITY_VISION_CACHE;
-            }
-            case EFFECT_TYPE -> {
-                visionKeyMap = EFFECT_VISION_KEY;
-                visionCache = EFFECT_VISION_CACHE;
-            }
-            case ENCHANTMENT_TYPE -> {
-                visionKeyMap = ENCHANTMENT_VISION_KEY;
-                visionCache = ENCHANTMENT_VISION_CACHE;
-            }
-            default -> {
-                VMinusMod.LOGGER.warn("Vision type could not be found.");
-                return null;
-            }
+        if (itemStack.hasTag() && itemStack.getOrCreateTag().contains("vision")) {
+            return itemStack.getOrCreateTag().getString("vision");
         }
+        return Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(itemStack.getItem())).toString();
+    }
 
-        JsonObject mainVision = getMainVisionByType(type);
-        JsonObject mergedData = new JsonObject();
-        for (String key : mainVision.keySet()) {
-            mergedData = scanVisionKey(mainVision, key, id, mergedData, itemstack, block, entityType);
+    private static @Nullable String attemptGetObjectId(@Nullable Block block) {
+        if (block == null) {
+            return null;
         }
+        return Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
+    }
 
-
-        int existingIndex = -1;
-        if (visionCache.size() > 0) {
-            for (int i = 0; i < visionCache.size(); i++) {
-                if (visionCache.get(i).equals(mergedData)) {
-                    existingIndex = i;
-                    break;
-                }
-            }
-         }
-
-        if (existingIndex != -1) {
-            visionKeyMap.put(id, existingIndex);
-            return visionCache.get(existingIndex);
-        } else {
-            int newIndex = visionCache.size();
-            visionKeyMap.put(id, newIndex);
-            visionCache.add(mergedData);
-            return mergedData;
+    private static @Nullable String attemptGetObjectId(@Nullable EntityType<?> entityType) {
+        if (entityType == null) {
+            return null;
         }
+        return Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(entityType)).toString();
+    }
+
+    private static @Nullable String attemptGetObjectId(@Nullable MobEffect mobEffect) {
+        if (mobEffect == null) {
+            return null;
+        }
+        return Objects.requireNonNull(ForgeRegistries.MOB_EFFECTS.getKey(mobEffect)).toString();
+    }
+
+    private static @Nullable String attemptGetObjectId(@Nullable Enchantment enchantment) {
+        if (enchantment == null) {
+            return null;
+        }
+        return Objects.requireNonNull(ForgeRegistries.ENCHANTMENTS.getKey(enchantment)).toString();
     }
 
 
-    private static JsonObject getMainVisionByType(byte type) {
-        return switch (type) {
-            case ITEM_TYPE -> VminusModVariables.main_item_vision;
-            case BLOCK_TYPE -> VminusModVariables.main_block_vision;
-            case ENTITY_TYPE -> VminusModVariables.main_entity_vision;
-            case EFFECT_TYPE -> VminusModVariables.main_effect_vision;
-            case ENCHANTMENT_TYPE -> VminusModVariables.main_enchantment_vision;
-            default -> null;
-        };
+    private static @Nullable VisionType getVisionType(@Nullable ItemStack itemStack) {
+        if (itemStack == null) {
+            return null;
+        }
+        return VisionType.ITEM;
     }
+
+    private static @Nullable VisionType getVisionType(@Nullable Block block) {
+        if (block == null) {
+            return null;
+        }
+        return VisionType.BLOCK;
+    }
+
+    private static @Nullable VisionType getVisionType(@Nullable EntityType<?> entityType) {
+        if (entityType == null) {
+            return null;
+        }
+        return VisionType.ENTITY;
+    }
+
+    private static @Nullable VisionType getVisionType(@Nullable MobEffect mobEffect) {
+        if (mobEffect == null) {
+            return null;
+        }
+        return VisionType.EFFECT;
+    }
+
+    private static @Nullable VisionType getVisionType(@Nullable Enchantment enchantment) {
+        if (enchantment == null) {
+            return null;
+        }
+        return VisionType.ENCHANTMENT;
+    }
+
+    private static JsonObject processVisionData(VisionType visionType, String id, @Nullable Object object, int key) {
+        JsonObject objectFromKey = getCacheByKey(key, visionType);
+        if (objectFromKey != null)
+            return objectFromKey;
+
+        AbstractMap<String, Integer> visionKeyMap = visionType.getVisionKey();
+        CopyOnWriteArrayList<JsonObject> visionCache = visionType.getVisionCache();
+        JsonObject mainVision = visionType.getMainVision();
+
+        if (mainVision == null) return null;
+
+        /* Checking if the id is already found, if not then give -1 as the index.
+            If it is not -1 then it can attempt to find a cache using that key
+         */
+        int index = visionKeyMap.getOrDefault(id, -1);
+        JsonObject cachedJsonObject = getCacheByKey(index, visionType);
+        if (cachedJsonObject != null) return cachedJsonObject;
+
+        /* Scans through the main vision and processes everything
+            to figure out what applies to the current object using the given registry id.
+         */
+        JsonObject jsonObject = new JsonObject();
+        for (String mainVisionKey : mainVision.keySet())
+            jsonObject = scanVisionJsonKey(mainVision, mainVisionKey, id, jsonObject, object);
+
+
+        // Try to find a json object with the same json to use the same keys for condensing storage of variables
+        index = getKeyFromMatchingCache(visionCache, jsonObject);
+        if (index != -1) {
+            visionKeyMap.put(id, index);
+            return visionCache.get(index);
+        }
+
+        // If nothing was found, then cache the json and return the final product
+        cacheVisionData(jsonObject, visionKeyMap, visionCache, id);
+        return jsonObject;
+    }
+
+    public static int getCacheKey(@Nullable EntityType<?> entityType) {
+        return getCacheKey(getVisionType(entityType), attemptGetObjectId(entityType));
+    }
+
+    public static int getCacheKey(@Nullable ItemStack itemStack) {
+        return getCacheKey(getVisionType(itemStack), attemptGetObjectId(itemStack));
+    }
+
+    public static int getCacheKey(@Nullable Block block) {
+        return getCacheKey(getVisionType(block), attemptGetObjectId(block));
+    }
+
+    public static int getCacheKey(VisionType visionType, String id) {
+        if (visionType == null || id == null)
+            return -1;
+        AbstractMap<String, Integer> visionKeyMap = visionType.getVisionKey();
+        return visionKeyMap.getOrDefault(id, -1);
+    }
+
+    // Gets a JsonObject from the respective cache using the given index
+    public static @Nullable JsonObject getCacheByKey(int index, VisionType visionType) {
+        if (index == -1)
+            return null;
+        CopyOnWriteArrayList<JsonObject> visionCache = visionType.getVisionCache();
+        return visionCache.get(index);
+    }
+
+    // Attempts to look for any matching JsonObject in the cache, and if it exists, then get the index
+    public static int getKeyFromMatchingCache(CopyOnWriteArrayList<JsonObject> visionCache, JsonObject checkingObject) {
+        for (int i = 0; i < visionCache.size(); i++) {
+            if (visionCache.get(i).equals(checkingObject)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void cacheVisionData(JsonObject jsonObject, AbstractMap<String, Integer> visionKeyMap, CopyOnWriteArrayList<JsonObject> visionCache, String id) {
+        int newIndex = visionCache.size();
+        visionKeyMap.put(id, newIndex);
+        if (jsonObject == null)
+            jsonObject = new JsonObject();
+        visionCache.add(jsonObject);
+    }
+
 
     private static ResourceLocation getOrCreateResourceLocation(String tagNamespace) {
         return RESOURCE_LOCATION_CACHE.computeIfAbsent(tagNamespace, ResourceLocation::new);
@@ -351,8 +484,7 @@ public class VisionHandler {
         return entity.is(entityTag);
     }
 
-
-    public static JsonObject mergeJsonObjects(@Nullable JsonObject target, JsonObject source) {
+    private static JsonObject mergeJsonObjects(@Nullable JsonObject target, JsonObject source) {
         if (target == null)
             target = new JsonObject();
         for (String key : source.keySet()) {
@@ -379,4 +511,5 @@ public class VisionHandler {
         }
         return mergedArray;
     }
+
 }
