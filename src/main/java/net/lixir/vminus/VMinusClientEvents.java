@@ -3,7 +3,7 @@ package net.lixir.vminus;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
