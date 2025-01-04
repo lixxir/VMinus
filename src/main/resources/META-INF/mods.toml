@@ -4,16 +4,12 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="vminus"
-version="1.0.0"
-displayName="V-Minus"
+version="3.2.0"
+displayName="VMinus"
 displayURL="https://curseforge.com/minecraft/mc-mods/v-minus"
 logoFile="logo.png"
-credits="."
 authors="lixir"
-description="Contains many functions to edit and ban vanilla features. Used as a core for Abyssmal."
-
-# Start of user code block mod configuration
-# End of user code block mod configuration
+description="Edit and Remove Items, Blocks, Entities, Enchantments & more with Configs / Datapacks!"
 
 [[dependencies.vminus]]
     modId="minecraft"

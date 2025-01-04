@@ -4,7 +4,7 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = '1.0'
+version = '3.2.0-forge-1.20.1'
 group = 'net.lixir.vminus'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
