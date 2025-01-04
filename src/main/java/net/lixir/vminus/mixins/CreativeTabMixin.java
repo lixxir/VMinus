@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.VisionValueHandler;
+import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
