@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
+import com.mojang.math.Vector3f;
 import net.lixir.vminus.helpers.CapeHelper;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -67,9 +67,9 @@ public abstract class CapeLayerMixin extends RenderLayer<AbstractClientPlayer, P
                     if (p_116618_.isCrouching()) {
                         f1 += 25.0F;
                     }
-                    p_116615_.mulPose(Axis.XP.rotationDegrees(6.0F + f2 / 2.0F + f1));
-                    p_116615_.mulPose(Axis.ZP.rotationDegrees(f3 / 2.0F));
-                    p_116615_.mulPose(Axis.YP.rotationDegrees(180.0F - f3 / 2.0F));
+                    p_116615_.mulPose(Vector3f.XP.rotationDegrees(6.0F + f2 / 2.0F + f1));
+                    p_116615_.mulPose(Vector3f.ZP.rotationDegrees(f3 / 2.0F));
+                    p_116615_.mulPose(Vector3f.YP.rotationDegrees(180.0F - f3 / 2.0F));
                     VertexConsumer vertexconsumer = p_116616_.getBuffer(RenderType.entitySolid(capeTexture));
                     this.getParentModel().renderCloak(p_116615_, vertexconsumer, p_116617_, OverlayTexture.NO_OVERLAY);
                     p_116615_.popPose();
