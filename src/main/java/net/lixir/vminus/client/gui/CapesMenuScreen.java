@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.capes.CapesMenuButtonMessage;
 import net.lixir.vminus.procedures.*;
-import net.lixir.vminus.world.inventory.CapesMenuMenu;
+import net.lixir.vminus.world.inventory.CapesMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -16,8 +16,8 @@ import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 
-public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
-    private final static HashMap<String, Object> guistate = CapesMenuMenu.guistate;
+public class CapesMenuScreen extends AbstractContainerScreen<CapesMenu> {
+    private final static HashMap<String, Object> guistate = CapesMenu.guistate;
     private static final ResourceLocation texture = new ResourceLocation("vminus:textures/screens/capes_menu.png");
     private final Level world;
     private final int x, y, z;
@@ -40,7 +40,7 @@ public class CapesMenuScreen extends AbstractContainerScreen<CapesMenuMenu> {
     ImageButton imagebutton_troll_cape_selected;
     ImageButton imagebutton_locked_cape4;
 
-    public CapesMenuScreen(CapesMenuMenu container, Inventory inventory, Component text) {
+    public CapesMenuScreen(CapesMenu container, Inventory inventory, Component text) {
         super(container, inventory, text);
         this.world = container.world;
         this.x = container.x;

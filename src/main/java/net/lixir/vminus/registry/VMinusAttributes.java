@@ -27,7 +27,6 @@ public class VMinusAttributes {
     public static final RegistryObject<Attribute> BLUNTPROTECTION = ATTRIBUTES.register("blunt_protection", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".blunt_protection", 0, -100, 100)).setSyncable(true));
     public static final RegistryObject<Attribute> FIREPROTECTION = ATTRIBUTES.register("fire_protection", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".fire_protection", 0, -100, 100)).setSyncable(true));
     public static final RegistryObject<Attribute> CRITICALDAMAGE = ATTRIBUTES.register("critical_damage", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".critical_damage", 0, 0, 100)).setSyncable(true));
-    public static final RegistryObject<Attribute> PROJECTILEDAMAGE = ATTRIBUTES.register("projectile_damage", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".projectile_damage", 0, -255, 255)).setSyncable(true));
     public static final RegistryObject<Attribute> MOBDETECTIONRANGE = ATTRIBUTES.register("mob_detection_range", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".mob_detection_range", 0, -100, 0)).setSyncable(true));
     public static final RegistryObject<Attribute> HEALTHLOSTSTATBOOST = ATTRIBUTES.register("health_lost_stat_boost", () -> (new RangedAttribute("attribute." + VMinusMod.MODID + ".health_lost_stat_boost", 0, -100, 100)).setSyncable(true));
 
