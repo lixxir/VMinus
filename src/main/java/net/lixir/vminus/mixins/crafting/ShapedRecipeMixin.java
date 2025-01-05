@@ -23,7 +23,7 @@ import java.util.List;
 @Mixin(ShapedRecipe.class)
 public class ShapedRecipeMixin {
     @Inject(method = "getResultItem", at = @At("RETURN"), cancellable = true)
-    public void vminus$getResultItem(RegistryAccess p_267111_, CallbackInfoReturnable<ItemStack> cir) {
+    public void vminus$getResultItem(CallbackInfoReturnable<ItemStack> cir) {
         cir.setReturnValue(VisionPropertyHandler.getRecipeOutputReplacement(cir.getReturnValue()));
     }
 }
