@@ -24,9 +24,4 @@ public abstract class BindingCurseEnchantmentMixin {
     private void isCurse(CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(EnchantmentVisionHelper.isCurse(enchantment, cir.getReturnValue() != null ? cir.getReturnValue() : false));
     }
-
-    @Inject(method = "canEnchant", at = @At("RETURN"), cancellable = true)
-    private void canEnchant(ItemStack itemstack, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(EnchantmentVisionHelper.canEnchant(enchantment, itemstack, cir.getReturnValue()));
-    }
 }
