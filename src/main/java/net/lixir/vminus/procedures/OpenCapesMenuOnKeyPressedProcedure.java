@@ -1,7 +1,7 @@
 package net.lixir.vminus.procedures;
 
 import io.netty.buffer.Unpooled;
-import net.lixir.vminus.world.inventory.CapesMenuMenu;
+import net.lixir.vminus.world.inventory.CapesMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -28,7 +28,7 @@ public class OpenCapesMenuOnKeyPressedProcedure {
 
                 @Override
                 public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
-                    return new CapesMenuMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
+                    return new CapesMenu(id, inventory, new FriendlyByteBuf(Unpooled.buffer()).writeBlockPos(_bpos));
                 }
             }, _bpos);
         }
