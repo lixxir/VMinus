@@ -2,13 +2,13 @@ package net.lixir.vminus.mixins.enchantments.functions;
 
 import com.google.common.collect.Lists;
 import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,7 +28,7 @@ public class EnchantmentHelperMixin {
         List<EnchantmentInstance> list = Lists.newArrayList();
         boolean flag = stack.is(Items.BOOK);
 
-        for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT) {
+        for (Enchantment enchantment : ForgeRegistries.ENCHANTMENTS) {
             if ((!enchantment.isTreasureOnly() || p_44820_) && enchantment.isDiscoverable() && (enchantment.canApplyAtEnchantingTable(stack) || (flag && enchantment.isAllowedOnBooks()))) {
                 for (int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
                     if (p_44818_ >= enchantment.getMinCost(i) && p_44818_ <= enchantment.getMaxCost(i)) {

@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.NumberUtil;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -391,7 +390,7 @@ public class VisionValueHandler {
         if (entity != null) {
             CompoundTag persistentData = entity.getPersistentData();
             if (conditions.has("in_dimension")) {
-                ResourceLocation dimensionLocation = entity.level().dimension().location();
+                ResourceLocation dimensionLocation = entity.level.dimension().location();
                 String dimensionId = conditions.get("in_dimension").getAsString();
                 boolean inverted = checkInverted(conditions);
                 if (inverted == dimensionLocation.equals(new ResourceLocation(dimensionId))) {
@@ -400,10 +399,10 @@ public class VisionValueHandler {
             }
             if (conditions.has("in_biome_tag")) {
                 String biomeId = conditions.get("in_biome_tag").getAsString();
-                LevelAccessor level = entity.level();
-                BlockPos pos = BlockPos.containing(entity.getX(), entity.getY(), entity.getZ());
+                LevelAccessor level = entity.level;
+                BlockPos pos = new BlockPos(entity.getX(), entity.getY(), entity.getZ());
                 boolean inverted = checkInverted(conditions);
-                if (inverted == level.getBiome(pos).is(TagKey.create(Registries.BIOME, new ResourceLocation(biomeId)))) {
+                if (inverted == level.getBiome(pos).is(TagKey.create(ForgeRegistries.BIOMES.getRegistryKey(), new ResourceLocation(biomeId)))) {
                     return false;
                 }
             }

@@ -3,10 +3,8 @@ package net.lixir.vminus.visions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.network.VminusModVariables;
 import net.lixir.vminus.visions.util.VisionType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -480,7 +478,7 @@ public class VisionHandler {
             return false;
         }
         String tagNamespace = tag.substring(1);
-        TagKey<EntityType<?>> entityTag = ENTITY_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> TagKey.create(Registries.ENTITY_TYPE, getOrCreateResourceLocation(ns)));
+        TagKey<EntityType<?>> entityTag = ENTITY_TAG_CACHE.computeIfAbsent(tagNamespace, ns -> TagKey.create(ForgeRegistries.ENTITY_TYPES.getRegistryKey(), getOrCreateResourceLocation(ns)));
         return entity.is(entityTag);
     }
 
