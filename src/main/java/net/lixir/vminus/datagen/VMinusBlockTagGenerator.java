@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -20,7 +21,7 @@ public class VMinusBlockTagGenerator extends BlockTagsProvider {
     }
 
     @Override
-    protected void addTags(HolderLookup.Provider pProvider) {
+    protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         var froglights = tag(VMinusTags.Blocks.FROGLIGHTS);
         froglights.add(Blocks.OCHRE_FROGLIGHT);
         froglights.add(Blocks.VERDANT_FROGLIGHT);
