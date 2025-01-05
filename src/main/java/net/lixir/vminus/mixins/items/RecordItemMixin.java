@@ -34,7 +34,7 @@ public class RecordItemMixin {
                 if (blockEntity instanceof JukeboxBlockEntity jukeboxBlockEntity) {
                     ItemStack copyStack = itemStack.copy();
                     copyStack.setCount(1);
-                    jukeboxBlockEntity.setFirstItem(copyStack);
+                    ((JukeboxBlock)Blocks.JUKEBOX).setRecord(context.getPlayer(), level, blockPos, blockState, copyStack);
                     level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState));
                     itemStack.shrink(1);
                     if (player != null) {

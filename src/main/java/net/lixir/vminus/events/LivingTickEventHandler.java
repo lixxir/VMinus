@@ -31,7 +31,7 @@ import java.util.List;
 public class LivingTickEventHandler {
     @SubscribeEvent
     public static void onEntityTick(LivingEvent.LivingTickEvent event) {
-        LevelAccessor world = event.getEntity().level();
+        LevelAccessor world = event.getEntity().level;
         Entity entity = event.getEntity();
         if (entity == null || !(world instanceof ServerLevel serverWorld))
             return;
@@ -52,7 +52,7 @@ public class LivingTickEventHandler {
         if (entity instanceof ServerPlayer serverPlayer) {
             GameType gameMode = serverPlayer.gameMode.getGameModeForPlayer();
             return gameMode == GameType.SPECTATOR;
-        } else if (entity.level().isClientSide() && entity instanceof Player player) {
+        } else if (entity.level.isClientSide() && entity instanceof Player player) {
             var connection = Minecraft.getInstance().getConnection();
             if (connection != null) {
                 var playerInfo = connection.getPlayerInfo(player.getGameProfile().getId());

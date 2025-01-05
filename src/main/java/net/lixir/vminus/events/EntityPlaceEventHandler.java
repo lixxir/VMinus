@@ -27,7 +27,7 @@ public class EntityPlaceEventHandler {
         double z = entity.getZ();
 
 
-        BlockPos pos = BlockPos.containing(x, y, z);
+        BlockPos pos = new BlockPos(x, y, z);
         BlockState blockState = world.getBlockState(pos);
         JsonObject blockData = VisionHandler.getVisionData(blockState.getBlock());
         if (blockData != null && blockData.has("place_blockstate")) {

@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class SlimeMixin extends Mob implements Enemy {
 
     @Unique
-    private final Slime slime = (Slime) (Object) this;
+    private final Slime vminus$slime = (Slime) (Object) this;
 
     protected SlimeMixin(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -25,32 +25,32 @@ public abstract class SlimeMixin extends Mob implements Enemy {
 
     @Inject(method = "remove", at = @At("HEAD"), cancellable = true)
     private void remove(Entity.RemovalReason removalReason, CallbackInfo ci) {
-        int size = slime.getSize();
-        if (!slime.level().isClientSide && size > 1 && slime.isDeadOrDying()) {
-            Component customName = slime.getCustomName();
-            boolean noAi = slime.isNoAi();
+        int size = vminus$slime.getSize();
+        if (!vminus$slime.level.isClientSide && size > 1 && vminus$slime.isDeadOrDying()) {
+            Component customName = vminus$slime.getCustomName();
+            boolean noAi = vminus$slime.isNoAi();
             float offset = (float) size / 4.0F;
             int newSize = size - 1;
-            int splitCount = 2 + slime.getRandom().nextInt(3);
+            int splitCount = 2 + vminus$slime.getRandom().nextInt(3);
             String variant = "";
-            if (slime.getPersistentData().contains("variant"))
-                variant = slime.getPersistentData().getString("variant");
+            if (vminus$slime.getPersistentData().contains("variant"))
+                variant = vminus$slime.getPersistentData().getString("variant");
             for (int i = 0; i < splitCount; ++i) {
                 float offsetX = ((float) (i % 2) - 0.5F) * offset;
                 float offsetZ = ((float) (i / 2) - 0.5F) * offset;
-                Slime newSlime = slime.getType().create(slime.level());
+                Slime newSlime = vminus$slime.getType().create(vminus$slime.level);
                 if (newSlime != null) {
-                    if (slime.isPersistenceRequired()) {
+                    if (vminus$slime.isPersistenceRequired()) {
                         newSlime.setPersistenceRequired();
                     }
                     newSlime.setCustomName(customName);
                     newSlime.setNoAi(noAi);
-                    newSlime.setInvulnerable(slime.isInvulnerable());
+                    newSlime.setInvulnerable(vminus$slime.isInvulnerable());
                     newSlime.setSize(newSize, true);
-                    newSlime.moveTo(slime.getX() + (double) offsetX, slime.getY() + 0.5D, slime.getZ() + (double) offsetZ, slime.getRandom().nextFloat() * 360.0F, 0.0F);
+                    newSlime.moveTo(vminus$slime.getX() + (double) offsetX, vminus$slime.getY() + 0.5D, vminus$slime.getZ() + (double) offsetZ, vminus$slime.getRandom().nextFloat() * 360.0F, 0.0F);
                     newSlime.getPersistentData().putString("variant", variant);
                     //newSlime.load(newSlimeNbt);
-                    slime.level().addFreshEntity(newSlime);
+                    vminus$slime.level.addFreshEntity(newSlime);
                 }
             }
         }

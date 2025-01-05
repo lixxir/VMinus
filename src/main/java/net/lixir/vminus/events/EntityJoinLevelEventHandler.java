@@ -80,7 +80,7 @@ public class EntityJoinLevelEventHandler {
                         } else if (event.hasResult()) {
                             event.setResult(Event.Result.DENY);
                         }
-                        Level world = entity.level();
+                        Level world = entity.level;
                         ItemEntity newItemEntity = new ItemEntity(world, entity.getX(), entity.getY(), entity.getZ(), replacementStack);
                         world.addFreshEntity(newItemEntity);
 

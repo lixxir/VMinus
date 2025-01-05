@@ -31,10 +31,10 @@ public class ItemVisionProcedureProcedure {
         theitem = new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation((itemId).toLowerCase(java.util.Locale.ENGLISH))));
         JsonObject itemData = VisionHandler.getVisionData(theitem, true);
         if (itemData != null) {
-            if (entity instanceof Player _player && !_player.level().isClientSide())
+            if (entity instanceof Player _player && !_player.level.isClientSide())
                 _player.displayClientMessage(Component.literal(("Item Vision found for " + itemId + ", " + itemData)), false);
         } else {
-            if (entity instanceof Player _player && !_player.level().isClientSide())
+            if (entity instanceof Player _player && !_player.level.isClientSide())
                 _player.displayClientMessage(Component.literal("Item Vision not found."), false);
         }
     }

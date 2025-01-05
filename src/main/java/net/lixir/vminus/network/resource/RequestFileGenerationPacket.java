@@ -24,7 +24,7 @@ public class RequestFileGenerationPacket {
     public static void handle(RequestFileGenerationPacket message, Supplier<NetworkEvent.Context> contextSupplier) {
         ServerPlayer player = contextSupplier.get().getSender();
         contextSupplier.get().enqueueWork(() -> {
-            LevelAccessor world = player.level();
+            LevelAccessor world = player.level;
             if (VisionType.ITEM.getMainVision().entrySet().isEmpty())
                 ResourceVisionLoader.generateItemVisionsFile(world);
             if (VisionType.BLOCK.getMainVision().entrySet().isEmpty())
