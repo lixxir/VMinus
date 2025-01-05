@@ -2,7 +2,6 @@ package net.lixir.vminus;
 
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacketHandler;
-import net.lixir.vminus.registry.VMinusMenus;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,8 +42,6 @@ public class VMinusMod {
 
     public VMinusMod() {
         MinecraftForge.EVENT_BUS.register(this);
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        VMinusMenus.REGISTRY.register(bus);
         registerNetworkMessages();
     }
 
