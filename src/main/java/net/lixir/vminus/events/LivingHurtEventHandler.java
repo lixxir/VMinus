@@ -40,18 +40,18 @@ public class LivingHurtEventHandler {
             }
         }
 
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fire_protection", "vminus:protection/fire");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blast_protection", "vminus:protection/blast");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:magic_protection", "vminus:protection/magic");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fall_protection", "vminus:protection/fall");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blunt_protection", "vminus:protection/blast");
+        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fire_protection");
+        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blast_protection");
+        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:magic_protection");
+        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fall_protection");
+        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blunt_protection");
 
         event.setAmount(damage + (amount * modifierSum));
     }
 
     private static float getAttributeValueFromItem(ItemStack itemStack, EquipmentSlot slot, Attribute attribute) {
         Collection<AttributeModifier> modifiers = itemStack.getAttributeModifiers(slot).get(attribute);
-        if (modifiers != null && !modifiers.isEmpty()) {
+        if (!modifiers.isEmpty()) {
             return (float) modifiers.stream().mapToDouble(AttributeModifier::getAmount).sum();
         }
         return 0.0f;
