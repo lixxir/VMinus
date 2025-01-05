@@ -10,7 +10,6 @@ import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -19,7 +18,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -27,6 +25,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -72,12 +71,15 @@ public abstract class ItemStackTooltipMixin {
     public static void appendEnchantmentNames(List<Component> enchantmentList, ListTag enchantments) {
         for (int i = 0; i < enchantments.size(); ++i) {
             CompoundTag compoundTag = enchantments.getCompound(i);
-            // MutableComponent iconComponent = Component.literal(" " + IconHandler.getIcon("effect")).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
-            BuiltInRegistries.ENCHANTMENT.getOptional(EnchantmentHelper.getEnchantmentId(compoundTag)).ifPresent((enchantment) -> {
+            ResourceLocation enchantmentId = EnchantmentHelper.getEnchantmentId(compoundTag);
+            Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(enchantmentId);
+
+            if (enchantment != null) {
                 enchantmentList.add(Component.literal(" ").append(enchantment.getFullname(EnchantmentHelper.getEnchantmentLevel(compoundTag))));
-            });
+            }
         }
     }
+
 
     @Shadow
     public abstract Item getItem();
@@ -123,7 +125,7 @@ public abstract class ItemStackTooltipMixin {
             mutablecomponent.withStyle(ChatFormatting.ITALIC);
         }
         list.add(mutablecomponent);
-        vminus$itemStack.getItem().appendHoverText(vminus$itemStack, player == null ? null : player.level(), list, flag);
+        vminus$itemStack.getItem().appendHoverText(vminus$itemStack, player == null ? null : player.level, list, flag);
         if (itemData != null) {
             List<String> tooltips = VisionValueHandler.getTooltips(itemData, vminus$itemStack, true);
             for (String tooltipD : tooltips) {
@@ -136,7 +138,6 @@ public abstract class ItemStackTooltipMixin {
                 list.add((Component.literal("#" + integer)).withStyle(ChatFormatting.GRAY));
             }
         }
-        int j = this.getHideFlags();
         //if (shouldShowInTooltip(j, ItemStack.TooltipPart.ADDITIONAL)) {
         //	stack.getItem().appendHoverText(stack, p_41652_ == null ? null : p_41652_.level(), list, p_41653_);
         //}
@@ -395,7 +396,7 @@ public abstract class ItemStackTooltipMixin {
         net.minecraftforge.event.ForgeEventFactory.onItemTooltip(vminus$itemStack, player, list, flag);
         if (flag.isAdvanced()) {
             if (player.getAbilities().instabuild) {
-                list.add((Component.literal(BuiltInRegistries.ITEM.getKey(vminus$itemStack.getItem()).toString())).withStyle(ChatFormatting.DARK_GRAY));
+                list.add((Component.literal(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(vminus$itemStack.getItem())).toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (vminus$itemStack.hasTag()) {
                 list.add(Component.translatable("item.nbt_tags", vminus$itemStack.getTag().getAllKeys().size()).withStyle(ChatFormatting.DARK_GRAY));
