@@ -4,7 +4,7 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = '3.2.0-forge-1.20.1'
+version = '1.0.0-forge-1.19.2'
 group = 'net.lixir.vminus'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -18,7 +18,7 @@ repositories {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.20.1'
+    mappings channel: 'official', version: '1.19.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -70,7 +70,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.4.0'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
