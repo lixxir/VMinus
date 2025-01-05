@@ -6,7 +6,6 @@ import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -25,18 +24,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
     @Shadow
     private final Map<MobEffect, MobEffectInstance> activeEffects = Maps.newHashMap();
     @Unique
-    private final LivingEntity entity = (LivingEntity) (Object) this;
+    private final LivingEntity vminus$entity = (LivingEntity) (Object) this;
 
     @Shadow
     protected abstract void spawnItemParticles(ItemStack itemstack, int count);
@@ -46,11 +41,15 @@ public abstract class LivingEntityMixin {
         String soundString = VisionValueHandler.getFirstValidString(null, "break_sound", itemstack);
         if (soundString != null && !soundString.isEmpty()) {
             if (!itemstack.isEmpty()) {
-                if (!((LivingEntity) (Object) this).isSilent()) {
+                if (!vminus$entity.isSilent()) {
                     ResourceLocation customSound = new ResourceLocation(soundString);
-                    SoundEvent customSoundEvent = BuiltInRegistries.SOUND_EVENT.getOptional(customSound).orElse(SoundEvents.ITEM_BREAK);
-                    ((LivingEntity) (Object) this).level().playLocalSound(((LivingEntity) (Object) this).getX(), ((LivingEntity) (Object) this).getY(), ((LivingEntity) (Object) this).getZ(), customSoundEvent,
-                            ((LivingEntity) (Object) this).getSoundSource(), 0.8F, 0.8F + ((LivingEntity) (Object) this).level().random.nextFloat() * 0.4F, false);
+                    SoundEvent customSoundEvent = ForgeRegistries.SOUND_EVENTS.getValue(customSound);
+                    if (customSoundEvent == null) {
+                        customSoundEvent = SoundEvents.ITEM_BREAK;
+                    }
+
+                    vminus$entity.level.playLocalSound(vminus$entity.getX(), vminus$entity.getY(), vminus$entity.getZ(),
+                            customSoundEvent, vminus$entity.getSoundSource(), 0.8F, 0.8F + vminus$entity.level.random.nextFloat() * 0.4F, false);
                 }
                 if (!VisionValueHandler.isBooleanMet(null, "no_break_particles", itemstack))
                     this.spawnItemParticles(itemstack, 5);
@@ -62,31 +61,29 @@ public abstract class LivingEntityMixin {
     // Automatic custom loot tables for variants
     @Inject(method = "getLootTable", at = @At("HEAD"), cancellable = true)
     public void getLootTable(CallbackInfoReturnable<ResourceLocation> cir) {
-        if (entity.getPersistentData() != null) {
-            if (entity.getPersistentData().contains("variant")) {
-                String variant = entity.getPersistentData().getString("variant");
-                String entityName = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).getPath();
-                if (!variant.equals("normal")) {
-                    ResourceLocation customLoot = new ResourceLocation("vminus:entities/variant/" + entityName + "/" + variant);
-                    if (customLoot != null)
-                        cir.setReturnValue(customLoot);
-                }
+        vminus$entity.getPersistentData();
+        if (vminus$entity.getPersistentData().contains("variant")) {
+            String variant = vminus$entity.getPersistentData().getString("variant");
+            String entityName = Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(vminus$entity.getType())).getPath();
+            if (!variant.equals("normal")) {
+                ResourceLocation customLoot = new ResourceLocation("vminus:entities/variant/" + entityName + "/" + variant);
+                cir.setReturnValue(customLoot);
             }
         }
     }
 
     @Inject(method = "tickEffects", at = @At("HEAD"), cancellable = true)
     private void tickEffects(CallbackInfo ci) {
-        LivingEntityAccessor accessor = (LivingEntityAccessor) entity;
+        LivingEntityAccessor accessor = (LivingEntityAccessor) vminus$entity;
         Iterator<MobEffect> iterator = accessor.getActiveEffects().keySet().iterator();
         try {
             while (iterator.hasNext()) {
                 MobEffect mobeffect = iterator.next();
                 MobEffectInstance mobeffectinstance = accessor.getActiveEffects().get(mobeffect);
-                if (!mobeffectinstance.tick(entity, () -> {
+                if (!mobeffectinstance.tick(vminus$entity, () -> {
                     accessor.callOnEffectUpdated(mobeffectinstance, true, null);
                 })) {
-                    if (!entity.level().isClientSide) {
+                    if (!vminus$entity.level.isClientSide) {
                         iterator.remove();
                         accessor.callOnEffectRemoved(mobeffectinstance);
                     }
@@ -97,7 +94,7 @@ public abstract class LivingEntityMixin {
         } catch (ConcurrentModificationException ignored) {
         }
         if (accessor.isEffectsDirty()) {
-            if (!entity.level().isClientSide) {
+            if (!vminus$entity.level.isClientSide) {
                 accessor.callUpdateInvisibilityStatus();
                 accessor.callUpdateGlowingStatus();
             }
@@ -125,86 +122,50 @@ public abstract class LivingEntityMixin {
                 flag &= random.nextInt(8) == 0;
             }
 
-            if (flag && i > 0) {
+            if (flag) {
                 double d0 = (double) (i >> 16 & 255) / 255.0D;
                 double d1 = (double) (i >> 8 & 255) / 255.0D;
-                double d2 = (double) (i >> 0 & 255) / 255.0D;
-                entity.level().addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT,
-                        entity.getRandomX(0.5D), entity.getRandomY(), entity.getRandomZ(0.5D), d0, d1, d2);
+                double d2 = (double) (i & 255) / 255.0D;
+                vminus$entity.level.addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT,
+                        vminus$entity.getRandomX(0.5D), vminus$entity.getRandomY(), vminus$entity.getRandomZ(0.5D), d0, d1, d2);
             }
         }
         ci.cancel();
     }
 
-    @Inject(method = "isSensitiveToWater", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isSensitiveToWater", at = @At("RETURN"), cancellable = true)
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
+        JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
         if (visionData != null && visionData.has("water_sensitive")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "water_sensitive", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "water_sensitive", vminus$entity));
         }
     }
 
-    @Inject(method = "canDisableShield", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canDisableShield", at = @At("RETURN"), cancellable = true)
     private void canDisableShield(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
+        JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
         if (visionData != null && visionData.has("disable_shields")) {
-            System.out.println("DISABLING SHIELDS!");
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "disable_shields", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "disable_shields", vminus$entity));
         }
     }
 
-    @Inject(method = "canBreatheUnderwater", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canBreatheUnderwater", at = @At("RETURN"), cancellable = true)
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
+        JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
         if (visionData != null && visionData.has("underwater_breathing")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "underwater_breathing", entity));
+            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "underwater_breathing", vminus$entity));
         }
     }
 
-    @Inject(method = "getSoundVolume", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getSoundVolume", at = @At("RETURN"), cancellable = true)
     private void getSoundVolume(CallbackInfoReturnable<Float> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
+        JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
         if (visionData != null && visionData.has("volume")) {
             float defaultVolume = 1f;
-            float totalVolume = VisionValueHandler.isNumberMet(visionData, "volume", defaultVolume, entity);
+            float totalVolume = VisionValueHandler.isNumberMet(visionData, "volume", defaultVolume, vminus$entity);
             if (totalVolume != defaultVolume) {
                 cir.setReturnValue(Math.max(totalVolume, 0.0f));
             }
-        }
-    }
-
-    @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
-    private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
-        if (visionData != null && visionData.has("experience")) {
-            int experience = VisionValueHandler.isNumberMet(visionData, "experience", 0, entity);
-            System.out.println("DROPPING NEW XP: " + experience);
-            cir.setReturnValue(Math.max(experience, 0));
-        }
-    }
-
-    @Nullable
-    @Inject(method = "getDeathSound", at = @At("HEAD"), cancellable = true)
-    private void getDeathSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
-        if (visionData != null && visionData.has("death_sound")) {
-            System.out.println("Trying deathsound");
-            String soundString = VisionValueHandler.getFirstValidString(visionData, "death_sound", entity);
-            SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
-            if (sound != null)
-                cir.setReturnValue(sound);
-        }
-    }
-
-    @Nullable
-    @Inject(method = "getHurtSound", at = @At("HEAD"), cancellable = true)
-    private void getHurtSound(DamageSource p_219440_, CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
-        if (visionData != null && visionData.has("hurt_sound")) {
-            String soundString = VisionValueHandler.getFirstValidString(visionData, "hurt_sound", entity);
-            SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
-            if (sound != null)
-                cir.setReturnValue(sound);
         }
     }
 }
