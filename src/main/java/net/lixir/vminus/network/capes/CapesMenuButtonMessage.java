@@ -2,7 +2,7 @@ package net.lixir.vminus.network.capes;
 
 import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.procedures.*;
-import net.lixir.vminus.world.inventory.CapesMenuMenu;
+import net.lixir.vminus.world.inventory.CapesMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -55,7 +55,7 @@ public class CapesMenuButtonMessage {
 
     public static void handleButtonAction(Player entity, int buttonID, int x, int y, int z) {
         Level world = entity.level();
-        HashMap guistate = CapesMenuMenu.guistate;
+        HashMap guistate = CapesMenu.guistate;
         // security measure to prevent arbitrary chunk generation
         if (!world.hasChunkAt(new BlockPos(x, y, z)))
             return;

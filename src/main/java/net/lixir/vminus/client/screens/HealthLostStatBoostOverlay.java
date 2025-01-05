@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Collection;
 
 @Mod.EventBusSubscriber({Dist.CLIENT})
-public class HealthLostStatBoostOverlayOverlay {
+public class HealthLostStatBoostOverlay {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void eventHandler(RenderGuiEvent.Pre event) {
         int w = event.getWindow().getGuiScaledWidth();

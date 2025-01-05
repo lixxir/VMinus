@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-public class CapesMenuMenu extends AbstractContainerMenu implements Supplier<Map<Integer, Slot>> {
+public class CapesMenu extends AbstractContainerMenu implements Supplier<Map<Integer, Slot>> {
     public final static HashMap<String, Object> guistate = new HashMap<>();
     public final Level world;
     public final Player entity;
@@ -32,7 +32,7 @@ public class CapesMenuMenu extends AbstractContainerMenu implements Supplier<Map
     public int x, y, z;
     private ContainerLevelAccess access = ContainerLevelAccess.NULL;
 
-    public CapesMenuMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
+    public CapesMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
         super(VMinusMenus.CAPES_MENU.get(), id);
         this.entity = inv.player;
         this.world = inv.player.level();
