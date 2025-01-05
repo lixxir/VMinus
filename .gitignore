@@ -11,8 +11,10 @@ build/
 out/
 classes/
 
-# build
-build/
+run/
+.run/
+
+src/generated/resources/.cache
 
 # idea
 .idea/
