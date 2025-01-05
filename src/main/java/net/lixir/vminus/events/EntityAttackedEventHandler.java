@@ -7,7 +7,6 @@ import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -46,7 +45,7 @@ public class EntityAttackedEventHandler {
     public static void onEntityAttacked(LivingAttackEvent event) {
         if (event != null && event.getEntity() != null) {
 
-            LevelAccessor world = event.getEntity().level();
+            LevelAccessor world = event.getEntity().level;
             DamageSource damagesource = event.getSource();
             Entity entity = event.getEntity();
             Entity sourceentity = event.getSource().getEntity();
@@ -67,27 +66,23 @@ public class EntityAttackedEventHandler {
             Entity directEntity = null;
 
             // Prevent invincible tagged entities from being hurt
-            if (entity.getType().is(TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation("vminus:invincible")))) {
+            if (entity.getType().is(TagKey.create(ForgeRegistries.ENTITY_TYPES.getRegistryKey(), new ResourceLocation("vminus:invincible")))) {
                 entity.invulnerableTime = 20;
-                if (event != null && event.isCancelable()) {
+                if (event.isCancelable()) {
                     event.setCanceled(true);
-                } else if (event != null && event.hasResult()) {
-                    event.setResult(Event.Result.DENY);
                 }
             }
 
             // Damage horse armor when attacked if it has durability
             if (entity instanceof Horse) {
                 if (entity.isAttackable()) {
-                    ItemStack horseArmor = (entity instanceof LivingEntity _entGetArmor ? _entGetArmor.getItemBySlot(EquipmentSlot.CHEST) : ItemStack.EMPTY);
+                    LivingEntity _entGetArmor = (LivingEntity) entity;
+                    ItemStack horseArmor = _entGetArmor.getItemBySlot(EquipmentSlot.CHEST);
                     if (!(horseArmor.getItem() == ItemStack.EMPTY.getItem())) {
                         if (horseArmor.isDamageableItem()) {
-                            {
-                                ItemStack _ist = horseArmor;
-                                if (_ist.hurt(1, RandomSource.create(), null)) {
-                                    _ist.shrink(1);
-                                    _ist.setDamageValue(0);
-                                }
+                            if (horseArmor.hurt(1, RandomSource.create(), null)) {
+                                    horseArmor.shrink(1);
+                                    horseArmor.setDamageValue(0);
                             }
                         }
                     }
@@ -112,7 +107,7 @@ public class EntityAttackedEventHandler {
                 }
             }
             // Enchantment particles
-            if (sourceentity != null && !(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
+            if (!(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
                 mainhand = (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY);
                 directEntity = damagesource.getDirectEntity();
                 if (!mainhand.isEmpty() && mainhand.isEnchanted()) {
@@ -129,28 +124,27 @@ public class EntityAttackedEventHandler {
                                 if (visionData.has("particle")) {
                                     // getting the string and resource location to add to the particle list
                                     String particleString = VisionValueHandler.getFirstValidString(visionData, "particle");
-                                    if (!particleString.isEmpty() && particleString != null) {
+                                    if (particleString != null && !particleString.isEmpty()) {
                                         ResourceLocation particleLocation = new ResourceLocation(particleString);
-                                        if (particleLocation != null)
-                                            particles.add(particleLocation);
+                                        particles.add(particleLocation);
                                     }
                                 }
                                 if (visionData.has("sound")) {
                                     String soundString = VisionValueHandler.getFirstValidString(visionData, "sound");
-                                    if (!world.isClientSide())
-                                        world.playSound(null, BlockPos.containing(sourceentity.getX(),
+                                    if (!world.isClientSide() && soundString != null)
+                                        world.playSound(null, new BlockPos(sourceentity.getX(),
                                                         sourceentity.getY() + 1,
                                                         sourceentity.getZ()),
                                                 Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(soundString))),
                                                 SoundSource.PLAYERS,
-                                                (float) 0.8,
-                                                (float) 1);
+                                                0.8f,
+                                                1.0f);
                                 }
                             }
                         }
                     }
                     // spawning random particles from the created list
-                    if (particles.size() > 0) {
+                    if (!particles.isEmpty()) {
                         for (int index0 = 0; index0 < Mth.nextInt(RandomSource.create(), 5, 7); index0++) {
                             ResourceLocation chosenParticle = particles.get(Mth.nextInt(RandomSource.create(), 0, (particles.size() - 1)));
                             // getting random positions
@@ -162,7 +156,7 @@ public class EntityAttackedEventHandler {
                             vY = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
                             vZ = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
                             ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(chosenParticle);
-                            if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {
+                            if (particleType instanceof SimpleParticleType simpleParticleType) {
                                 //world.sendParticles(simpleParticleType, ranX, ranY, ranZ, 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
                                 world.addParticle(simpleParticleType, ranX, ranY, ranZ, vX, vY, vZ);
                             }
