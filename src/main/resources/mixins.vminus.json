@@ -7,6 +7,8 @@
     "ChatFormattingMixin",
     "CreativeTabMixin",
     "MobEffectMixin",
+    "ReloadableServerResourcesAccessor",
+    "ReloadableServerResourcesMixin",
     "blocks.BlockRealMixin",
     "blocks.BlockStateBaseMixin",
     "blocks.CocaoBlockMixin",
@@ -93,5 +95,8 @@
     "client.entityrenderers.SpiderRendererMixin",
     "client.entityrenderers.SquidRendererMixin"
   ],
+  "injectors": {
+    "defaultRequire": 1
+  },
   "minVersion": "0.8"
 }
