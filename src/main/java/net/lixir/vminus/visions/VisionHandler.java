@@ -211,7 +211,7 @@ public class VisionHandler {
         if (entityType == null) {
             return null;
         }
-        return Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(entityType)).toString();
+        return Objects.requireNonNull(ForgeRegistries.ENTITIES.getKey(entityType)).toString();
     }
 
     private static @Nullable String attemptGetObjectId(@Nullable MobEffect mobEffect) {
@@ -279,9 +279,9 @@ public class VisionHandler {
                 }
             }
             case ENTITY -> {
-                for (EntityType<?> entity : ForgeRegistries.ENTITY_TYPES.getValues()) {
+                for (EntityType<?> entity : ForgeRegistries.ENTITIES.getValues()) {
                     VisionHandler.processVisionData(
-                            visionType, Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(entity)).toString(), entity, -1, context);
+                            visionType, Objects.requireNonNull(ForgeRegistries.ENTITIES.getKey(entity)).toString(), entity, -1, context);
                 }
             }
             case EFFECT -> {
@@ -394,9 +394,9 @@ public class VisionHandler {
               return false;
 
             TagKey<Item> itemTagKey = TagKey.create(ForgeRegistries.ITEMS.getRegistryKey(), matchKey);
-            Collection<Holder<Item>> tags = context.getTag(itemTagKey);
+            Collection<Holder<Item>> tags = context.getTag(itemTagKey).getValues();
 
-            if (tags == null || tags.isEmpty())
+            if (tags.isEmpty())
                 return false;
 
             ResourceLocation itemKey = ForgeRegistries.ITEMS.getKey(item);
@@ -416,9 +416,9 @@ public class VisionHandler {
             return false;
 
         TagKey<Block> blockTagKey = TagKey.create(ForgeRegistries.BLOCKS.getRegistryKey(), matchKey);
-        Collection<Holder<Block>> tags = context.getTag(blockTagKey);
+        Collection<Holder<Block>> tags = context.getTag(blockTagKey).getValues();
 
-        if (tags == null || tags.isEmpty())
+        if (tags.isEmpty())
             return false;
 
         ResourceLocation blockKey = ForgeRegistries.BLOCKS.getKey(block);
@@ -436,19 +436,19 @@ public class VisionHandler {
         if (context == null)
             return false;
 
-        TagKey<EntityType<?>> entityTagKey = TagKey.create(ForgeRegistries.ENTITY_TYPES.getRegistryKey(), matchKey);
-        Collection<Holder<EntityType<?>>> tags = context.getTag(entityTagKey);
+        TagKey<EntityType<?>> entityTagKey = TagKey.create(ForgeRegistries.ENTITIES.getRegistryKey(), matchKey);
+        Collection<Holder<EntityType<?>>> tags = context.getTag(entityTagKey).getValues();
 
-        if (tags == null || tags.isEmpty())
+        if (tags.isEmpty())
             return false;
 
-        ResourceLocation entityKey = ForgeRegistries.ENTITY_TYPES.getKey(entityType);
+        ResourceLocation entityKey = ForgeRegistries.ENTITIES.getKey(entityType);
 
         if (entityKey == null)
             return false;
 
         return tags.stream().anyMatch(holder -> {
-            ResourceLocation holderKey = ForgeRegistries.ENTITY_TYPES.getKey(holder.value());
+            ResourceLocation holderKey = ForgeRegistries.ENTITIES.getKey(holder.value());
             return Objects.equals(holderKey, entityKey);
         });
     }

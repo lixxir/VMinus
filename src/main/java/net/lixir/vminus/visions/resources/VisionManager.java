@@ -14,8 +14,8 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class VisionManager extends SimpleJsonResourceReloadListener {
@@ -36,41 +36,30 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
 
     // Had to override, so I could use the directory from the vision type instead.
     @Override
-    protected @NotNull Map<ResourceLocation, JsonElement> prepare(ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller) {
+    protected @NotNull Map<ResourceLocation, JsonElement> prepare(ResourceManager p_10771_, ProfilerFiller p_10772_) {
         Map<ResourceLocation, JsonElement> map = Maps.newHashMap();
         int i = this.directory.length() + 1;
 
-        for(Map.Entry<ResourceLocation, Resource> entry : resourceManager.listResources(this.directory, (p_215600_) -> p_215600_.getPath().endsWith(".json")).entrySet()) {
-            ResourceLocation resourcelocation = entry.getKey();
+        for(ResourceLocation resourcelocation : p_10771_.listResources(this.directory, (p_10774_) -> p_10774_.endsWith(".json"))) {
             String s = resourcelocation.getPath();
             ResourceLocation resourcelocation1 = new ResourceLocation(resourcelocation.getNamespace(), s.substring(i, s.length() - PATH_SUFFIX_LENGTH));
 
-            try {
-                Reader reader = entry.getValue().openAsReader();
-
-                try {
-                    JsonElement jsonelement = GsonHelper.fromJson(GSON, reader, JsonElement.class);
-                    if (jsonelement != null) {
-                        JsonElement jsonelement1 = map.put(resourcelocation1, jsonelement);
-                        if (jsonelement1 != null) {
-                            throw new IllegalStateException("Duplicate data file ignored with ID " + resourcelocation1);
-                        }
-                    } else {
-                        VMinusMod.LOGGER.error("Couldn't load data file {} from {} as it's null or empty", resourcelocation1, resourcelocation);
+            try (
+                    Resource resource = p_10771_.getResource(resourcelocation);
+                    InputStream inputstream = resource.getInputStream();
+                    Reader reader = new BufferedReader(new InputStreamReader(inputstream, StandardCharsets.UTF_8));
+            ) {
+                JsonElement jsonelement = GsonHelper.fromJson(GSON, reader, JsonElement.class);
+                if (jsonelement != null) {
+                    JsonElement jsonelement1 = map.put(resourcelocation1, jsonelement);
+                    if (jsonelement1 != null) {
+                        throw new IllegalStateException("Duplicate data file ignored with ID " + resourcelocation1);
                     }
-                } catch (Throwable throwable1) {
-                    try {
-                        reader.close();
-                    } catch (Throwable throwable) {
-                        throwable1.addSuppressed(throwable);
-                    }
-
-                    throw throwable1;
+                } else {
+                    VMinusMod.LOGGER.error("Couldn't load data file {} from {} as it's null or empty", resourcelocation1, resourcelocation);
                 }
-
-                reader.close();
-            } catch (IllegalArgumentException | IOException | JsonParseException jsonParseException) {
-                VMinusMod.LOGGER.error("Couldn't parse data file {} from {}", resourcelocation1, resourcelocation, jsonParseException);
+            } catch (IOException | JsonParseException | IllegalArgumentException jsonparseexception) {
+                VMinusMod.LOGGER.error("Couldn't parse data file {} from {}", new Object[]{resourcelocation1, resourcelocation, jsonparseexception});
             }
         }
 
