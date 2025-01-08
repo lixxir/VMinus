@@ -22,6 +22,11 @@ public class VMinusTags {
     }
 
     public static class Items {
+        public static final TagKey<Item> GOLDEN_TOOLS = tag("golden_tools");
+        public static final TagKey<Item> GOLDEN_ARMOR = tag("golden_armor");
+        public static final TagKey<Item> GOLDEN_EQUIPMENT = tag("golden_equipment");
+        public static final TagKey<Item> LIGHTFOOTED = tag("lightfooted");
+        public static final TagKey<Item> BANNED = tag("banned");
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinusMod.MODID, name));
