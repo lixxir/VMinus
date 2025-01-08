@@ -12,7 +12,7 @@ public class VMinusTags {
     public static class Blocks {
         public static final TagKey<Block> SOUL_TORCHES = tag("soul_torches");
         public static final TagKey<Block> TORCHES = tag("torches");
-        public static final TagKey<Block> FROGLIGHTS = tag("soul_torches");
+        public static final TagKey<Block> FROGLIGHTS = tag("froglights");
         public static final TagKey<Block> MOB_HEADS = tag("mob_heads");
         public static final TagKey<Block> CONCRETE_POWDER = tag("concrete_powder");
 
