@@ -1,118 +1,27 @@
-package net.lixir.vminus.visions;
+package net.lixir.vminus.visions.resources;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.network.VminusModVariables;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.world.level.LevelAccessor;
+import net.lixir.vminus.visions.util.VisionType;
 
 import javax.annotation.Nullable;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-public class ResourceVisionLoader {
-    public static void generateItemVisionsFile(LevelAccessor world) {
-        if (world.isClientSide())
-            return;
-        if (world instanceof ServerLevel serverLevel_) {
-            VminusModVariables.main_item_vision = mergeModifiersFromResourcePacks(serverLevel_, "item_visions");
-        }
-    }
+public class VisionResourceHandler {
+    private final static int DEFAULT_PRIORITY = 500;
 
-    public static void generateBlockVisionsFile(LevelAccessor world) {
-        if (world.isClientSide())
-            return;
-        if (world instanceof ServerLevel serverLevel_) {
-            VminusModVariables.main_block_vision = mergeModifiersFromResourcePacks(serverLevel_, "block_visions");
-        }
-    }
-
-    public static void generateEntityVisionsFile(LevelAccessor world) {
-        if (world.isClientSide())
-            return;
-        if (world instanceof ServerLevel serverLevel_) {
-            VminusModVariables.main_entity_vision = mergeModifiersFromResourcePacks(serverLevel_, "entity_visions");
-        }
-    }
-
-    public static void generateEffectVisionsFile(LevelAccessor world) {
-        if (world.isClientSide())
-            return;
-        if (world instanceof ServerLevel serverLevel_) {
-            VminusModVariables.main_effect_vision = mergeModifiersFromResourcePacks(serverLevel_, "effect_visions");
-        }
-    }
-
-    public static void generateEnchantmentVisionsFile(LevelAccessor world) {
-        if (world.isClientSide())
-            return;
-        if (world instanceof ServerLevel serverLevel_) {
-            VminusModVariables.main_enchantment_vision = mergeModifiersFromResourcePacks(serverLevel_, "enchantment_visions");
-        }
-    }
-
-    public static JsonObject mergeModifiersFromResourcePacks(ServerLevel serverLevel, String folderName) {
-        JsonObject jsonObject = new JsonObject();
-        ResourceManager resourceManager = serverLevel.getServer().getResourceManager();
-
-        resourceManager.listPacks().forEach(pack -> {
-            pack.getNamespaces(PackType.SERVER_DATA).forEach(namespace -> {
-                resourceManager.getResourceStack(new ResourceLocation(namespace, folderName))
-                        .forEach(resource -> {
-                            try (InputStream inputStream = resource.open()) {
-                                String jsonString = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-                                        .lines().collect(Collectors.joining("\n"));
-                                JsonObject newJsonObject = JsonParser.parseString(jsonString).getAsJsonObject();
-                                processJsonFolder(newJsonObject, folderName, jsonObject);
-                            } catch (IOException e) {
-                                VMinusMod.LOGGER.error("Error reading resource in folder {}", folderName, e);
-                            }
-                        });
-            });
-        });
-
-        File configDir = new File("config/vminus/" + folderName);
-        if (configDir.exists() && configDir.isDirectory()) {
-            File[] jsonFiles = configDir.listFiles((dir, name) -> name.endsWith(".json"));
-            if (jsonFiles != null) {
-                for (File file : jsonFiles) {
-                    try (FileReader reader = new FileReader(file)) {
-                        JsonObject configJson = JsonParser.parseReader(reader).getAsJsonObject();
-                        processJsonFolder(configJson, folderName, jsonObject);
-                    } catch (IOException e) {
-                        VMinusMod.LOGGER.error("Error reading config: {}", file.getName(), e);
-                    }
-                }
-            }
-        }
-
-        return jsonObject;
-    }
-
-    private static void processJsonFolder(JsonObject newJsonObject, String folderName, JsonObject jsonObject) {
-        String listType = switch (folderName) {
-            case "item_visions" -> "items";
-            case "block_visions" -> "blocks";
-            case "entity_visions" -> "entities";
-            case "enchantment_visions" -> "enchantments";
-            case "effect_visions" -> "effects";
-            default -> "";
-        };
-
+    public static JsonObject processJsonObject(String folderName, JsonElement jsonElement) {
+        VisionType visionType = VisionType.getFromDirectory(folderName);
+        String listType = visionType.getListType();
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
         if (!listType.isEmpty()) {
-            newJsonObject = transformArrayKeyJson(newJsonObject, listType);
+            jsonObject = transformArrayKeyJson(jsonObject, listType);
         }
 
-        for (String key : newJsonObject.keySet()) {
-            JsonElement newElement = newJsonObject.get(key);
+        for (String key : jsonObject.keySet()) {
+            JsonElement newElement = jsonObject.get(key);
             JsonElement wrappedElement = wrapPrimitive(key, newElement);
 
             if (jsonObject.has(key)) {
@@ -130,6 +39,7 @@ public class ResourceVisionLoader {
                 jsonObject.add(key, wrappedElement);
             }
         }
+        return jsonObject;
     }
 
     public static JsonObject transformArrayKeyJson(JsonObject inputJson, String listType) {
@@ -242,6 +152,8 @@ public class ResourceVisionLoader {
                 }
             }
         }
-        return 500;
+        return DEFAULT_PRIORITY;
     }
+
+
 }
