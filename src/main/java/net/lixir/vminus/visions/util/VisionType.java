@@ -2,28 +2,26 @@ package net.lixir.vminus.visions.util;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.network.VminusModVariables;
-import net.lixir.vminus.visions.VisionHandler;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public enum VisionType {
-    ITEM(VisionHandler.getItemVisionKey(), VisionHandler.getItemVisionCache(), (byte) 0, "item_visions", "items"),
-    BLOCK(VisionHandler.getBlockVisionKey(), VisionHandler.getBlockVisionCache(), (byte) 1, "block_visions", "blocks"),
-    ENTITY(VisionHandler.getEntityVisionKey(), VisionHandler.getEntityVisionCache(), (byte) 2, "entity_visions", "entities"),
-    EFFECT(VisionHandler.getEffectVisionKey(), VisionHandler.getEffectVisionCache(), (byte) 3, "effect_visions", "effects"),
-    ENCHANTMENT(VisionHandler.getEnchantmentVisionKey(), VisionHandler.getEnchantmentVisionCache(), (byte) 4, "enchantment_visions", "enchantments");
+    ITEM((byte) 0, "item_visions", "items"),
+    BLOCK((byte) 1, "block_visions", "blocks"),
+    ENTITY((byte) 2, "entity_visions", "entities"),
+    EFFECT((byte) 3, "effect_visions", "effects"),
+    ENCHANTMENT((byte) 4, "enchantment_visions", "enchantments");
 
-    private final ConcurrentHashMap<String, Integer> visionKey;
-    private final CopyOnWriteArrayList<JsonObject> visionCache;
+    private final ConcurrentHashMap<String, Integer> visionKey = new ConcurrentHashMap<>();
+    private final CopyOnWriteArrayList<JsonObject> visionCache = new CopyOnWriteArrayList<>();
+
     private final byte id;
     private final String folderName;
     private final String listType;
 
-    VisionType(ConcurrentHashMap<String, Integer> visionKey, CopyOnWriteArrayList<JsonObject> visionCache, byte id, String folderName, String listType) {
-        this.visionKey = visionKey;
-        this.visionCache = visionCache;
+    VisionType(byte id, String folderName, String listType) {
         this.id = id;
         this.folderName = folderName;
         this.listType = listType;
