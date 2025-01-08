@@ -1,0 +1,43 @@
+{
+  "minecraft:golden_leggings": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:magic_protection",
+        "name": "Magic protection",
+        "value": 0.2,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "fda6061a-6a26-11ef-a28f-325096b39f47"
+      },
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.12,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "fb7821a2-6a26-11ef-a2b7-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.02,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "f8b45bf2-6a26-11ef-8926-325096b39f47"
+      },
+      {
+        "id": "minecraft:generic.movement_speed",
+        "name": "Speed",
+        "value": 0.15,
+        "operation": "multiply_base",
+        "slot": "legs",
+        "uuid": "da633c0e-6aa3-11ef-8912-325096b39f47"
+      }
+    ]
+  }
+}

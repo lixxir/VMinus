@@ -1,0 +1,43 @@
+{
+  "minecraft:golden_helmet": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:magic_protection",
+        "name": "Magic Protection",
+        "value": 0.15,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "2a40c920-69a1-11ef-a971-325096b39f47"
+      },
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt Protection",
+        "value": 0.10,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "540820be-69a1-11ef-833b-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.01,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "3fff6d3e-69a1-11ef-90f3-325096b39f47"
+      },
+      {
+        "id": "minecraft:generic.movement_speed",
+        "name": "Speed",
+        "value": 0.04,
+        "operation": "multiply_base",
+        "slot": "head",
+        "uuid": "20d0f668-6aa4-11ef-a333-325096b39f47"
+      }
+    ]
+  }
+}

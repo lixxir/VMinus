@@ -1,0 +1,48 @@
+{
+  "minecraft:golden_horse_armor": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "durability": [
+      {
+        "value": 512
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:magic_protection",
+        "name": "Magic protection",
+        "value": 0.8,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "afc95e46-6a8b-11ef-a592-325096b39f47"
+      },
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.50,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "b1f87832-6a8b-11ef-94b5-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.05,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "b41017b0-6a8b-11ef-9e15-325096b39f47"
+      },
+      {
+        "id": "minecraft:generic.movement_speed",
+        "name": "Speed",
+        "value": 0.15,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "da633c0e-6aa3-11ef-8912-325096b39f47"
+      }
+    ]
+  }
+}

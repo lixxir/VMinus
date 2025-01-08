@@ -1,0 +1,14 @@
+{
+  "items": [
+    "#vminus:golden_tools"
+  ],
+  "attributes": [
+    {
+      "replace": true,
+      "id": "vminus:mining_speed",
+      "value": 16,
+      "slot": "mainhand"
+    }
+  ],
+  "durability": 256
+}

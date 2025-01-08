@@ -1,0 +1,43 @@
+{
+  "minecraft:golden_chestplate": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:magic_protection",
+        "name": "Magic protection",
+        "value": 0.25,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "d4900122-6a26-11ef-9653-325096b39f47"
+      },
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt protection",
+        "value": 0.14,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "d6902baa-6a26-11ef-a302-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.03,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "d865b346-6a26-11ef-81b2-325096b39f47"
+      },
+      {
+        "id": "minecraft:generic.movement_speed",
+        "name": "Speed",
+        "value": 0.06,
+        "operation": "multiply_base",
+        "slot": "chest",
+        "uuid": "143e28c6-6aa4-11ef-adc0-325096b39f47"
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "minecraft:golden_boots": {
+    "remove_attributes": [
+      {
+        "id": "minecraft:generic.armor"
+      }
+    ],
+    "attributes": [
+      {
+        "id": "vminus:magic_protection",
+        "name": "Magic Protection",
+        "value": 0.1,
+        "operation": "multiply_base",
+        "slot": "feet",
+        "uuid": "583860fa-6a27-11ef-bd03-325096b39f47"
+      },
+      {
+        "id": "vminus:blunt_protection",
+        "name": "Blunt Protection",
+        "value": 0.08,
+        "operation": "multiply_base",
+        "slot": "feet",
+        "uuid": "5645ee34-6a27-11ef-9710-325096b39f47"
+      },
+      {
+        "id": "vminus:protection",
+        "name": "Protection",
+        "value": 0.01,
+        "operation": "multiply_base",
+        "slot": "feet",
+        "uuid": "541f14f0-6a27-11ef-a4ae-325096b39f47"
+      },
+      {
+        "id": "minecraft:generic.movement_speed",
+        "name": "Speed",
+        "value": 0.03,
+        "operation": "multiply_base",
+        "slot": "feet",
+        "uuid": "2a8348a0-6aa4-11ef-a92d-325096b39f47"
+      }
+    ]
+  }
+}
