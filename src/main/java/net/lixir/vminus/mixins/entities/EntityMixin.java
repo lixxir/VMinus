@@ -22,12 +22,4 @@ public class EntityMixin {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "silent", entity.getType()));
         }
     }
-
-    @Inject(method = "dampensVibrations", at = @At("HEAD"), cancellable = true)
-    private void dampensVibrations(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
-        if (visionData != null && visionData.has("dampens_vibrations")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "dampens_vibrations", entity.getType()));
-        }
-    }
 }
