@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[43,)"
+loaderVersion="[40,)"
 license="All Rights Reserved"
 
 [[mods]]
@@ -14,7 +14,7 @@ description="Edit and Remove Items, Blocks, Entities, Enchantments & more with C
 [[dependencies.vminus]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.2]"
+    versionRange="[1.18.2]"
     ordering="NONE"
     side="BOTH"
 
