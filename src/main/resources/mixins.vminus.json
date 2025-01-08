@@ -7,8 +7,6 @@
     "ChatFormattingMixin",
     "CreativeTabMixin",
     "MobEffectMixin",
-    "ReloadableServerResourcesAccessor",
-    "ReloadableServerResourcesMixin",
     "blocks.BlockRealMixin",
     "blocks.BlockStateBaseMixin",
     "blocks.CocaoBlockMixin",
