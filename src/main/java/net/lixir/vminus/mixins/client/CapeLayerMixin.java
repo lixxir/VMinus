@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.lixir.vminus.helpers.CapeHelper;
+import net.lixir.vminus.capes.CapeHelper;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;

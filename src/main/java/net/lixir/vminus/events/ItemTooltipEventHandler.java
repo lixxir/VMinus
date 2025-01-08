@@ -1,6 +1,7 @@
-package net.lixir.vminus;
+package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.IconHandler;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.client.gui.screens.Screen;

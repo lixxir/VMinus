@@ -1,7 +1,6 @@
 package net.lixir.vminus.events;
 
 import net.lixir.vminus.client.gui.CapesMenuScreen;
-import net.lixir.vminus.registry.VMinusMenus;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

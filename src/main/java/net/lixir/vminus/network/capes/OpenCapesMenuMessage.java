@@ -1,7 +1,6 @@
 package net.lixir.vminus.network.capes;
 
 import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.procedures.OpenCapesMenuOnKeyPressedProcedure;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
