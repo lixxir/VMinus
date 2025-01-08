@@ -1,21 +1,16 @@
 package net.lixir.vminus;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.network.resource.RequestFileGenerationPacket;
 import net.lixir.vminus.visions.VisionHandler;
 import net.lixir.vminus.visions.util.VisionValueHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -24,16 +19,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
-public class VMinusClientEvents {
+public class ItemTooltipEventHandler {
     // Requesting to accumulate all the stored jsons on the server-side for visions.
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onEntityJoin(EntityJoinLevelEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof Player && entity == Minecraft.getInstance().player) {
-            VMinusMod.PACKET_HANDLER.sendToServer(new RequestFileGenerationPacket());
-        }
-    }
-
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         Entity player = event.getEntity();
