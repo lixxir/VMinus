@@ -31,11 +31,11 @@ public class RecordItemMixin {
             if (!level.isClientSide) {
                 Player player = context.getPlayer();
                 BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                if (blockEntity instanceof JukeboxBlockEntity jukeboxBlockEntity) {
+                if (blockEntity instanceof JukeboxBlockEntity) {
                     ItemStack copyStack = itemStack.copy();
                     copyStack.setCount(1);
-                    ((JukeboxBlock)Blocks.JUKEBOX).setRecord(context.getPlayer(), level, blockPos, blockState, copyStack);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos, GameEvent.Context.of(player, blockState));
+                    ((JukeboxBlock)Blocks.JUKEBOX).setRecord(level, blockPos, blockState, copyStack);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockPos);
                     itemStack.shrink(1);
                     if (player != null) {
                         player.awardStat(Stats.PLAY_RECORD);
