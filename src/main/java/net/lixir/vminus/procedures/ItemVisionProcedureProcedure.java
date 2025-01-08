@@ -7,6 +7,7 @@ import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.MessageArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -32,10 +33,10 @@ public class ItemVisionProcedureProcedure {
         JsonObject itemData = VisionHandler.getVisionData(theitem, true);
         if (itemData != null) {
             if (entity instanceof Player _player && !_player.level.isClientSide())
-                _player.displayClientMessage(Component.literal(("Item Vision found for " + itemId + ", " + itemData)), false);
+                _player.displayClientMessage(new TextComponent(("Item Vision found for " + itemId + ", " + itemData)), false);
         } else {
             if (entity instanceof Player _player && !_player.level.isClientSide())
-                _player.displayClientMessage(Component.literal("Item Vision not found."), false);
+                _player.displayClientMessage(new TextComponent("Item Vision not found."), false);
         }
     }
 }
