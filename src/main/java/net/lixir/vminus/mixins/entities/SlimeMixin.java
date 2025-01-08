@@ -46,7 +46,7 @@ public abstract class SlimeMixin extends Mob implements Enemy {
                     newSlime.setCustomName(customName);
                     newSlime.setNoAi(noAi);
                     newSlime.setInvulnerable(vminus$slime.isInvulnerable());
-                    newSlime.setSize(newSize, true);
+                    ((SlimeAccessor) newSlime).invokeSetSize(newSize, true);
                     newSlime.moveTo(vminus$slime.getX() + (double) offsetX, vminus$slime.getY() + 0.5D, vminus$slime.getZ() + (double) offsetZ, vminus$slime.getRandom().nextFloat() * 360.0F, 0.0F);
                     newSlime.getPersistentData().putString("variant", variant);
                     //newSlime.load(newSlimeNbt);
