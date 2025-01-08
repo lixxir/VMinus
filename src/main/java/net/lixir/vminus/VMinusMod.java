@@ -42,6 +42,7 @@ public class VMinusMod {
 
     public VMinusMod() {
         MinecraftForge.EVENT_BUS.register(this);
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         registerNetworkMessages();
     }
 

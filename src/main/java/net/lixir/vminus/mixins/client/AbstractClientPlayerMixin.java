@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.client;
 
-import net.lixir.vminus.helpers.CapeHelper;
+import net.lixir.vminus.capes.CapeHelper;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
