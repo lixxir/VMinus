@@ -6,6 +6,7 @@ import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +43,7 @@ public class ItemTooltipEventHandler {
                 if (!(inspectString.equals("inspection.item." + inspectNum + "." + validInspect))) {
                     inspectable = true;
                     if (altDown) {
-                        tooltip.add(Component.literal(inspectStart + inspectString));
+                        tooltip.add(new TextComponent(inspectStart + inspectString));
                     } else {
                         break;
                     }
@@ -54,9 +55,9 @@ public class ItemTooltipEventHandler {
             JsonObject itemData = VisionHandler.getVisionData(itemstack);
             if (inspectable || VisionValueHandler.isBooleanMet(itemData, "inspectable", itemstack)) {
                 if (!altDown) {
-                    tooltip.add(Component.literal("§9[ALT" + IconHandler.getIcon("inspect") + "§9]"));
+                    tooltip.add(new TextComponent(("§9[ALT" + IconHandler.getIcon("inspect") + "§9]")));
                 } else {
-                    tooltip.add(Component.literal("§8[ALT" + IconHandler.getIcon("inspect_held") + "§8]"));
+                    tooltip.add(new TextComponent(("§8[ALT" + IconHandler.getIcon("inspect_held") + "§8]")));
                 }
             }
         }
