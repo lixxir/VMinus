@@ -16,9 +16,6 @@ public class VMinusBlockTagGenerator extends BlockTagsProvider {
 
     @Override
     protected void addTags() {
-        TagAppender<Block> froglights = tag(VMinusTags.Blocks.FROGLIGHTS);
-        froglights.add(Blocks.OCHRE_FROGLIGHT, Blocks.VERDANT_FROGLIGHT, Blocks.PEARLESCENT_FROGLIGHT);
-
         TagAppender<Block> torches = tag(VMinusTags.Blocks.TORCHES);
         torches.add(Blocks.TORCH, Blocks.WALL_TORCH);
 
