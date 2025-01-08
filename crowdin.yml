@@ -1,3 +1,5 @@
 files:
   - source: /src/main/resources/assets/vminus/lang/en_us.json
     translation: /src/main/resources/assets/vminus/lang/%locale_with_underscore%.json
+    transform:
+      export_pattern: lowercase
