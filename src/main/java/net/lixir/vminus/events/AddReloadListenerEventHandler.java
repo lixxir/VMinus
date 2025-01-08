@@ -14,11 +14,8 @@ public class AddReloadListenerEventHandler {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void AddReloadListenerEvent(AddReloadListenerEvent event) {
        ICondition.IContext context = event.getConditionContext();
-       event.addListener(new VisionManager(VisionType.ITEM, context));
-       event.addListener(new VisionManager(VisionType.BLOCK, context));
-       event.addListener(new VisionManager(VisionType.ENTITY, context));
-       event.addListener(new VisionManager(VisionType.EFFECT, context));
-       event.addListener(new VisionManager(VisionType.ENCHANTMENT, context));
-
+       for (VisionType visionType : VisionType.values()) {
+           event.addListener(new VisionManager(visionType, context));
+       }
     }
 }
