@@ -18,12 +18,12 @@ public enum VisionType {
     private final CopyOnWriteArrayList<JsonObject> visionCache = new CopyOnWriteArrayList<>();
 
     private final byte id;
-    private final String folderName;
+    private final String directory;
     private final String listType;
 
-    VisionType(byte id, String folderName, String listType) {
+    VisionType(byte id, String directory, String listType) {
         this.id = id;
-        this.folderName = folderName;
+        this.directory = directory;
         this.listType = listType;
     }
 
@@ -61,7 +61,7 @@ public enum VisionType {
     }
 
     public String getDirectoryName() {
-        return this.folderName;
+        return this.directory;
     }
 
     public String getListType() {

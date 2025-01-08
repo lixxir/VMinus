@@ -14,6 +14,8 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
@@ -104,6 +106,42 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
                 }
             } catch (Exception e) {
                 VMinusMod.LOGGER.error("Error processing JSON file: {}", jsonFile.getKey(), e);
+            }
+        }
+
+        // Processing for configs.
+        File configDir = new File("config/vminus/" + directory);
+        if (!configDir.exists() && !configDir.mkdirs()) {
+            VMinusMod.LOGGER.error("Failed to create directory: {}", configDir.getPath());
+        }
+        if (configDir.exists() && configDir.isDirectory()) {
+            File[] jsonFiles = configDir.listFiles((dir, name) -> name.endsWith(".json"));
+            if (jsonFiles != null) {
+                for (File file : jsonFiles) {
+                    try (FileReader reader = new FileReader(file)) {
+                        JsonObject configJson = JsonParser.parseReader(reader).getAsJsonObject();
+                        try {
+                            JsonObject jsonObject = VisionResourceHandler.processJsonObject(this.directory, configJson);
+
+                            for (String key : jsonObject.keySet()) {
+                                JsonElement value = jsonObject.get(key);
+
+                                if (mainJsonObject.has(key)) {
+                                    JsonObject existingObject = mainJsonObject.getAsJsonObject(key);
+                                    JsonObject newObject = value.getAsJsonObject();
+
+                                    VisionResourceHandler.mergeJsonObjects(existingObject, newObject, 0);
+                                } else {
+                                    mainJsonObject.add(key, value);
+                                }
+                            }
+                        } catch (Exception e) {
+                            VMinusMod.LOGGER.error("Error processing JSON file: {}", file.getName(), e);
+                        }
+                    } catch (IOException e) {
+                        VMinusMod.LOGGER.error("Error reading config: {}", file.getName(), e);
+                    }
+                }
             }
         }
         this.visionType.getVisionKey().clear();
