@@ -12,10 +12,7 @@ import net.lixir.vminus.visions.util.VisionValueHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -75,7 +72,7 @@ public abstract class ItemStackTooltipMixin {
             Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(enchantmentId);
 
             if (enchantment != null) {
-                enchantmentList.add(Component.literal(" ").append(enchantment.getFullname(EnchantmentHelper.getEnchantmentLevel(compoundTag))));
+                enchantmentList.add(new TextComponent(" ").append(enchantment.getFullname(EnchantmentHelper.getEnchantmentLevel(compoundTag))));
             }
         }
     }
@@ -83,9 +80,6 @@ public abstract class ItemStackTooltipMixin {
 
     @Shadow
     public abstract Item getItem();
-
-    @Shadow
-    protected abstract int getHideFlags();
 
     @Shadow
     public abstract Rarity getRarity();
@@ -119,7 +113,7 @@ public abstract class ItemStackTooltipMixin {
         boolean echoed = tag != null && tag.getBoolean("echo");
         boolean deathDurability = tag != null && tag.getBoolean("death_durability");
 
-        MutableComponent mutablecomponent = Component.empty().append(this.getHoverName()).withStyle(this.getRarity().color);
+        MutableComponent mutablecomponent = new TextComponent("").append(this.getHoverName()).withStyle(this.getRarity().color);
 
         if (this.hasCustomHoverName()) {
             mutablecomponent.withStyle(ChatFormatting.ITALIC);
@@ -129,13 +123,13 @@ public abstract class ItemStackTooltipMixin {
         if (itemData != null) {
             List<String> tooltips = VisionValueHandler.getTooltips(itemData, vminus$itemStack, true);
             for (String tooltipD : tooltips) {
-                list.add(Component.literal((tooltipD)));
+                list.add(new TextComponent((tooltipD)));
             }
         }
         if (!flag.isAdvanced() && !vminus$itemStack.hasCustomHoverName() && vminus$itemStack.is(Items.FILLED_MAP)) {
             Integer integer = MapItem.getMapId(vminus$itemStack);
             if (integer != null) {
-                list.add((Component.literal("#" + integer)).withStyle(ChatFormatting.GRAY));
+                list.add((new TextComponent("#" + integer)).withStyle(ChatFormatting.GRAY));
             }
         }
         //if (shouldShowInTooltip(j, ItemStack.TooltipPart.ADDITIONAL)) {
@@ -147,9 +141,9 @@ public abstract class ItemStackTooltipMixin {
                 CompoundTag compoundtag = this.tag.getCompound("display");
                 if (compoundtag.contains("color", 99)) {
                     if (flag.isAdvanced()) {
-                        list.add((Component.translatable("item.color", String.format("#%06X", compoundtag.getInt("color")))).withStyle(ChatFormatting.GRAY));
+                        list.add((new TranslatableComponent("item.color", String.format("#%06X", compoundtag.getInt("color")))).withStyle(ChatFormatting.GRAY));
                     } else {
-                        list.add((Component.translatable("item.dyed")).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                        list.add((new TranslatableComponent("item.dyed")).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
                     }
                 }
                 if (compoundtag.getTagType("Lore") == 9) {
@@ -195,7 +189,7 @@ public abstract class ItemStackTooltipMixin {
             BlockState blockState = block.defaultBlockState();
             int light = blockState.getLightEmission();
             if (light > 0)
-                list.add(Component.literal(" " + IconHandler.getIcon("luminance") + IconHandler.getIcon("blueColor") + " " + light + " Luminance"));
+                list.add(new TextComponent(" " + IconHandler.getIcon("luminance") + IconHandler.getIcon("blueColor") + " " + light + " Luminance"));
         }
         List<Component> tempList = new ArrayList<>();
         for (Map.Entry<EquipmentSlot, Map<Attribute, AttributeModifier>> entry : mergedAttributes.entrySet()) {
@@ -203,7 +197,7 @@ public abstract class ItemStackTooltipMixin {
             Map<Attribute, AttributeModifier> attributes = entry.getValue();
             if (!attributes.isEmpty()) {
                 if (mergedAttributes.size() > 1) {
-                    tempList.add(Component.translatable("item.modifiers." + slot.getName()).withStyle(ChatFormatting.GRAY));
+                    tempList.add(new TranslatableComponent("item.modifiers." + slot.getName()).withStyle(ChatFormatting.GRAY));
                 }
                 for (Map.Entry<Attribute, AttributeModifier> attributeEntry : attributes.entrySet()) {
                     Attribute attribute = attributeEntry.getKey();
@@ -229,8 +223,8 @@ public abstract class ItemStackTooltipMixin {
                     if (attributeId.equals("vminus:mob_detection_range")) {
                         colorOverride = 1;
                     }
-                    MutableComponent iconComponent = Component.literal(" " + icon).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
-                    MutableComponent attributeComponent = Component.translatable(attribute.getDescriptionId());
+                    MutableComponent iconComponent = new TextComponent(" " + icon).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    MutableComponent attributeComponent = new TranslatableComponent(attribute.getDescriptionId());
                     MutableComponent modifierComponent = null;
                     if (attribute == Attributes.ATTACK_SPEED) {
                         String attackSpeedType = null;
@@ -257,20 +251,20 @@ public abstract class ItemStackTooltipMixin {
                                 attackSpeedType = "Slow";
                             }
                         }
-                        modifierComponent = Component.literal("");
-                        MutableComponent attackSpeed = Component.literal("" + attackSpeedType + " ");
+                        modifierComponent = new TextComponent("");
+                        MutableComponent attackSpeed = new TextComponent("" + attackSpeedType + " ");
                         modifierComponent.append(attackSpeed);
                         modifierComponent.append(attributeComponent).withStyle(Style.EMPTY.withColor(ChatFormatting.BLUE));
                     } else {
                         if (d0 > 0.0D) {
-                            modifierComponent = Component.translatable("attribute.modifier.plus." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), attributeComponent)
+                            modifierComponent = new TranslatableComponent("attribute.modifier.plus." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), attributeComponent)
                                     .setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE));
                         } else if (colorOverride == 1) {
-                            modifierComponent = Component.translatable("attribute.modifier.take." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1 * -1), attributeComponent)
+                            modifierComponent = new TranslatableComponent("attribute.modifier.take." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1 * -1), attributeComponent)
                                     .setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE));
                         } else if (d0 < 0.0D) {
                             d1 *= -1.0D;
-                            modifierComponent = Component.translatable("attribute.modifier.take." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), attributeComponent)
+                            modifierComponent = new TranslatableComponent("attribute.modifier.take." + attributeModifier.getOperation().toValue(), ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), attributeComponent)
                                     .setStyle(Style.EMPTY.withColor(ChatFormatting.RED));
                         }
                     }
@@ -296,14 +290,14 @@ public abstract class ItemStackTooltipMixin {
         Boolean unbreakable = false;
         if (vminus$itemStack.hasTag()) {
             if (this.tag.getBoolean("Unbreakable")) {
-                list.add((Component.translatable("item.unbreakable")).withStyle(ChatFormatting.BLUE));
+                list.add((new TranslatableComponent("item.unbreakable")).withStyle(ChatFormatting.BLUE));
                 unbreakable = true;
             }
             if (this.tag.contains("CanDestroy", 9)) {
                 ListTag listtag1 = this.tag.getList("CanDestroy", 8);
                 if (!listtag1.isEmpty()) {
-                    list.add(Component.empty());
-                    list.add((Component.translatable("item.canBreak")).withStyle(ChatFormatting.GRAY));
+                    list.add(new TextComponent(""));
+                    list.add((new TranslatableComponent("item.canBreak")).withStyle(ChatFormatting.GRAY));
                     for (int k = 0; k < listtag1.size(); ++k) {
                         list.addAll(expandBlockState(listtag1.getString(k)));
                     }
@@ -312,8 +306,8 @@ public abstract class ItemStackTooltipMixin {
             if (this.tag.contains("CanPlaceOn", 9)) {
                 ListTag listtag2 = this.tag.getList("CanPlaceOn", 8);
                 if (!listtag2.isEmpty()) {
-                    list.add(Component.empty());
-                    list.add((Component.translatable("item.canPlace")).withStyle(ChatFormatting.GRAY));
+                    list.add(new TextComponent(""));
+                    list.add((new TranslatableComponent("item.canPlace")).withStyle(ChatFormatting.GRAY));
                     for (int l = 0; l < listtag2.size(); ++l) {
                         list.addAll(expandBlockState(listtag2.getString(l)));
                     }
@@ -333,13 +327,13 @@ public abstract class ItemStackTooltipMixin {
                     int durationSeconds = duration / 20;
                     boolean isBadEffect = !effectPair.getFirst().getEffect().isBeneficial();
                     String icon = !isBadEffect ? IconHandler.getIcon("effect") + IconHandler.getIcon("grayColor") : IconHandler.getIcon("bad_effect") + IconHandler.getIcon("redColor");
-                    Component effectLevel = Component.translatable("potion.potency." + amplifier);
+                    Component effectLevel = new TranslatableComponent("potion.potency." + amplifier);
                     String durationMinutes = String.format("%02d", durationSeconds / 60);
                     String durationSecondsString = String.format("%02d", durationSeconds % 60);
                     String durationString = durationMinutes + ":" + durationSecondsString;
                     String chanceString = chance < 1 ? " [" + (int) (chance * 100) + "%]" : "";
-                    MutableComponent finalString = Component.literal(" " + icon + effectName + (!effectLevel.toString().isEmpty() ? " " : ""));
-                    list.add(finalString.append(effectLevel).append(Component.literal((!isBadEffect ? IconHandler.getIcon("grayColor") : IconHandler.getIcon("redColor")) + " (" + durationString + ")" + chanceString)));
+                    MutableComponent finalString = new TextComponent(" " + icon + effectName + (!effectLevel.toString().isEmpty() ? " " : ""));
+                    list.add(finalString.append(effectLevel).append(new TextComponent((!isBadEffect ? IconHandler.getIcon("grayColor") : IconHandler.getIcon("redColor")) + " (" + durationString + ")" + chanceString)));
                 });
             }
             if (ModList.get().isLoaded("detour")) {
@@ -357,7 +351,7 @@ public abstract class ItemStackTooltipMixin {
                 healSpeed = IconHandler.getIcon("hunger_shank");
                 healText = "Nutrition";
             }
-            list.add(Component.literal(" " + healSpeed + IconHandler.getIcon("blueColor") + foodProperties.getNutrition() + " " + healText));
+            list.add(new TextComponent(" " + healSpeed + IconHandler.getIcon("blueColor") + foodProperties.getNutrition() + " " + healText));
             if (!ModList.get().isLoaded("detour")) {
                 double saturation = foodProperties.getSaturationModifier();
                 String saturationString = "";
@@ -372,10 +366,10 @@ public abstract class ItemStackTooltipMixin {
                 } else if (saturation > 1.6) {
                     saturationString = "Supernatural";
                 }
-                list.add(Component.literal(" " + IconHandler.getIcon("saturation") + IconHandler.getIcon("blueColor") + saturationString + " Saturation"));
+                list.add(new TextComponent(" " + IconHandler.getIcon("saturation") + IconHandler.getIcon("blueColor") + saturationString + " Saturation"));
             }
             double eatDuration = item.getUseDuration(vminus$itemStack);
-            list.add(Component.literal(" " + IconHandler.getIcon("eating_duration") + IconHandler.getIcon("blueColor") + (new java.text.DecimalFormat("#.#").format(eatDuration / 20)) + "s Eating Duration"));
+            list.add(new TextComponent(" " + IconHandler.getIcon("eating_duration") + IconHandler.getIcon("blueColor") + (new java.text.DecimalFormat("#.#").format(eatDuration / 20)) + "s Eating Duration"));
         }
         StringBuilder genericStats = new StringBuilder();
         if (maxDurability >= 1 && (!vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:cosmetic"))) && !echoed) && !unbreakable)
@@ -385,24 +379,24 @@ public abstract class ItemStackTooltipMixin {
             genericStats.append(IconHandler.getIcon("rune") + IconHandler.getIcon("grayColor") + enchants + IconHandler.getIcon("darkGrayColor") + "/" + enchantmentLimit + " ");
         if (!genericStats.toString().isEmpty()) {
             String genericStatsString = genericStats.toString().replaceAll("\\s+$", "");
-            list.add(Component.literal(genericStatsString));
+            list.add(new TextComponent(genericStatsString));
         }
         if (itemData != null) {
             List<String> tooltips = VisionValueHandler.getTooltips(itemData, vminus$itemStack, false);
             for (String tooltipD : tooltips) {
-                list.add(Component.literal((tooltipD)));
+                list.add(new TextComponent((tooltipD)));
             }
         }
         net.minecraftforge.event.ForgeEventFactory.onItemTooltip(vminus$itemStack, player, list, flag);
         if (flag.isAdvanced()) {
             if (player.getAbilities().instabuild) {
-                list.add((Component.literal(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(vminus$itemStack.getItem())).toString())).withStyle(ChatFormatting.DARK_GRAY));
+                list.add((new TextComponent(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(vminus$itemStack.getItem())).toString())).withStyle(ChatFormatting.DARK_GRAY));
             }
             if (vminus$itemStack.hasTag()) {
-                list.add(Component.translatable("item.nbt_tags", vminus$itemStack.getTag().getAllKeys().size()).withStyle(ChatFormatting.DARK_GRAY));
+                list.add(new TranslatableComponent("item.nbt_tags", vminus$itemStack.getTag().getAllKeys().size()).withStyle(ChatFormatting.DARK_GRAY));
                 if (tag != null) {
                     String json = tag.toString();
-                    Component nbtText = Component.literal(json).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY));
+                    Component nbtText = new TextComponent(json).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY));
                     list.add(nbtText);
                 }
             }

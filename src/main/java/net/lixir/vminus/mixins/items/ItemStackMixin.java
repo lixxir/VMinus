@@ -17,13 +17,12 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -51,7 +51,7 @@ public abstract class ItemStackMixin {
     private int vminus$key = VisionHandler.EMPTY_KEY;
 
     @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
-    public void vminus$hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
+    public void vminus$hurt(int p_41630_, Random p_41631_, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
             if (vminus$key == -1)
                 vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
@@ -99,7 +99,7 @@ public abstract class ItemStackMixin {
     @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
     public void getBarWidth(CallbackInfoReturnable<Integer> cir) {
         if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-            vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
+            vminus$itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(capability -> {
                 int numberOfSlots = capability.getSlots();
                 double amount = 0;
                 for (int i = 0; i < numberOfSlots; i++) {
@@ -121,6 +121,7 @@ public abstract class ItemStackMixin {
             cir.setReturnValue(Math.min(barWidth, 13));
         }
     }
+
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
     public void getBarColor(CallbackInfoReturnable<Integer> cir) {
@@ -150,7 +151,7 @@ public abstract class ItemStackMixin {
             cir.cancel();
         } else {
             if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-                vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(capability -> {
+                vminus$itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(capability -> {
                     int numberOfSlots = capability.getSlots();
                     int totalItems = 0;
                     int maxCapacity = 0;
@@ -214,7 +215,7 @@ public abstract class ItemStackMixin {
     @Inject(method = "isBarVisible", at = @At("HEAD"), cancellable = true)
     public void isBarVisible(CallbackInfoReturnable<Boolean> cir) {
         if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
-            vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
+            vminus$itemStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(capability -> {
                 boolean hasItems = false;
                 for (int i = 0; i < capability.getSlots(); i++) {
                     if (capability.getStackInSlot(i).getCount() > 0) {
