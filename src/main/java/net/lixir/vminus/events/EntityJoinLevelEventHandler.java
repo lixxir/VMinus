@@ -19,7 +19,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,8 +30,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 @Mod.EventBusSubscriber
 public class EntityJoinLevelEventHandler {
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
+    public static void onEntityJoin(EntityJoinWorldEvent event) {
+        if (!(event.getEntity().getLevel() instanceof ServerLevel serverLevel)) return;
 
         Entity entity = event.getEntity();
         if (entity == null)

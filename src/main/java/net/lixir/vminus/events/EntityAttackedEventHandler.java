@@ -11,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -34,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 @Mod.EventBusSubscriber
 public class EntityAttackedEventHandler {
@@ -44,7 +44,6 @@ public class EntityAttackedEventHandler {
     @SubscribeEvent
     public static void onEntityAttacked(LivingAttackEvent event) {
         if (event != null && event.getEntity() != null) {
-
             LevelAccessor world = event.getEntity().level;
             DamageSource damagesource = event.getSource();
             Entity entity = event.getEntity();
@@ -65,30 +64,28 @@ public class EntityAttackedEventHandler {
             double ranY = 0;
             Entity directEntity = null;
 
-            // Prevent invincible tagged entities from being hurt
-            if (entity.getType().is(TagKey.create(ForgeRegistries.ENTITY_TYPES.getRegistryKey(), new ResourceLocation("vminus:invincible")))) {
+            if (entity.getType().is(TagKey.create(ForgeRegistries.ENTITIES.getRegistryKey(), new ResourceLocation("vminus:invincible")))) {
                 entity.invulnerableTime = 20;
                 if (event.isCancelable()) {
                     event.setCanceled(true);
                 }
             }
 
-            // Damage horse armor when attacked if it has durability
             if (entity instanceof Horse) {
                 if (entity.isAttackable()) {
                     LivingEntity _entGetArmor = (LivingEntity) entity;
                     ItemStack horseArmor = _entGetArmor.getItemBySlot(EquipmentSlot.CHEST);
                     if (!(horseArmor.getItem() == ItemStack.EMPTY.getItem())) {
                         if (horseArmor.isDamageableItem()) {
-                            if (horseArmor.hurt(1, RandomSource.create(), null)) {
-                                    horseArmor.shrink(1);
-                                    horseArmor.setDamageValue(0);
+                            if (horseArmor.hurt(1, new Random(), null)) {
+                                horseArmor.shrink(1);
+                                horseArmor.setDamageValue(0);
                             }
                         }
                     }
                 }
             }
-            // Stun hit entities if they have a certain nbt.
+
             if ((sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) == 1) {
                 if (!(mainhand.getItem() == ItemStack.EMPTY.getItem())) {
                     if (mainhand.getOrCreateTag().getBoolean("stun")) {
@@ -106,7 +103,7 @@ public class EntityAttackedEventHandler {
                     }
                 }
             }
-            // Enchantment particles
+
             if (!(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
                 mainhand = (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY);
                 directEntity = damagesource.getDirectEntity();
@@ -114,15 +111,12 @@ public class EntityAttackedEventHandler {
                     if (((isModLoaded("detour") && (sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) >= 0.75) || !isModLoaded("detour"))
                             || !(sourceentity instanceof Player) || directEntity == null
                             && !(directEntity == (damagesource.getEntity())) && entity.isAttackable()) {
-                        // iterating through all of the items enchants
                         Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(mainhand);
                         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
                             Enchantment enchantment = entry.getKey();
-                            // getting the vision data from the enchantment
                             JsonObject visionData = VisionHandler.getVisionData(enchantment);
                             if (visionData != null) {
                                 if (visionData.has("particle")) {
-                                    // getting the string and resource location to add to the particle list
                                     String particleString = VisionValueHandler.getFirstValidString(visionData, "particle");
                                     if (particleString != null && !particleString.isEmpty()) {
                                         ResourceLocation particleLocation = new ResourceLocation(particleString);
@@ -143,21 +137,19 @@ public class EntityAttackedEventHandler {
                             }
                         }
                     }
-                    // spawning random particles from the created list
+
                     if (!particles.isEmpty()) {
-                        for (int index0 = 0; index0 < Mth.nextInt(RandomSource.create(), 5, 7); index0++) {
-                            ResourceLocation chosenParticle = particles.get(Mth.nextInt(RandomSource.create(), 0, (particles.size() - 1)));
-                            // getting random positions
-                            ranX = entity.getX() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * (-1) - 0.3, entity.getBbWidth() / 2 + 0.3);
-                            ranY = entity.getY() + Mth.nextDouble(RandomSource.create(), 0, entity.getBbHeight() + 0.3);
-                            ranZ = entity.getZ() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * (-1) - 0.3, entity.getBbWidth() / 2 + 0.3);
-                            // getting random velocities
-                            vX = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
-                            vY = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
-                            vZ = Mth.nextDouble(RandomSource.create(), -0.08, 0.08);
+                        Random rand = new Random();
+                        for (int index0 = 0; index0 < rand.nextInt(3) + 5; index0++) {
+                            ResourceLocation chosenParticle = particles.get(rand.nextInt(particles.size()));
+                            ranX = entity.getX() + rand.nextDouble() * (entity.getBbWidth() / 2) * (-1) - 0.3;
+                            ranY = entity.getY() + rand.nextDouble() * entity.getBbHeight() + 0.3;
+                            ranZ = entity.getZ() + rand.nextDouble() * (entity.getBbWidth() / 2) * (-1) - 0.3;
+                            vX = rand.nextDouble() * 0.16 - 0.08;
+                            vY = rand.nextDouble() * 0.16 - 0.08;
+                            vZ = rand.nextDouble() * 0.16 - 0.08;
                             ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(chosenParticle);
                             if (particleType instanceof SimpleParticleType simpleParticleType) {
-                                //world.sendParticles(simpleParticleType, ranX, ranY, ranZ, 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
                                 world.addParticle(simpleParticleType, ranX, ranY, ranZ, vX, vY, vZ);
                             }
                         }

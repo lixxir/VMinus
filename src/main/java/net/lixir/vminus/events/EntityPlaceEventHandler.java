@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -19,9 +19,11 @@ import net.minecraftforge.fml.common.Mod;
 public class EntityPlaceEventHandler {
     @SubscribeEvent
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
-        LevelAccessor world = event.getLevel();
         Entity entity = event.getEntity();
-        if (entity == null) return;
+        if (entity == null)
+            return;
+        LevelAccessor world = entity.getLevel();
+
         double x = entity.getX();
         double y = entity.getY();
         double z = entity.getZ();

@@ -64,7 +64,7 @@ public abstract class LivingEntityMixin {
         vminus$entity.getPersistentData();
         if (vminus$entity.getPersistentData().contains("variant")) {
             String variant = vminus$entity.getPersistentData().getString("variant");
-            String entityName = Objects.requireNonNull(ForgeRegistries.ENTITY_TYPES.getKey(vminus$entity.getType())).getPath();
+            String entityName = Objects.requireNonNull(ForgeRegistries.ENTITIES.getKey(vminus$entity.getType())).getPath();
             if (!variant.equals("normal")) {
                 ResourceLocation customLoot = new ResourceLocation("vminus:entities/variant/" + entityName + "/" + variant);
                 cir.setReturnValue(customLoot);
@@ -138,14 +138,6 @@ public abstract class LivingEntityMixin {
         JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
         if (visionData != null && visionData.has("water_sensitive")) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "water_sensitive", vminus$entity));
-        }
-    }
-
-    @Inject(method = "canDisableShield", at = @At("RETURN"), cancellable = true)
-    private void canDisableShield(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(vminus$entity.getType());
-        if (visionData != null && visionData.has("disable_shields")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "disable_shields", vminus$entity));
         }
     }
 

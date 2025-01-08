@@ -20,7 +20,7 @@ public class PlayerCriticalHitEventHandler {
 
     @SubscribeEvent
     public static void onPlayerCriticalHit(CriticalHitEvent event) {
-        LivingEntity entity = event.getEntity();
+        LivingEntity entity = (LivingEntity) event.getEntity();
         event.setDamageModifier((ModList.get().isLoaded("detour") ? DETOUR_DAMAGE_MODIFIER : DEFAULT_DAMAGE_MODIFIER) + getAttributeModifiers(entity));
     }
 

@@ -14,7 +14,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -24,7 +24,7 @@ import java.util.Collection;
 @Mod.EventBusSubscriber({Dist.CLIENT})
 public class HealthLostStatBoostOverlay {
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    public static void eventHandler(RenderGuiEvent.Pre event) {
+    public static void eventHandler(RenderGameOverlayEvent event) {
         int w = event.getWindow().getGuiScaledWidth();
         int h = event.getWindow().getGuiScaledHeight();
         Player entity = Minecraft.getInstance().player;
@@ -41,7 +41,7 @@ public class HealthLostStatBoostOverlay {
             }
             if (modifierSum > 0) {
                 float transparency = 1.0f - healthPercentage;
-                PoseStack poseStack = event.getPoseStack(); // Get the PoseStack for transformations
+                PoseStack poseStack = event.getMatrixStack(); // Get the PoseStack for transformations
                 RenderSystem.disableDepthTest();
                 RenderSystem.depthMask(false);
                 RenderSystem.enableBlend();

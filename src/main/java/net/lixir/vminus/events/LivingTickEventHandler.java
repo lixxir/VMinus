@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -26,11 +25,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 @Mod.EventBusSubscriber
 public class LivingTickEventHandler {
     @SubscribeEvent
-    public static void onEntityTick(LivingEvent.LivingTickEvent event) {
+    public static void onEntityTick(LivingEvent event) {
         LevelAccessor world = event.getEntity().level;
         Entity entity = event.getEntity();
         if (entity == null || !(world instanceof ServerLevel serverWorld))
@@ -70,20 +70,23 @@ public class LivingTickEventHandler {
         for (MobEffectInstance effectInstance : activeEffects) {
             if (effectInstance.isVisible()) {
                 ResourceLocation effectId = ForgeRegistries.MOB_EFFECTS.getKey(effectInstance.getEffect());
-                effects.add(effectId.toString());
+                if (effectId != null)
+                    effects.add(effectId.toString());
             }
         }
         return effects;
     }
 
     private static String getRandomEffect(List<String> effects) {
-        return effects.get(Mth.nextInt(RandomSource.create(), 0, effects.size() - 1));
+        Random random = new Random();
+        return effects.get(random.nextInt(effects.size()));
     }
 
     private static double[] getSpawnCoordinates(Entity entity) {
-        double spawnX = entity.getX() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
-        double spawnY = entity.getY() + Mth.nextDouble(RandomSource.create(), 0, entity.getBbHeight());
-        double spawnZ = entity.getZ() + Mth.nextDouble(RandomSource.create(), (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
+        Random random = new Random();
+        double spawnX = entity.getX() + Mth.nextDouble(random, (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
+        double spawnY = entity.getY() + Mth.nextDouble(random, 0, entity.getBbHeight());
+        double spawnZ = entity.getZ() + Mth.nextDouble(random, (entity.getBbWidth() / 2) * -1 - 0.3, entity.getBbWidth() / 2 + 0.3);
         return new double[]{spawnX, spawnY, spawnZ};
     }
 
@@ -96,15 +99,14 @@ public class LivingTickEventHandler {
         JsonObject visionData = VisionHandler.getVisionData(mobEffect);
         if (visionData != null && visionData.has("particle")) {
             String effectString = VisionValueHandler.getFirstValidString(visionData, "particle");
+            if (effectString == null)
+                return;
             ResourceLocation particleLocation = new ResourceLocation(effectString);
             ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(particleLocation);
-            if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {
-                world.sendParticles(simpleParticleType, spawnCoords[0], spawnCoords[1], spawnCoords[2], 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
+            if (particleType instanceof SimpleParticleType simpleParticleType) {
+                Random random = new Random();  // Using Java's Random class
+                world.sendParticles(simpleParticleType, spawnCoords[0], spawnCoords[1], spawnCoords[2], 1, 0, 0, 0, Mth.nextDouble(random, 0.01, 0.03));  // Replaced Mth.nextDouble with Random
             }
-        }// else {
-        //	int color = effectInstance.getEffect().getColor();
-        //	boolean isAmbient = effectInstance.isAmbient();
-        ////	spawnEffectParticles(color, isAmbient, world, x, y, z);
-        //}
+        }
     }
 }

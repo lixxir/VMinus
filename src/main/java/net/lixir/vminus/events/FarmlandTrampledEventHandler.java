@@ -5,8 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -20,11 +19,8 @@ public class FarmlandTrampledEventHandler {
         CompoundTag tag = boots.getTag();
         if (tag != null) {
             if (tag.getBoolean("lightfooted")) {
-                if (event != null && event.isCancelable()) {
+                if (event.isCancelable())
                     event.setCanceled(true);
-                } else if (event != null && event.hasResult()) {
-                    event.setResult(Event.Result.DENY);
-                }
             }
         }
     }

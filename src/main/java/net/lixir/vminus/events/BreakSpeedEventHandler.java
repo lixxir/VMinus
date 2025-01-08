@@ -16,10 +16,10 @@ import java.util.Collection;
 public class BreakSpeedEventHandler {
     @SubscribeEvent
     public static void onBlockBreaking(PlayerEvent.BreakSpeed event) {
-        if (event.getPosition().isEmpty())
+        if (event.getPos() == null)
             return;
         double breakSpeed = event.getNewSpeed();
-        LivingEntity entity = event.getEntity();
+        LivingEntity entity = (LivingEntity) event.getEntity();
         if (entity == null)
             return;
         float modifierSum = 0.0f;
