@@ -1,10 +1,10 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[43,)"
 license="All Rights Reserved"
 
 [[mods]]
 modId="vminus"
-version="3.2.0"
+version="1.0.0"
 displayName="VMinus"
 displayURL="https://curseforge.com/minecraft/mc-mods/v-minus"
 logoFile="logo.png"
@@ -14,7 +14,7 @@ description="Edit and Remove Items, Blocks, Entities, Enchantments & more with C
 [[dependencies.vminus]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.20.1]"
+    versionRange="[1.19.2]"
     ordering="NONE"
     side="BOTH"
 
