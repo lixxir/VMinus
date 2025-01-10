@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.UUID;
 
 public class CapeHelper {
+
+    private static final String DEV_NAME = "Dev";
+
     private static final List<CapeOwner> PATRONS = Arrays.asList(
             CapeOwner.LIXIR,
             CapeOwner.SWEETY,
@@ -41,7 +44,8 @@ public class CapeHelper {
             CapeOwner.TEALOTL,
             CapeOwner.CAMRIOD_CORE,
             CapeOwner.NUCLEARDIAMOND,
-            CapeOwner.SHARKYTHENARWHAL
+            CapeOwner.SHARKYTHENARWHAL,
+            CapeOwner.SHONESTAIN
     );
 
     private static final List<CapeOwner> BOOSTERS = Arrays.asList(
@@ -121,19 +125,45 @@ public class CapeHelper {
         if (entity instanceof Player player) {
             UUID playerUUID = player.getGameProfile().getId();
             String playerName = player.getGameProfile().getName();
-            if ((PATRONS.contains(playerUUID) || BOOSTERS.contains(playerUUID) || playerName.equals("Dev")) && "beeper".equals(capeId)) {
+
+
+
+            switch (capeId) {
+                case "beeper" -> {
+                    if (matchesUuid(playerUUID, PATRONS) || matchesUuid(playerUUID, BOOSTERS) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+                case "ghost" -> {
+                    if (matchesUuid(playerUUID, BOOSTERS) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+                case "marrow", "shroud" -> {
+                    if (matchesUuid(playerUUID, PATRONS) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+                case "prototype" -> {
+                    if (matchesUuid(playerUUID, DEVELOPERS) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+                case "photon" -> {
+                    if (matchesUuid(playerUUID, PHOTON_BUILDER) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+                case "troll" -> {
+                    if (matchesUuid(playerUUID, CONTRIBUTORS) || DEV_NAME.equals(playerName))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private static boolean matchesUuid(UUID playerUUID, List<CapeOwner> owners) {
+        for (CapeOwner owner : owners) {
+            if (owner.getUuid().equals(playerUUID)) {
                 return true;
-            } else if ((BOOSTERS.contains(playerUUID) || playerName.equals("Dev")) && "ghost".equals(capeId)) {
-                return true;
-            } else if ((PATRONS.contains(playerUUID) || playerName.equals("Dev")) && "marrow".equals(capeId)) {
-                return true;
-            } else if ((PATRONS.contains(playerUUID) || playerName.equals("Dev")) && "shroud".equals(capeId)) {
-                return true;
-            } else if ((DEVELOPERS.contains(playerUUID) || playerName.equals("Dev")) && "prototype".equals(capeId)) {
-                return true;
-            } else if ((PHOTON_BUILDER.contains(playerUUID) || playerName.equals("Dev")) && "photon".equals(capeId)) {
-                return true;
-            } else return (CONTRIBUTORS.contains(playerUUID) || playerName.equals("Dev")) && "troll".equals(capeId);
+            }
         }
         return false;
     }

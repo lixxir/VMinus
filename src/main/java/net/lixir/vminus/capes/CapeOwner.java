@@ -56,6 +56,7 @@ public enum CapeOwner {
     EL_MOLGAJETE(UUID.fromString("6ccc5244-e72e-4515-8482-1b4116bd2b85")),
     DRELMAO(UUID.fromString("3f06c48a-8141-413a-8cc7-e123da7709a3")),
     ALPHEI(UUID.fromString("a7ce848e-4e4d-4878-9abc-129636cc87a0")),
+    SHONESTAIN(UUID.fromString("74a16b25-1652-4cf8-8eb8-4a4a25008e1a")),
     LEXALIS8(UUID.fromString("f223f221-2362-420f-83f7-694e5756c893"));
 
     private final UUID uuid;
