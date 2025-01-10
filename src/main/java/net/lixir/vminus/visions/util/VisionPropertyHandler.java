@@ -1,6 +1,7 @@
 package net.lixir.vminus.visions.util;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinusConfig;
 import net.lixir.vminus.visions.VisionHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -16,11 +17,33 @@ import java.util.Objects;
 
 public class VisionPropertyHandler {
 
-    public static boolean isBanned(@Nullable ItemStack itemstack, @Nullable JsonObject visionData){
-        return getBoolean(itemstack, "banned", visionData);
+    public static boolean isBanned(@Nullable ItemStack itemStack, @Nullable JsonObject visionData){
+        if (itemStack == null)
+            return false;
+        if (isItemConfigBanned(itemStack))
+            return true;
+        return getBoolean(itemStack, "banned", visionData);
     }
-    public static boolean isBanned(@Nullable ItemStack itemstack){
-        return getBoolean(itemstack, "banned", null);
+    public static boolean isBanned(@Nullable ItemStack itemStack){
+        if (itemStack == null)
+            return false;
+        if (isItemConfigBanned(itemStack))
+            return true;
+        return getBoolean(itemStack, "banned", null);
+    }
+
+    public static boolean isItemConfigBanned(ItemStack itemStack) {
+        ResourceLocation resourceLocation = ForgeRegistries.ITEMS.getKey(itemStack.getItem());
+        if (resourceLocation == null)
+            return false;
+        return VMinusConfig.BANNED_ITEMS.get().contains(resourceLocation.toString());
+    }
+
+    public static boolean isItemConfigHidden(ItemStack itemStack) {
+        ResourceLocation resourceLocation = ForgeRegistries.ITEMS.getKey(itemStack.getItem());
+        if (resourceLocation == null)
+            return false;
+        return VMinusConfig.HIDDEN_ITEMS.get().contains(resourceLocation.toString());
     }
 
     public static @Nullable ItemStack getReplacement(@Nullable ItemStack itemStack) {
