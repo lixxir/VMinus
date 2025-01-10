@@ -8,7 +8,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
@@ -42,7 +44,8 @@ public class VMinusMod {
 
     public VMinusMod() {
         MinecraftForge.EVENT_BUS.register(this);
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        //final IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
         registerNetworkMessages();
     }
 

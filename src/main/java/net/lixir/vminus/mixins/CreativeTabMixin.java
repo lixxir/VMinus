@@ -1,10 +1,14 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinusConfig;
 import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.visions.util.VisionPropertyHandler;
 import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,20 +30,21 @@ public abstract class CreativeTabMixin {
     @Inject(method = "buildContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;rebuildSearchTree()V"))
     private void CreativeTabOverride(CreativeModeTab.ItemDisplayParameters displayContext, CallbackInfo ci) {
         List<ItemStack> itemsToRemove = new ArrayList<>();
-        for (ItemStack itemstack : displayItems) {
-            JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            if (VisionValueHandler.isBooleanMet(itemData, "banned", itemstack)) {
-                itemsToRemove.add(itemstack);
+        for (ItemStack itemStack : displayItems) {
+            JsonObject visionData = VisionHandler.getVisionData(itemStack);
+            if (VisionPropertyHandler.isBanned(itemStack,visionData) ||  VisionPropertyHandler.isItemConfigHidden(itemStack)) {
+                itemsToRemove.add(itemStack);
             }
         }
         displayItems.removeAll(itemsToRemove);
         itemsToRemove.clear();
-        for (ItemStack itemstack : displayItemsSearchTab) {
-            JsonObject itemData = VisionHandler.getVisionData(itemstack);
-            if (VisionValueHandler.isBooleanMet(itemData, "banned", itemstack)) {
-                itemsToRemove.add(itemstack);
+        for (ItemStack itemStack : displayItemsSearchTab) {
+            JsonObject visionData = VisionHandler.getVisionData(itemStack);
+            if (VisionPropertyHandler.isBanned(itemStack,visionData) || VisionPropertyHandler.isItemConfigHidden(itemStack)) {
+                itemsToRemove.add(itemStack);
             }
         }
         displayItemsSearchTab.removeAll(itemsToRemove);
     }
+
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.IconHandler;
+import net.lixir.vminus.VMinusConfig;
 import net.lixir.vminus.helpers.DurabilityHelper;
 import net.lixir.vminus.helpers.EnchantAndCurseHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
@@ -99,6 +100,8 @@ public abstract class ItemStackTooltipMixin {
 
     @Inject(method = "getTooltipLines", at = @At(value = "HEAD"), cancellable = true)
     private void getTooltipLines(@Nullable Player player, TooltipFlag flag, CallbackInfoReturnable<List<Component>> cir) {
+        if (!VMinusConfig.TOOLTIP_REWORK.get())
+            return;
         Item item = vminus$itemStack.getItem();
 
         List<Component> list = cir.getReturnValue() != null ? cir.getReturnValue() : Lists.newArrayList();
