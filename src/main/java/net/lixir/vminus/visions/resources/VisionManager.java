@@ -52,13 +52,9 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
 
                 try {
                     JsonElement jsonelement = GsonHelper.fromJson(GSON, reader, JsonElement.class);
-                    if (jsonelement != null) {
-                        JsonElement jsonelement1 = map.put(resourcelocation1, jsonelement);
-                        if (jsonelement1 != null) {
-                            throw new IllegalStateException("Duplicate data file ignored with ID " + resourcelocation1);
-                        }
-                    } else {
-                        VMinusMod.LOGGER.error("Couldn't load data file {} from {} as it's null or empty", resourcelocation1, resourcelocation);
+                    JsonElement jsonelement1 = map.put(resourcelocation1, jsonelement);
+                    if (jsonelement1 != null) {
+                        throw new IllegalStateException("Duplicate data file ignored with ID " + resourcelocation1);
                     }
                 } catch (Throwable throwable1) {
                     try {
