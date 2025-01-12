@@ -19,14 +19,10 @@ public abstract class BlockRealMixin {
     @Unique
     private final Block vminus$block = (Block) (Object) this;
 
-    @Unique
-    private int vminus$key = VisionHandler.EMPTY_KEY;
 
     @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
     private void getSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$block);
-        JsonObject blockData = VisionHandler.getVisionData(vminus$block, vminus$key);
+        JsonObject blockData = VisionHandler.getVisionData(vminus$block);
         if (blockData != null && blockData.has("speed_factor")) {
             cir.setReturnValue(VisionValueHandler.isNumberMet(blockData, "speed_factor", cir.getReturnValue() != null ? cir.getReturnValue() : 1.0F, vminus$block));
         }
@@ -34,9 +30,7 @@ public abstract class BlockRealMixin {
 
     @Inject(method = "getFriction", at = @At("RETURN"), cancellable = true)
     private void getFriction(CallbackInfoReturnable<Float> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$block);
-        JsonObject blockData = VisionHandler.getVisionData(vminus$block, vminus$key);
+        JsonObject blockData = VisionHandler.getVisionData(vminus$block);
         if (blockData != null && blockData.has("friction")) {
             cir.setReturnValue(VisionValueHandler.isNumberMet(blockData, "friction", cir.getReturnValue() != null ? cir.getReturnValue() : 1.0F, vminus$block));
         }
@@ -44,9 +38,7 @@ public abstract class BlockRealMixin {
 
     @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
     private void getJumpFactor(CallbackInfoReturnable<Float> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$block);
-        JsonObject blockData = VisionHandler.getVisionData(vminus$block, vminus$key);
+        JsonObject blockData = VisionHandler.getVisionData(vminus$block);
         if (blockData != null && blockData.has("jump_factor")) {
             cir.setReturnValue(VisionValueHandler.isNumberMet(blockData, "jump_factor", cir.getReturnValue() != null ? cir.getReturnValue() : 1.0F, vminus$block));
         }
@@ -54,9 +46,7 @@ public abstract class BlockRealMixin {
 
     @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
     private void getExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$block);
-        JsonObject blockData = VisionHandler.getVisionData(vminus$block, vminus$key);
+        JsonObject blockData = VisionHandler.getVisionData(vminus$block);
         if (blockData != null && blockData.has("explosion_resistance")) {
             cir.setReturnValue(Math.max(VisionValueHandler.isNumberMet(blockData, "explosion_resistance", cir.getReturnValue() != null ? cir.getReturnValue() : 1.0F, vminus$block), -1));
         }
@@ -64,9 +54,7 @@ public abstract class BlockRealMixin {
 
     @Inject(method = "getSoundType", at = @At("RETURN"), cancellable = true)
     private void getSoundType(BlockState state, CallbackInfoReturnable<SoundType> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$block);
-        JsonObject blockData = VisionHandler.getVisionData(vminus$block, vminus$key);
+        JsonObject blockData = VisionHandler.getVisionData(vminus$block);
         if (blockData != null && blockData.has("sound")) {
             String breakSound = VisionValueHandler.getFirstValidString(blockData, "sound", vminus$block, "break");
             String stepSound = VisionValueHandler.getFirstValidString(blockData, "sound", vminus$block, "step");

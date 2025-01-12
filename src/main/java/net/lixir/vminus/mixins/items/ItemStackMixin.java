@@ -47,15 +47,11 @@ public abstract class ItemStackMixin {
     @Shadow
     public abstract Rarity getRarity();
 
-    @Unique
-    private int vminus$key = VisionHandler.EMPTY_KEY;
 
     @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
     public void vminus$hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
-            if (vminus$key == -1)
-                vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-            JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+            JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
             String replaceId = VisionValueHandler.getFirstValidString(itemData, "break_replacement", vminus$itemStack);
             if (replaceId != null && !replaceId.isEmpty()) {
                 final ItemStack findItem = vminus$itemStack;
@@ -124,9 +120,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
     public void getBarColor(CallbackInfoReturnable<Integer> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         if (itemData != null && itemData.has("bar")) {
             int startColor = 4384126;
             int endColor = 2186818;
@@ -236,9 +230,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "setDamageValue", at = @At(value = "HEAD"), cancellable = true)
     public void setDamageValue(int damage, CallbackInfo ci) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         CompoundTag tag = vminus$itemStack.getTag();
         if (itemData != null && itemData.has("min_damage")) {
             int dealtDamage = vminus$itemStack.getDamageValue();
@@ -266,9 +258,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "durability");
         if (!propertyMet.isEmpty()) {
             int maxDurability = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, vminus$itemStack);
@@ -278,9 +268,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
@@ -289,9 +277,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
         if (!propertyMet.isEmpty()) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
@@ -300,9 +286,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "isEdible", at = @At("HEAD"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         if (itemData != null && itemData.has("food_properties")) {
             cir.setReturnValue(true);
         }
@@ -310,9 +294,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getDrinkingSound", at = @At("HEAD"), cancellable = true)
     private void getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         if (itemData != null && itemData.has("food_properties")) {
             JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
             for (JsonElement element : foodPropertiesArray) {
@@ -334,9 +316,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "foil");
         if (!propertyMet.isEmpty()) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
@@ -345,9 +325,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getEatingSound", at = @At("HEAD"), cancellable = true)
     private void getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         if (itemData != null && itemData.has("food_properties")) {
             JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
             for (JsonElement element : foodPropertiesArray) {
@@ -369,9 +347,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
         String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "use_duration");
         if (!propertyMet.isEmpty()) {
             int defaultDuration = 32;

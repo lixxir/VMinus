@@ -95,9 +95,6 @@ public abstract class ItemStackTooltipMixin {
     @Shadow
     public abstract boolean hasCustomHoverName();
 
-    @Unique
-    private int vminus$key = VisionHandler.EMPTY_KEY;
-
     @Inject(method = "getTooltipLines", at = @At(value = "HEAD"), cancellable = true)
     private void getTooltipLines(@Nullable Player player, TooltipFlag flag, CallbackInfoReturnable<List<Component>> cir) {
         if (!VMinusConfig.TOOLTIP_REWORK.get())
@@ -106,9 +103,7 @@ public abstract class ItemStackTooltipMixin {
 
         List<Component> list = cir.getReturnValue() != null ? cir.getReturnValue() : Lists.newArrayList();
 
-        if (vminus$key == -1)
-            vminus$key = VisionHandler.getCacheKey(vminus$itemStack);
-        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack, vminus$key);
+        JsonObject itemData = VisionHandler.getVisionData(vminus$itemStack);
 
         CompoundTag tag = vminus$itemStack.getTag();
 
