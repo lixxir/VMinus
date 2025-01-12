@@ -20,6 +20,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
@@ -54,7 +55,6 @@ public class VisionHandler {
                 } else if (object instanceof EntityType<?> entityType) {
                     found = isEntityTagged(entityType, new ResourceLocation(matchKey), context);
                 }
-                if (found) VMinusMod.LOGGER.info("ID is tagged: {}", id);
             }
 
             if (inverted) found = !found;
@@ -365,7 +365,12 @@ public class VisionHandler {
         if (index == -1)
             return null;
         CopyOnWriteArrayList<JsonObject> visionCache = visionType.getVisionCache();
+        ConcurrentHashMap<String, Integer> visionKey = visionType.getVisionKey();
         if (visionCache.isEmpty())
+            return null;
+        if (visionKey.isEmpty())
+            return null;
+        if (visionKey.containsKey(index))
             return null;
         return visionCache.get(index);
     }
