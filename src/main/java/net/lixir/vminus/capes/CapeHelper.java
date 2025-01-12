@@ -1,7 +1,6 @@
 package net.lixir.vminus.capes;
 
 import net.lixir.vminus.network.VminusModVariables;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -99,7 +98,7 @@ public class CapeHelper {
 
 
 
-    public static ResourceLocation getCapeTexture(AbstractClientPlayer player) {
+    public static ResourceLocation getCapeTexture(Player player) {
         String capeId = player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null)
                 .map(capability -> capability.cape_id).orElse("");
         if (ownsCape(player, capeId)) {
