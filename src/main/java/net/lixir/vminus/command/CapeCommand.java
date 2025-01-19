@@ -1,16 +1,12 @@
 package net.lixir.vminus.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.lixir.vminus.VMinusMod;
 import net.lixir.vminus.capes.Cape;
 import net.lixir.vminus.capes.CapeHelper;
-import net.lixir.vminus.network.capes.SetCapePacket;
+import net.lixir.vminus.network.VminusModVariables;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,7 +18,6 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.UUID;
 
 @Mod.EventBusSubscriber
 public class CapeCommand {
@@ -38,8 +33,10 @@ public class CapeCommand {
 
                             if (player != null) {
                                 if (CapeHelper.ownsCape(player, capeId) || capeId.equals("default")) {
-                                    UUID playerUUID = player.getUUID();
-                                    VMinusMod.PACKET_HANDLER.sendToServer(new SetCapePacket(capeId, playerUUID));
+                                    player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
+                                        capability.cape_id = capeId;
+                                        capability.syncPlayerVariables(player);
+                                    });
                                     player.sendSystemMessage(Component.literal("Cape set to " + capeId).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
                                 } else {
                                     player.sendSystemMessage(Component.literal("You do not own this cape or it does not exist.").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
@@ -50,12 +47,11 @@ public class CapeCommand {
     }
 
     public static CompletableFuture<Suggestions> getCapeSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
-        Player entity;
+        Player entity = null;
+
 
         if (context.getSource().getEntity() instanceof Player) {
             entity = (Player) context.getSource().getEntity();
-        } else {
-            entity = Minecraft.getInstance().player;
         }
 
         if (entity != null) {

@@ -17,16 +17,12 @@ import javax.annotation.Nullable;
 @Mixin(AbstractClientPlayer.class)
 @OnlyIn(Dist.CLIENT)
 public abstract class AbstractClientPlayerMixin {
-    private static final ResourceLocation DEFAULT_ELYTRA = new ResourceLocation("textures/entity/elytra.png");
-    @Shadow
-    private PlayerInfo playerInfo;
-
     @Shadow
     @Nullable
     protected abstract PlayerInfo getPlayerInfo();
 
     @Inject(method = "getElytraTextureLocation", at = @At("HEAD"), cancellable = true)
-    private void getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void vminus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         PlayerInfo playerInfo = this.getPlayerInfo();
         if (playerInfo != null) {
             AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
@@ -38,7 +34,7 @@ public abstract class AbstractClientPlayerMixin {
     }
 
     @Inject(method = "getCloakTextureLocation", at = @At("HEAD"), cancellable = true)
-    private void getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void vminus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         PlayerInfo playerInfo = this.getPlayerInfo();
         if (playerInfo != null) {
             AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;

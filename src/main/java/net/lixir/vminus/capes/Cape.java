@@ -1,15 +1,16 @@
 package net.lixir.vminus.capes;
 
+import net.lixir.vminus.VMinusMod;
 import net.minecraft.resources.ResourceLocation;
 
 public enum Cape {
-    BEEPER("beeper", "vminus", "textures/cape/beeper.png"),
-    GHOST("ghost", "vminus", "textures/cape/ghost.png"),
-    SHROUD("shroud", "vminus", "textures/cape/shroud.png"),
-    MARROW("marrow", "vminus", "textures/cape/marrow.png"),
-    PROTOTYPE("prototype", "vminus", "textures/cape/prototype.png"),
-    TROLL("troll", "vminus", "textures/cape/troll.png"),
-    PHOTON("photon", "vminus", "textures/cape/photon.png");
+    BEEPER("beeper", VMinusMod.MODID, "textures/cape/beeper.png"),
+    GHOST("ghost", VMinusMod.MODID, "textures/cape/ghost.png"),
+    SHROUD("shroud", VMinusMod.MODID, "textures/cape/shroud.png"),
+    MARROW("marrow", VMinusMod.MODID, "textures/cape/marrow.png"),
+    PROTOTYPE("prototype", VMinusMod.MODID, "textures/cape/prototype.png"),
+    TROLL("troll", VMinusMod.MODID, "textures/cape/troll.png"),
+    PHOTON("photon", VMinusMod.MODID, "textures/cape/photon.png");
 
     private final String id;
     private final String namespace;

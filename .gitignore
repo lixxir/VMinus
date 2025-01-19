@@ -4,6 +4,7 @@
 bin/
 .classpath/
 .project
+mcmodsrepo/
 
 # gradle
 .gradle/
