@@ -9,5 +9,13 @@
   "attribute.vminus.mining_speed": "Mining Speed",
   "attribute.vminus.projectile_damage": "Projectile Damage",
   "attribute.vminus.blunt_protection": "Blunt Protection",
-  "attribute.vminus.mob_detection_range": "Mob Detection Range"
+  "attribute.vminus.mob_detection_range": "Mob Detection Range",
+  "subtitles.ui.inventory.item.drop": "Item drops",
+  "rarity.common": "Common",
+  "rarity.uncommon": "Uncommon",
+  "rarity.rare": "Rare",
+  "rarity.epic": "Epic",
+  "rarity.legendary": "Legendary",
+  "rarity.inverted": "Inverted",
+  "rarity.unobtainable": "Unobtainable"
 }
