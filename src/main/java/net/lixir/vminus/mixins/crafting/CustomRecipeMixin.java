@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.util.VisionPropertyHandler;
+import net.lixir.vminus.vision.util.VisionPropertyHandler;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CustomRecipe;

@@ -7,16 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BowlFoodItem.class)
 public class BowlFoodItemMixin {
-    /**
-     * @author lixir
-     * @reason to allow for stackable bowls by adding the bowls to the inventory instead of overwriting the itemstack.
-     */
-    @Overwrite
-    public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+    @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
+    public void vminus$finishUsingItem(ItemStack stack, Level p_40685_, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
         if (entity instanceof Player player && !player.getAbilities().instabuild) {
             stack.shrink(1);
             ItemStack bowl = new ItemStack(Items.BOWL);
@@ -24,6 +22,6 @@ public class BowlFoodItemMixin {
                 player.drop(bowl, false);
             }
         }
-        return stack;
+        cir.setReturnValue(stack);
     }
 }

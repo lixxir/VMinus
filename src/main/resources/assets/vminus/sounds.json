@@ -1,0 +1,11 @@
+{
+  "ui.inventory.item.drop": {
+    "subtitle": "subtitles.ui.inventory.item.drop",
+    "sounds": [
+      {
+        "name": "vminus:ui/inventory/item/drop",
+        "stream": false
+      }
+    ]
+  }
+}

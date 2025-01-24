@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,7 +16,7 @@ public class ItemEntityMixin {
     private void fireImmune(CallbackInfoReturnable<Boolean> cir) {
         ItemEntity item = (ItemEntity) (Object) this;
         ItemStack itemstack = item.getItem();
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        JsonObject itemData = Vision.getData(itemstack);
         if (itemData != null && itemData.has("fire_resistant")) {
             cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, "fire_resistant", itemstack));
         }

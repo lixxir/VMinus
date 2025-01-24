@@ -1,5 +1,5 @@
 plugins {
-    id 'idea'
+    id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
@@ -10,18 +10,10 @@ group = mod_group_id
 
 base {
     archivesName = mod_id
-    archivesBaseName = 'vminus'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-repositories {
-    maven {
-        name = 'MinecraftForge'
-        url = 'https://maven.minecraftforge.net/'
-    }
-    mavenCentral()
-}
 
 minecraft {
 
@@ -91,8 +83,16 @@ minecraft {
     }
 }
 
+repositories {
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
+    mavenCentral()
+}
+
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.3.22'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
@@ -120,8 +120,10 @@ jar {
                 'Specification-Title'     : mod_id,
                 'Specification-Vendor'    : mod_authors,
                 'Specification-Version'   : "1",
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : project.jar.archiveVersion,
+                'groupId': mod_group_id,
+                'artifactId': mod_id,
+                'Implementation-Title'    : mod_id,
+                'Implementation-Version'  : mod_version,
                 'Implementation-Vendor'   : mod_authors,
                 'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
@@ -133,18 +135,18 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 jar.finalizedBy('reobfJar')
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            from components.java
-            groupId = 'net.lixir'
-            artifactId = 'vminus'
-            version = '1.0.0'
+            groupId = mod_group_id
+            artifactId = mod_id
+            artifact jar
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            url file("${project.rootDir}/mcmodsrepo")
         }
     }
 }

@@ -4,7 +4,7 @@
  */
 package net.lixir.vminus.registry;
 
-import net.lixir.vminus.VMinusMod;
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.block.entity.ModHangingSignBlockEntity;
 import net.lixir.vminus.block.entity.ModSignBlockEntity;
 import net.lixir.vminus.registry.util.BlockSet;
@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class VMinusBlockEntities {
-	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VMinusMod.MODID);
+	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, VMinus.ID);
 	public static final RegistryObject<BlockEntityType<ModSignBlockEntity>> MOD_SIGN =
 			BLOCK_ENTITIES.register("mod_sign", () -> {
 				List<Block> signBlocks = BlockSet.BLOCK_SETS.stream()

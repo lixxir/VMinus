@@ -17,26 +17,42 @@ public abstract class ChatFormattingMixin {
     @Mutable
     private static ChatFormatting[] $VALUES;
 
-    private static final ChatFormatting INDIGO = addFormatting("INDIGO", 'g', hexToInt("8653fc"));
-    private static final ChatFormatting LIGHT_PINK = addFormatting("LIGHT_PINK", 't',  hexToInt("f99dca"));
-    private static final ChatFormatting PINK = addFormatting("PINK", 'q',  hexToInt("f771b2"));
-    private static final ChatFormatting ORANGE = addFormatting("ORANGE", 'i', hexToInt("fc702a"));
-    private static final ChatFormatting CORAL = addFormatting("CORAL", 'p', hexToInt("fc8c5f"));
-    private static final ChatFormatting SKY_BLUE = addFormatting("SKY_BLUE", 'v', hexToInt("7badfc"));
-    private static final ChatFormatting PINE = addFormatting("PINE", 'n', hexToInt("629646"));
-    private static final ChatFormatting PLUM = addFormatting("PLUM", 'z', hexToInt("4d3b7f"));
-    private static final ChatFormatting TOOTHPASTE = addFormatting("TOOTHPASTE", 'h', hexToInt("2afcd2"));
-    private static final ChatFormatting NEON_YELLOW = addFormatting("NEON_YELLOW", 'y', hexToInt("fce305"));
-    private static final ChatFormatting BROWN = addFormatting("BROWN", 'j', hexToInt("82522e"));
-    private static final ChatFormatting DARK_BROWN = addFormatting("DARK_BROWN", 'u', hexToInt("3a2b1f"));
-    private static final ChatFormatting NEON_RED = addFormatting("NEON_RED", 'x', hexToInt("fc0521"));
-    private static final ChatFormatting COBALT = addFormatting("COBALT", 'C', hexToInt("0059ff"));
+    @Unique
+    private static final ChatFormatting INDIGO = vminus$addFormatting("INDIGO", 'g', hexToInt("8653fc"));
+    @Unique
+    private static final ChatFormatting LIGHT_PINK = vminus$addFormatting("LIGHT_PINK", 't',  hexToInt("f99dca"));
+    @Unique
+    private static final ChatFormatting PINK = vminus$addFormatting("PINK", 'q',  hexToInt("f771b2"));
+    @Unique
+    private static final ChatFormatting ORANGE = vminus$addFormatting("ORANGE", 'i', hexToInt("fc702a"));
+    @Unique
+    private static final ChatFormatting CORAL = vminus$addFormatting("CORAL", 'p', hexToInt("fc8c5f"));
+    @Unique
+    private static final ChatFormatting SKY_BLUE = vminus$addFormatting("SKY_BLUE", 'v', hexToInt("7badfc"));
+    @Unique
+    private static final ChatFormatting PINE = vminus$addFormatting("PINE", 'n', hexToInt("629646"));
+    @Unique
+    private static final ChatFormatting PLUM = vminus$addFormatting("PLUM", 'z', hexToInt("4d3b7f"));
+    @Unique
+    private static final ChatFormatting TOOTHPASTE = vminus$addFormatting("TOOTHPASTE", 'h', hexToInt("2afcd2"));
+    @Unique
+    private static final ChatFormatting NEON_YELLOW = vminus$addFormatting("NEON_YELLOW", 'y', hexToInt("fce305"));
+    @Unique
+    private static final ChatFormatting BROWN = vminus$addFormatting("BROWN", 'j', hexToInt("82522e"));
+    @Unique
+    private static final ChatFormatting DARK_BROWN = vminus$addFormatting("DARK_BROWN", 'u', hexToInt("3a2b1f"));
+    @Unique
+    private static final ChatFormatting NEON_RED = vminus$addFormatting("NEON_RED", 'x', hexToInt("fc0521"));
+    @Unique
+    private static final ChatFormatting COBALT = vminus$addFormatting("COBALT", 'C', hexToInt("0059ff"));
+
     @Invoker(value = "<init>")
     public static ChatFormatting chatFormattingInit(String internalName, int internalId, String p_12667_, char p_12668_, int p_12669_, @Nullable Integer p_12630_) {
         throw new AssertionError();
     }
 
-    private static ChatFormatting addFormatting(String internalName, char code, int color) {
+    @Unique
+    private static ChatFormatting vminus$addFormatting(String internalName, char code, int color) {
         ArrayList<ChatFormatting> categories = new ArrayList<>(Arrays.asList(ChatFormattingMixin.$VALUES));
         int id = categories.get(categories.size() - 1).ordinal() + 1;
         ChatFormatting category = chatFormattingInit(internalName, id, internalName, code, id, color);

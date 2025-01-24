@@ -1,7 +1,7 @@
 package net.lixir.vminus.datagen.blockset;
 
 
-import net.lixir.vminus.VMinusMod;
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -135,10 +135,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                 wallBlock(block, baseName, alternateBaseName);
                 itemModels().wallInventory(wallName, getTextureLocation(baseName, alternateBaseName));
             } else {
-                VMinusMod.LOGGER.warn("Wall block is not a WallBlock: {}", wallName);
+                VMinus.LOGGER.warn("Wall block is not a WallBlock: {}", wallName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Wall block not found: {}", wallName);
+            VMinus.LOGGER.warn("Wall block not found: {}", wallName);
         }
     }
 
@@ -153,10 +153,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                 slabBlock(baseName, renderType, alternateBaseName);
                 itemModels().withExistingParent(slabName, modId + ":block/" + slabName);
             } else {
-                VMinusMod.LOGGER.warn("BlockSet Slab block is not a SlabBlock: {}", slabName);
+                VMinus.LOGGER.warn("BlockSet Slab block is not a SlabBlock: {}", slabName);
             }
         } else {
-            VMinusMod.LOGGER.warn("BlockSet Slab block not found: {}", slabName);
+            VMinus.LOGGER.warn("BlockSet Slab block not found: {}", slabName);
         }
     }
 
@@ -169,12 +169,12 @@ public class BlockSetStateProvider extends BlockStateProvider {
             Block block = stairsBlock.get();
             if (block instanceof StairBlock) {
                 stairsBlock(block, baseName, renderType, alternateBaseName);
-                itemModels().withExistingParent(stairsName, modId + "block/" + stairsName);
+                itemModels().withExistingParent(stairsName, modId + ":block/" + stairsName);
             } else {
-                VMinusMod.LOGGER.warn("Stairs block is not a StairBlock: {}", stairsName);
+                VMinus.LOGGER.warn("Stairs block is not a StairBlock: {}", stairsName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Stairs block not found: {}", stairsName);
+            VMinus.LOGGER.warn("Stairs block not found: {}", stairsName);
         }
     }
 
@@ -189,10 +189,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                 fenceBlock(block, baseName, alternateBaseName);
                 itemModels().fenceInventory(fenceName, getTextureLocation(baseName, alternateBaseName));
             } else {
-                VMinusMod.LOGGER.warn("Fence block is not a FenceBlock: {}", fenceName);
+                VMinus.LOGGER.warn("Fence block is not a FenceBlock: {}", fenceName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Fence block not found: {}", fenceName);
+            VMinus.LOGGER.warn("Fence block not found: {}", fenceName);
         }
     }
 
@@ -206,12 +206,12 @@ public class BlockSetStateProvider extends BlockStateProvider {
             Block block = fenceGateBlock.get();
             if (block instanceof FenceGateBlock) {
                 fenceGateBlock(block, baseName, alternateBaseName);
-                itemModels().withExistingParent(fenceGateName, modId + "block/" + fenceGateName);
+                itemModels().withExistingParent(fenceGateName, modId + ":block/" + fenceGateName);
             } else {
-                VMinusMod.LOGGER.warn("Fence gate block is not a FenceGateBlock: {}", fenceGateName);
+                VMinus.LOGGER.warn("Fence gate block is not a FenceGateBlock: {}", fenceGateName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Fence gate block not found: {}", fenceGateName);
+            VMinus.LOGGER.warn("Fence gate block not found: {}", fenceGateName);
         }
     }
 
@@ -224,12 +224,12 @@ public class BlockSetStateProvider extends BlockStateProvider {
             Block block = pressurePlateBlock.get();
             if (block instanceof PressurePlateBlock) {
                 pressurePlateBlock(block, baseName, alternateBaseName);
-                itemModels().withExistingParent(pressurePlateName, modId + "block/" + pressurePlateName);
+                itemModels().withExistingParent(pressurePlateName, modId + ":block/" + pressurePlateName);
             } else {
-                VMinusMod.LOGGER.warn("Pressure plate block is not a PressurePlateBlock: {}", pressurePlateName);
+                VMinus.LOGGER.warn("Pressure plate block is not a PressurePlateBlock: {}", pressurePlateName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Pressure plate block not found: {}", pressurePlateName);
+            VMinus.LOGGER.warn("Pressure plate block not found: {}", pressurePlateName);
         }
     }
 
@@ -244,10 +244,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                 buttonBlock(block, baseName, alternateBaseName);
                 itemModels().buttonInventory(buttonName, getTextureLocation(baseName, alternateBaseName));
             } else {
-                VMinusMod.LOGGER.warn("Button block is not a ButtonBlock: {}", buttonName);
+                VMinus.LOGGER.warn("Button block is not a ButtonBlock: {}", buttonName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Button block not found: {}", buttonName);
+            VMinus.LOGGER.warn("Button block not found: {}", buttonName);
         }
     }
 
@@ -256,7 +256,7 @@ public class BlockSetStateProvider extends BlockStateProvider {
         ResourceLocation key = new ResourceLocation(modId, trapdoorName);
         RegistryObject<Block> trapdoorBlock = RegistryObject.create(key, ForgeRegistries.BLOCKS);
         Block block = trapdoorBlock.get();
-        ResourceLocation trapdoorTexture = new ResourceLocation(modId, "block/" + trapdoorName);
+        ResourceLocation trapdoorTexture = new ResourceLocation(modId, ":block/" + trapdoorName);
 
         trapdoorBlockWithRenderType((TrapDoorBlock) block, trapdoorTexture, true, "cutout");
         itemModels().trapdoorBottom(trapdoorName, trapdoorTexture);
@@ -273,10 +273,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                 doorBlock(block, doorName);
                 itemModels().basicItem(new ResourceLocation(modId, doorName));
             } else {
-                VMinusMod.LOGGER.warn("Door block is not a DoorBlock: {}", doorName);
+                VMinus.LOGGER.warn("Door block is not a DoorBlock: {}", doorName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Door block not found: {}", doorName);
+            VMinus.LOGGER.warn("Door block not found: {}", doorName);
         }
     }
 
@@ -325,7 +325,7 @@ public class BlockSetStateProvider extends BlockStateProvider {
         if (crackedBlock.isPresent()) {
             simpleBlockWithItem(crackedBlock.get(), cubeAll(crackedBlock.get()));
         } else {
-            VMinusMod.LOGGER.warn("Cracked block not found: {}", crackedName);
+            VMinus.LOGGER.warn("Cracked block not found: {}", crackedName);
         }
     }
 
@@ -371,10 +371,10 @@ public class BlockSetStateProvider extends BlockStateProvider {
                     slabBlock((SlabBlock) blockInstance, getTextureLocation(baseName, alternateBaseName), getTextureLocation(baseName, alternateBaseName));
                 }
             } else {
-                VMinusMod.LOGGER.warn("Slab block is not a SlabBlock: {}", slabName);
+                VMinus.LOGGER.warn("Slab block is not a SlabBlock: {}", slabName);
             }
         } else {
-            VMinusMod.LOGGER.warn("Slab block not found: {}", slabName);
+            VMinus.LOGGER.warn("Slab block not found: {}", slabName);
         }
     }
 

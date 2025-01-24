@@ -3,7 +3,7 @@ package net.lixir.vminus.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionHandler;
+import net.lixir.vminus.vision.Vision;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
@@ -29,7 +29,7 @@ public class EntityPlaceEventHandler {
 
         BlockPos pos = BlockPos.containing(x, y, z);
         BlockState blockState = world.getBlockState(pos);
-        JsonObject blockData = VisionHandler.getVisionData(blockState.getBlock());
+        JsonObject blockData = Vision.getData(blockState.getBlock());
         if (blockData != null && blockData.has("place_blockstate")) {
             JsonArray blockStates = blockData.getAsJsonArray("place_blockstate");
             for (JsonElement element : blockStates) {

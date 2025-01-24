@@ -1,8 +1,8 @@
 package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -93,7 +93,7 @@ public class LivingTickEventHandler {
         if (mobEffect == null) {
             return;
         }
-        JsonObject visionData = VisionHandler.getVisionData(mobEffect);
+        JsonObject visionData = Vision.getData(mobEffect);
         if (visionData != null && visionData.has("particle")) {
             String effectString = VisionValueHandler.getFirstValidString(visionData, "particle");
             ResourceLocation particleLocation = new ResourceLocation(effectString);

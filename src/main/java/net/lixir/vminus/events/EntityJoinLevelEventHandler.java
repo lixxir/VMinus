@@ -3,12 +3,13 @@ package net.lixir.vminus.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.helpers.MobVariantHelper;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.util.MobVariantHelper;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
-import net.lixir.vminus.visions.util.VisionPropertyHandler;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.util.VisionPropertyHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -16,7 +17,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -37,7 +37,7 @@ public class EntityJoinLevelEventHandler {
         if (entity == null)
             return;
 
-        JsonObject visionData = VisionHandler.getVisionData(entity.getType());
+        JsonObject visionData = Vision.getData(entity.getType());
         // Banning banned entities
         if (VisionValueHandler.isBooleanMet(visionData, "banned", entity)) {
             if (event.isCancelable())
@@ -72,9 +72,11 @@ public class EntityJoinLevelEventHandler {
         // Attempts to replace / ban an in-world item entity if needed.
         if (entity instanceof ItemEntity) {
             ItemStack itemstack = (entity instanceof ItemEntity _itemEnt ? _itemEnt.getItem() : ItemStack.EMPTY);
-            JsonObject itemVisionData = VisionHandler.getVisionData(itemstack);
+            JsonObject itemVisionData = Vision.getData(itemstack);
             ItemStack replacementStack = VisionPropertyHandler.getDropReplacement(itemstack,  itemVisionData);
             if (replacementStack != null && !replacementStack.isEmpty()) {
+                        replacementStack.setCount(itemstack.getCount());
+
                         if (event.isCancelable()) {
                             event.setCanceled(true);
                         } else if (event.hasResult()) {
@@ -82,9 +84,10 @@ public class EntityJoinLevelEventHandler {
                         }
                         Level world = entity.level();
                         ItemEntity newItemEntity = new ItemEntity(world, entity.getX(), entity.getY(), entity.getZ(), replacementStack);
+                        newItemEntity.setDeltaMovement(entity.getDeltaMovement());
                         world.addFreshEntity(newItemEntity);
 
-                } else if (VisionPropertyHandler.isBanned(itemstack, itemVisionData)) {
+                } else if (VisionProperties.isBanned(itemstack, itemVisionData)) {
                     if (event.isCancelable()) {
                         event.setCanceled(true);
                     } else if (event.hasResult()) {
@@ -106,14 +109,14 @@ public class EntityJoinLevelEventHandler {
             /* Have to have the first one without a delay for when it first spawns,
              and another one with a delay on rejoin so that it works */
             serverLevel.getServer().execute(() -> {
-                VMinusMod.PACKET_HANDLER.send(
+                VMinus.PACKET_HANDLER.send(
                         PacketDistributor.TRACKING_ENTITY.with(() -> entity),
                         new MobVariantSyncPacket(entity.getId(), chosenVariant)
                 );
             });
-            VMinusMod.queueServerWork(1, () -> {
+            VMinus.queueServerWork(1, () -> {
                 serverLevel.getServer().execute(() -> {
-                    VMinusMod.PACKET_HANDLER.send(
+                    VMinus.PACKET_HANDLER.send(
                             PacketDistributor.TRACKING_ENTITY.with(() -> entity),
                             new MobVariantSyncPacket(entity.getId(), chosenVariant)
                     );

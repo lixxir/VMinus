@@ -4,7 +4,7 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="vminus"
-version="3.2.4"
+version="3.2.7"
 displayName="VMinus"
 displayURL="https://curseforge.com/minecraft/mc-mods/v-minus"
 logoFile="logo.png"
@@ -18,5 +18,11 @@ description="Edit and Remove Items, Blocks, Entities, Enchantments & more with C
     ordering="NONE"
     side="BOTH"
 
+[[dependencies.vminus]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.3.22,)"
+    ordering="NONE"
+    side="BOTH"
 
 

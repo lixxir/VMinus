@@ -1,6 +1,6 @@
 package net.lixir.vminus.network.mobvariants;
 
-import net.lixir.vminus.VMinusMod;
+import net.lixir.vminus.VMinus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.fml.common.Mod;
@@ -19,10 +19,10 @@ public class MobVariantSyncPacketHandler {
                 if (entity != null) {
                     entity.getPersistentData().putString("variant", packet.variant());
                 } else {
-                    VMinusMod.LOGGER.warn("Entity ID {} not found on client.", packet.entityId());
+                    VMinus.LOGGER.warn("Entity ID {} not found on client.", packet.entityId());
                 }
             } else {
-                VMinusMod.LOGGER.error("Client world is null during MobVariantSyncPacket handling!");
+                VMinus.LOGGER.error("Client world is null during MobVariantSyncPacket handling!");
             }
         });
         context.setPacketHandled(true);

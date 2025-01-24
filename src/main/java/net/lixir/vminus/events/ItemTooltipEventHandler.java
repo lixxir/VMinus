@@ -2,8 +2,8 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.IconHandler;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -52,7 +52,7 @@ public class ItemTooltipEventHandler {
                 }
                 inspectNum++;
             }
-            JsonObject itemData = VisionHandler.getVisionData(itemstack);
+            JsonObject itemData = Vision.getData(itemstack);
             if (inspectable || VisionValueHandler.isBooleanMet(itemData, "inspectable", itemstack)) {
                 if (!altDown) {
                     tooltip.add(Component.literal("§9[ALT" + IconHandler.getIcon("inspect") + "§9]"));

@@ -1,9 +1,9 @@
 package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -101,7 +101,7 @@ public class EntityAttackedEventHandler {
                             void timedLoop(int current, int total, int ticks) {
                                 entity.makeStuckInBlock(Blocks.AIR.defaultBlockState(), new Vec3(0.25, 0.05, 0.25));
                                 final int tick2 = ticks;
-                                VMinusMod.queueServerWork(tick2, () -> {
+                                VMinus.queueServerWork(tick2, () -> {
                                     if (total > current + 1) {
                                         timedLoop(current + 1, total, tick2);
                                     }
@@ -124,7 +124,7 @@ public class EntityAttackedEventHandler {
                         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
                             Enchantment enchantment = entry.getKey();
                             // getting the vision data from the enchantment
-                            JsonObject visionData = VisionHandler.getVisionData(enchantment);
+                            JsonObject visionData = Vision.getData(enchantment);
                             if (visionData != null) {
                                 if (visionData.has("particle")) {
                                     // getting the string and resource location to add to the particle list

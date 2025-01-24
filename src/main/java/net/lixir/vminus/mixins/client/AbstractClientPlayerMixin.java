@@ -21,6 +21,9 @@ public abstract class AbstractClientPlayerMixin {
     @Nullable
     protected abstract PlayerInfo getPlayerInfo();
 
+
+
+
     @Inject(method = "getElytraTextureLocation", at = @At("HEAD"), cancellable = true)
     private void vminus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         PlayerInfo playerInfo = this.getPlayerInfo();

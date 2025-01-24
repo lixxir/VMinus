@@ -1,5 +1,6 @@
 package net.lixir.vminus.registry.util;
 
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.block.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -22,6 +23,7 @@ public class BlockSet {
     public static final ArrayList<BlockSet> BLOCK_SETS = new ArrayList<>();
     public static final ArrayList<String> usingMods = new ArrayList<>();
     private final ArrayList<RegistryObject<Block>> blocks = new ArrayList<>();
+
 
     private final String baseName;
     public WoodType woodType = null;
@@ -81,10 +83,17 @@ public class BlockSet {
     private boolean leavesColored = false;
     private boolean isWoodSet = false;
     private ResourceLocation leavesAfterCreativeTabItem;
-    private String modId;
+    private final String modId;
 
-    public BlockSet(String baseName) {
+    private final DeferredRegister<Item> itemRegistry;
+    private final DeferredRegister<Block> blockRegistry;
+
+
+    public BlockSet(String baseName, String modId, DeferredRegister<Item> itemRegistry, DeferredRegister<Block> blockRegistry) {
         this.baseName = baseName;
+        this.modId = modId;
+        this.itemRegistry = itemRegistry;
+        this.blockRegistry = blockRegistry;
     }
 
     public static String correctBaseName(String baseName) {
@@ -287,7 +296,7 @@ public class BlockSet {
         this.toolType = ToolType.AXE;
         this.includeLeaves = true;
         this.leavesColored = true;
-        this.alternateBaseName = "detour:" + baseName + "_planks";
+        this.alternateBaseName = this.modId + ":" + baseName + "_planks";
         this.creativeTabItem = new ResourceLocation("minecraft", "bricks");
         return this;
     }
@@ -684,20 +693,22 @@ public class BlockSet {
         return returnBlock;
     }
 
-    public BlockSet build(String modId) {
-        this.modId = modId;
+    public BlockSet build() {
+        VMinus.LOGGER.debug("Building BlockSet for mod: {}", modId);
         Block block;
         RegistryObject<Block> baseBlock;
 
-        final DeferredRegister<Item> itemRegistry = DeferredRegister.create(ForgeRegistries.ITEMS, modId);
-        final DeferredRegister<Block> blockRegistry = DeferredRegister.create(ForgeRegistries.BLOCKS, modId);
 
-        if (isWoodSet)
+        if (isWoodSet) {
+            VMinus.LOGGER.debug("Registering WoodType: {}", modId + ":" + baseName);
             this.woodType = WoodType.register(new WoodType(modId + ":" + baseName, BlockSetType.OAK));
+        }
 
         if (includeBaseBlock) {
+            VMinus.LOGGER.debug("Including base block for: {}", (isWoodSet ? baseName + "_planks" : baseName));
             block = null;
             if (this.copyBlock != null && !this.copyBlock.isEmpty()) {
+                VMinus.LOGGER.debug("Copying block from: {}", this.copyBlock);
                 Block copyBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.copyBlock));
                 baseBlock = blockRegistry.register((isWoodSet ? baseName + "_planks" : baseName),
                         () -> new Block(BlockBehaviour.Properties.copy(copyBlock)));
@@ -711,6 +722,7 @@ public class BlockSet {
         } else {
             baseBlock = null;
             if (alternateBaseName != null && !alternateBaseName.isEmpty()) {
+                VMinus.LOGGER.debug("Using alternate base block name: {}", alternateBaseName);
                 ResourceLocation resourceLocation = new ResourceLocation(alternateBaseName.split(":")[0], alternateBaseName.split(":")[1]);
                 block = ForgeRegistries.BLOCKS.getValue(resourceLocation);
                 this.alternateBaseBlock = block;
@@ -724,6 +736,7 @@ public class BlockSet {
             Block copyBlock = getCopyBlock(baseBlock, block);
 
             if (includeCracked) {
+                VMinus.LOGGER.debug("Including cracked block for: {}", baseName);
                 this.crackedBlock = blockRegistry.register("cracked_" + baseName,
                         () -> getBlockWithRendering(BlockType.BASE, BlockBehaviour.Properties.copy(copyBlock)));
                 itemRegistry.register("cracked_" + baseName, () -> new BlockItem(crackedBlock.get(), new Item.Properties()));
@@ -731,6 +744,7 @@ public class BlockSet {
             }
 
             if (includeStairs) {
+                VMinus.LOGGER.debug("Including stairs block for: {}", fixedBaseBlockId);
                 this.stairsBlock = blockRegistry.register(fixedBaseBlockId + "_stairs",
                         () -> getBlockWithRendering(BlockType.STAIRS, BlockBehaviour.Properties.copy(copyBlock), block));
                 itemRegistry.register(fixedBaseBlockId + "_stairs", () -> new BlockItem(stairsBlock.get(), new Item.Properties()));
@@ -738,6 +752,7 @@ public class BlockSet {
             }
 
             if (includeSlab) {
+                VMinus.LOGGER.debug("Including slab block for: {}", fixedBaseBlockId);
                 this.slabBlock = blockRegistry.register(fixedBaseBlockId + "_slab",
                         () -> getBlockWithRendering(BlockType.SLAB, BlockBehaviour.Properties.copy(copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_slab", () -> new BlockItem(slabBlock.get(), new Item.Properties()));
@@ -745,6 +760,7 @@ public class BlockSet {
             }
 
             if (includeWall) {
+                VMinus.LOGGER.debug("Including wall block for: {}", fixedBaseBlockId);
                 this.wallBlock = blockRegistry.register(fixedBaseBlockId + "_wall",
                         () -> getBlockWithRendering(BlockType.WALL, BlockBehaviour.Properties.copy(copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_wall", () -> new BlockItem(wallBlock.get(), new Item.Properties()));
@@ -752,6 +768,7 @@ public class BlockSet {
             }
 
             if (includeFence) {
+                VMinus.LOGGER.debug("Including fence block for: {}", fixedBaseBlockId);
                 this.fenceBlock = blockRegistry.register(fixedBaseBlockId + "_fence",
                         () -> getBlockWithRendering(BlockType.FENCE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_FENCE : copyBlock)));
 
@@ -760,6 +777,7 @@ public class BlockSet {
             }
 
             if (includeFenceGate) {
+                VMinus.LOGGER.debug("Including fence gate block for: {}", fixedBaseBlockId);
                 this.fenceGateBlock = blockRegistry.register(fixedBaseBlockId + "_fence_gate",
                         () -> getBlockWithRendering(BlockType.FENCE_GATE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_FENCE_GATE : copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_fence_gate", () -> new BlockItem(fenceGateBlock.get(), new Item.Properties()));
@@ -767,6 +785,7 @@ public class BlockSet {
             }
 
             if (includePressurePlate) {
+                VMinus.LOGGER.debug("Including pressure plate block for: {}", fixedBaseBlockId);
                 this.pressurePlateBlock = blockRegistry.register(fixedBaseBlockId + "_pressure_plate",
                         () -> getBlockWithRendering(BlockType.PRESSURE_PLATE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_PRESSURE_PLATE : copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_pressure_plate", () -> new BlockItem(pressurePlateBlock.get(), new Item.Properties()));
@@ -774,6 +793,7 @@ public class BlockSet {
             }
 
             if (includeButton) {
+                VMinus.LOGGER.debug("Including button block for: {}", fixedBaseBlockId);
                 this.buttonBlock = blockRegistry.register(fixedBaseBlockId + "_button",
                         () -> getBlockWithRendering(BlockType.BUTTON, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_BUTTON : copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_button", () -> new BlockItem(buttonBlock.get(), new Item.Properties()));
@@ -781,6 +801,7 @@ public class BlockSet {
             }
 
             if (includeDoor) {
+                VMinus.LOGGER.debug("Including door block for: {}", fixedBaseBlockId);
                 this.doorBlock = blockRegistry.register(fixedBaseBlockId + "_door",
                         () -> getBlockWithRendering(BlockType.DOOR, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_DOOR : copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_door", () -> new BlockItem(doorBlock.get(), new Item.Properties()));
@@ -788,6 +809,7 @@ public class BlockSet {
             }
 
             if (includeTrapdoor) {
+                VMinus.LOGGER.debug("Including trapdoor block for: {}", fixedBaseBlockId);
                 this.trapDoorBlock = blockRegistry.register(fixedBaseBlockId + "_trapdoor",
                         () -> getBlockWithRendering(BlockType.TRAPDOOR, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_TRAPDOOR : copyBlock)));
                 itemRegistry.register(fixedBaseBlockId + "_trapdoor", () -> new BlockItem(trapDoorBlock.get(), new Item.Properties()));
@@ -796,6 +818,7 @@ public class BlockSet {
 
             if (isWoodSet) {
                 if (includeSign) {
+                    VMinus.LOGGER.debug("Including sign blocks for: {}", fixedBaseBlockId);
                     this.standingSignBlock = blockRegistry.register(fixedBaseBlockId + "_sign",
                             () -> new ModStandingSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_SIGN : copyBlock), this.woodType));
                     this.wallSignBlock = blockRegistry.register(fixedBaseBlockId + "_wall_sign",
@@ -809,6 +832,7 @@ public class BlockSet {
                 }
 
                 if (includeHangingSign) {
+                    VMinus.LOGGER.debug("Including hanging sign blocks for: {}", fixedBaseBlockId);
                     this.hangingSignBlock = blockRegistry.register(fixedBaseBlockId + "_hanging_sign",
                             () -> new ModHangingSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_HANGING_SIGN : copyBlock), this.woodType));
                     this.wallHangingSignBlock = blockRegistry.register(fixedBaseBlockId + "_hanging_wall_sign",
@@ -822,6 +846,7 @@ public class BlockSet {
                 }
 
                 if (includeLeaves) {
+                    VMinus.LOGGER.debug("Including leaves block for: {}", fixedBaseBlockId);
                     this.leavesBlock = blockRegistry.register(fixedBaseBlockId + "_leaves",
                             () -> new ModLeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
                     itemRegistry.register(fixedBaseBlockId + "_leaves", () -> new BlockItem(leavesBlock.get(), new Item.Properties()));
@@ -830,6 +855,7 @@ public class BlockSet {
                 }
 
                 if (includeLog) {
+                    VMinus.LOGGER.debug("Including log blocks for: {}", fixedBaseBlockId);
                     // Names
                     final String logId = fixedBaseBlockId + "_log";
                     final String strippedLogId = "stripped_" + logId;
@@ -860,6 +886,7 @@ public class BlockSet {
 
         usingMods.add(this.modId);
         BLOCK_SETS.add(this);
+        VMinus.LOGGER.debug("Finished building BlockSet for mod: {}", modId);
         return this;
     }
 

@@ -1,6 +1,6 @@
 package net.lixir.vminus.network.mobvariants;
 
-import net.lixir.vminus.VMinusMod;
+import net.lixir.vminus.VMinus;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +20,7 @@ public record MobVariantSyncPacket(int entityId, String variant) {
 
     @SubscribeEvent
     public static void registerMessage(FMLCommonSetupEvent event) {
-        VMinusMod.addNetworkMessage(
+        VMinus.addNetworkMessage(
                 MobVariantSyncPacket.class,
                 MobVariantSyncPacket::encode,
                 MobVariantSyncPacket::decode,

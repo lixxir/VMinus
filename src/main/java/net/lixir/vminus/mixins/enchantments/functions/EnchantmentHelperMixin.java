@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.enchantments.functions;
 
 import com.google.common.collect.Lists;
-import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
+import net.lixir.vminus.vision.util.EnchantmentVisionHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;

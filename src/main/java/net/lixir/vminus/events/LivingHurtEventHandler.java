@@ -1,6 +1,6 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.helpers.ProtectionHelper;
+import net.lixir.vminus.util.ProtectionHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;

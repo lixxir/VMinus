@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinusMod;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,21 +19,21 @@ public abstract class MobEffectMixin {
 
     @Inject(method = "getColor", at = @At("HEAD"), cancellable = true)
     private void getColor(CallbackInfoReturnable<Integer> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(effect);
+        JsonObject visionData = Vision.getData(effect);
         if (visionData != null && visionData.has("color")) {
             String color = VisionValueHandler.getFirstValidString(visionData, "color");
             if (color.startsWith("#")) {
                 int colorInt = Integer.parseInt(color.substring(1), 16);
                 cir.setReturnValue(colorInt);
             } else {
-                VMinusMod.LOGGER.warn("Mob Effect color must begin with a \"#\": " + effect);
+                VMinus.LOGGER.warn("Mob Effect color must begin with a \"#\": " + effect);
             }
         }
     }
 
     @Inject(method = "getCategory", at = @At("HEAD"), cancellable = true)
     public void getCategory(CallbackInfoReturnable<MobEffectCategory> cir) {
-        JsonObject visionData = VisionHandler.getVisionData(effect);
+        JsonObject visionData = Vision.getData(effect);
         if (visionData != null && visionData.has("category")) {
             String category = VisionValueHandler.getFirstValidString(visionData, "category");
             MobEffectCategory customCategory = getCategoryFromString(category);
@@ -53,7 +53,7 @@ public abstract class MobEffectMixin {
             case "neutral":
                 return MobEffectCategory.NEUTRAL;
             default:
-                VMinusMod.LOGGER.warn("Unknown Mob Effect Category: " + category);
+                VMinus.LOGGER.warn("Unknown Mob Effect Category: " + category);
         }
         return null;
     }

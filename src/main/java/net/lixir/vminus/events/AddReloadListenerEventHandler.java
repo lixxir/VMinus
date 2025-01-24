@@ -1,7 +1,7 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.visions.resources.VisionManager;
-import net.lixir.vminus.visions.util.VisionType;
+import net.lixir.vminus.vision.resources.VisionManager;
+import net.lixir.vminus.vision.util.VisionType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;

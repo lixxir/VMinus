@@ -5,8 +5,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.visions.VisionHandler;
-import net.lixir.vminus.visions.util.VisionValueHandler;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -37,7 +37,7 @@ public class ItemAttributeEventHandler {
     public static void addAttributeModifier(ItemAttributeModifierEvent event) {
         ItemStack itemstack = event.getItemStack();
         String itemId = ForgeRegistries.ITEMS.getKey(itemstack.getItem()).toString();
-        JsonObject itemData = VisionHandler.getVisionData(itemstack);
+        JsonObject itemData = Vision.getData(itemstack);
         CompoundTag tag = itemstack.getTag();
         EquipmentSlot eventSlot = (event != null) ? event.getSlotType() : null;
         Boolean miningFlag = false;
