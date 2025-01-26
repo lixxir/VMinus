@@ -8,8 +8,6 @@ import net.lixir.vminus.util.MobVariantHelper;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.util.VisionValueHandler;
-import net.lixir.vminus.vision.util.VisionPropertyHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -39,7 +37,7 @@ public class EntityJoinLevelEventHandler {
 
         JsonObject visionData = Vision.getData(entity.getType());
         // Banning banned entities
-        if (VisionValueHandler.isBooleanMet(visionData, "banned", entity)) {
+        if (VisionProperties.isBanned(entity)) {
             if (event.isCancelable())
                 event.setCanceled(true);
             return;
@@ -73,7 +71,7 @@ public class EntityJoinLevelEventHandler {
         if (entity instanceof ItemEntity) {
             ItemStack itemstack = (entity instanceof ItemEntity _itemEnt ? _itemEnt.getItem() : ItemStack.EMPTY);
             JsonObject itemVisionData = Vision.getData(itemstack);
-            ItemStack replacementStack = VisionPropertyHandler.getDropReplacement(itemstack,  itemVisionData);
+            ItemStack replacementStack = VisionProperties.getReplacementStack(itemstack);
             if (replacementStack != null && !replacementStack.isEmpty()) {
                         replacementStack.setCount(itemstack.getCount());
 

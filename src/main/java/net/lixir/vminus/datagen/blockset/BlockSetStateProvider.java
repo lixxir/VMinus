@@ -256,7 +256,7 @@ public class BlockSetStateProvider extends BlockStateProvider {
         ResourceLocation key = new ResourceLocation(modId, trapdoorName);
         RegistryObject<Block> trapdoorBlock = RegistryObject.create(key, ForgeRegistries.BLOCKS);
         Block block = trapdoorBlock.get();
-        ResourceLocation trapdoorTexture = new ResourceLocation(modId, ":block/" + trapdoorName);
+        ResourceLocation trapdoorTexture = new ResourceLocation(modId, "block/" + trapdoorName);
 
         trapdoorBlockWithRenderType((TrapDoorBlock) block, trapdoorTexture, true, "cutout");
         itemModels().trapdoorBottom(trapdoorName, trapdoorTexture);

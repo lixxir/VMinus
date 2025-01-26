@@ -26,12 +26,4 @@ public class SoundHelper {
         SoundEvent fallEvent = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(fallSound));
         return new SoundType(1.0F, 1.0F, breakEvent, stepEvent, placeEvent, hitEvent, fallEvent);
     }
-
-    public static @Nullable SoundEvent getSoundEventFromString(String soundName) {
-        ResourceLocation soundLocation = new ResourceLocation(soundName);
-        if (ForgeRegistries.SOUND_EVENTS.containsKey(soundLocation)) {
-            return ForgeRegistries.SOUND_EVENTS.getValue(soundLocation);
-        }
-        return null;
-    }
 }

@@ -2,8 +2,8 @@ package net.lixir.vminus.mixins.crafting;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.VisionUtil;
 import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.util.VisionPropertyHandler;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +21,7 @@ public abstract class IngredientMixin {
     @Unique
     private final Ingredient vminus$ingredient = (Ingredient) (Object) this;
 
+
     @Inject(method = "test*", at = @At("HEAD"), cancellable = true)
     public void vminus$test(@Nullable ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
         IngredientAccessor accessor = (IngredientAccessor) vminus$ingredient;
@@ -33,8 +34,10 @@ public abstract class IngredientMixin {
             cir.setReturnValue(itemStack.isEmpty());
             return;
         }
-        cir.setReturnValue(VisionPropertyHandler.matchesIngredient(itemStack, accessor.getValues()));
+        cir.setReturnValue(VisionUtil.matchesIngredient(itemStack, accessor.getValues()));
     }
+
+
 
 
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
@@ -44,10 +47,10 @@ public abstract class IngredientMixin {
         for (Ingredient.Value value : accessor.getValues()) {
             for (ItemStack stack : value.getItems()) {
                 JsonObject visionData = Vision.getData(stack);
-                ItemStack replacementStack = VisionPropertyHandler.getIngredientReplacement(stack, visionData);
+                ItemStack itemStack = VisionProperties.getReplacementStack(stack);
 
-                if (replacementStack != null) {
-                    replacedItems.add(replacementStack);
+                if (itemStack != null) {
+                    replacedItems.add(itemStack);
                 } else if (!VisionProperties.isBanned(stack, visionData)) {
                     replacedItems.add(stack);
                 }

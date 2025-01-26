@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.vision.util.VisionType;
+import net.lixir.vminus.vision.VisionType;
 
 import java.util.Map;
 import java.util.UUID;
@@ -31,12 +31,8 @@ public class VisionResourceProcessor {
             VMinus.LOGGER.info("Checking: {}", jsonElement);
             if (originalKey.endsWith(VisionManager.CONDITION_PATH) || originalKey.endsWith( VisionManager.PRIORITY_PATH))
                 continue;
-
+            String randomSign = generateRandomSign(originalKey, jsonFileObject, visionSign);
             if (jsonElement.isJsonPrimitive()) {
-                // Generate a random key for this primitive value.
-
-                String randomSign = generateRandomSign(originalKey, jsonFileObject, visionSign);
-
                 // Also give conditions the same name.
                 if (jsonFileObject.has(originalKey + VisionManager.CONDITION_PATH)) {
                     updatedJsonFileObject.add(randomSign +  VisionManager.CONDITION_PATH, jsonFileObject.get(originalKey +  VisionManager.CONDITION_PATH));
@@ -55,7 +51,9 @@ public class VisionResourceProcessor {
 
             } else if (originalKey.equals("conditions")) {
                 updatedJsonFileObject.add(visionSign.substring(0, visionSign.indexOf('-')) + "$" + originalKey, jsonElement);
-            } else {
+            } else if (jsonElement.isJsonObject()) {
+                updatedJsonFileObject.add(randomSign, jsonFileObject.get(originalKey));
+            }else {
                 updatedJsonFileObject.add(originalKey, jsonElement);
             }
         }

@@ -2,20 +2,16 @@ package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.IconHandler;
-import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.VMinusConfig;
 import net.lixir.vminus.util.DurabilityHelper;
 import net.lixir.vminus.util.EnchantAndCurseHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.EnchantmentVisionHelper;
-import net.lixir.vminus.vision.util.VisionPropertyNameHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -65,8 +61,8 @@ public abstract class ItemStackMixin {
     @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
     public void vminus$hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (cir.getReturnValue()) {
-            JsonObject itemData = Vision.getData(vminus$itemStack);
-            String replaceId = VisionValueHandler.getFirstValidString(itemData, "break_replacement", vminus$itemStack);
+            JsonObject visionData = Vision.getData(vminus$itemStack);
+            String replaceId = VisionProperties.getString(VisionProperties.Names.BREAK_REPLACEMENT, visionData, VisionProperties.Names.ID, vminus$itemStack);
             if (replaceId != null && !replaceId.isEmpty()) {
                 final ItemStack findItem = vminus$itemStack;
                 CompoundTag tag = findItem.getOrCreateTag();
@@ -87,7 +83,7 @@ public abstract class ItemStackMixin {
                 }
                 player.awardStat(Stats.ITEM_BROKEN.get(findItem.getItem()));
                 if (slotIndex != -1) {
-                    if (VisionValueHandler.isBooleanMet(null, "break_replacement", vminus$itemStack, "carry_nbt")) {
+                    if (VisionProperties.getBoolean(VisionProperties.Names.BREAK_REPLACEMENT, visionData, VisionProperties.Names.CARRY_NBT, vminus$itemStack)) {
                         replacementStack.setTag(tag);
                     }
                     if (slotIndex < 100) {
@@ -134,6 +130,7 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
     public void getBarColor(CallbackInfoReturnable<Integer> cir) {
+        /*
         JsonObject itemData = Vision.getData(vminus$itemStack);
         if (itemData != null && itemData.has("bar")) {
             int startColor = 4384126;
@@ -197,6 +194,8 @@ public abstract class ItemStackMixin {
                 }
             }
         }
+
+         */
     }
 
     @Inject(method = "enchant", at = @At("HEAD"), cancellable = true)
@@ -242,60 +241,22 @@ public abstract class ItemStackMixin {
         }
     }
 
-    @Inject(method = "setDamageValue", at = @At(value = "HEAD"), cancellable = true)
-    public void setDamageValue(int damage, CallbackInfo ci) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        CompoundTag tag = vminus$itemStack.getTag();
-        if (itemData != null && itemData.has("min_damage")) {
-            int dealtDamage = vminus$itemStack.getDamageValue();
-            int minDamage = VisionValueHandler.isNumberMet(itemData, "min_damage", 0, vminus$itemStack);
-            if (dealtDamage < minDamage) {
-                vminus$itemStack.getOrCreateTag().putInt("Damage", minDamage);
-                ci.cancel();
-            }
-        }
-        if (tag != null && tag.contains("reinforcement")) {
-            if (tag.getInt("reinforcement") > 0) {
-                int stillDamage = 0;
-                tag.putInt("reinforcement", tag.getInt("reinforcement") - damage);
-                if (tag.getInt("reinforcement") <= 0) {
-                    stillDamage = tag.getInt("reinforcement") * -1;
-                    tag.remove("reinforcement");
-                    tag.remove("max_reinforcement");
-                }
-                if (stillDamage > 0)
-                    vminus$itemStack.getOrCreateTag().putInt("Damage", vminus$itemStack.getDamageValue() + stillDamage);
-                ci.cancel();
-            }
-        }
-    }
-
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "durability");
-        if (!propertyMet.isEmpty()) {
-            int maxDurability = VisionValueHandler.isNumberMet(itemData, propertyMet, cir.getReturnValue() != null ? cir.getReturnValue() : 0, vminus$itemStack);
-            cir.setReturnValue(maxDurability);
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.DURABILITY, vminus$itemStack) != null)
+            cir.setReturnValue(Math.max(0,VisionProperties.getNumber(VisionProperties.Names.DURABILITY, vminus$itemStack, cir.getReturnValue()).intValue()));
     }
 
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
-        if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.DAMAGEABLE, vminus$itemStack) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.DAMAGEABLE, vminus$itemStack, cir.getReturnValue()));
     }
 
     @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "damageable");
-        if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.ENCHANTABLE, vminus$itemStack) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.ENCHANTABLE, vminus$itemStack, cir.getReturnValue()));
     }
 
     @Inject(method = "isEdible", at = @At("HEAD"), cancellable = true)
@@ -306,70 +267,36 @@ public abstract class ItemStackMixin {
         }
     }
 
-    @Inject(method = "getDrinkingSound", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getDrinkingSound", at = @At("RETURN"), cancellable = true)
     private void getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        if (itemData != null && itemData.has("food_properties")) {
-            JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
-            for (JsonElement element : foodPropertiesArray) {
-                if (element.isJsonObject()) {
-                    JsonObject foodProperties = element.getAsJsonObject();
-                    if (foodProperties.has("eat_sound")) {
-                        String soundName = foodProperties.get("eat_sound").getAsString();
-                        SoundEvent eatSound = SoundHelper.getSoundEventFromString(soundName);
-                        if (eatSound != null) {
-                            cir.setReturnValue(eatSound);
-                            cir.cancel();
-                            return;
-                        }
-                    }
-                }
-            }
+        JsonObject visionData = Vision.getData(vminus$itemStack);
+        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.EAT_SOUND, vminus$itemStack);
+        if (burpSound != null && !burpSound.isEmpty()) {
+            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
+            cir.setReturnValue(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation));
         }
     }
 
-    @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "hasFoil", at = @At("RETURN"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "foil");
-        if (!propertyMet.isEmpty()) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(itemData, propertyMet, vminus$itemStack));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.GLINT, vminus$itemStack) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.GLINT, vminus$itemStack, cir.getReturnValue()));
     }
 
-    @Inject(method = "getEatingSound", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getEatingSound", at = @At("RETURN"), cancellable = true)
     private void getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        if (itemData != null && itemData.has("food_properties")) {
-            JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
-            for (JsonElement element : foodPropertiesArray) {
-                if (element.isJsonObject()) {
-                    JsonObject foodProperties = element.getAsJsonObject();
-                    if (foodProperties.has("eat_sound")) {
-                        String soundName = foodProperties.get("eat_sound").getAsString();
-                        SoundEvent eatSound = SoundHelper.getSoundEventFromString(soundName);
-                        if (eatSound != null) {
-                            cir.setReturnValue(eatSound);
-                            cir.cancel();
-                            return;
-                        }
-                    }
-                }
-            }
+        JsonObject visionData = Vision.getData(vminus$itemStack);
+        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.EAT_SOUND, vminus$itemStack);
+        if (burpSound != null && !burpSound.isEmpty()) {
+            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
+            cir.setReturnValue(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation));
         }
     }
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        String propertyMet = VisionPropertyNameHandler.propertyMet(itemData, "use_duration");
-        if (!propertyMet.isEmpty()) {
-            int defaultDuration = 32;
-            int calculatedDuration = VisionValueHandler.isNumberMet(itemData, propertyMet, defaultDuration, vminus$itemStack);
-            if (calculatedDuration != defaultDuration) {
-                cir.setReturnValue(calculatedDuration);
-            }
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.USE_DURATION, vminus$itemStack) != null)
+            cir.setReturnValue(Math.max(0,VisionProperties.getNumber(VisionProperties.Names.USE_DURATION, vminus$itemStack, cir.getReturnValue()).intValue()));
     }
 
     @Unique
@@ -447,12 +374,15 @@ public abstract class ItemStackMixin {
 
 
         vminus$itemStack.getItem().appendHoverText(vminus$itemStack, player == null ? null : player.level(), list, flag);
+        /*
         if (itemData != null) {
             List<String> tooltips = VisionValueHandler.getTooltips(itemData, vminus$itemStack, true);
             for (String tooltipD : tooltips) {
                 list.add(Component.literal((tooltipD)));
             }
         }
+
+         */
         if (!flag.isAdvanced() && !vminus$itemStack.hasCustomHoverName() && vminus$itemStack.is(Items.FILLED_MAP)) {
             Integer integer = MapItem.getMapId(vminus$itemStack);
             if (integer != null) {
@@ -711,12 +641,15 @@ public abstract class ItemStackMixin {
             String genericStatsString = genericStats.toString().replaceAll("\\s+$", "");
             list.add(Component.literal(genericStatsString));
         }
+        /*
         if (itemData != null) {
             List<String> tooltips = VisionValueHandler.getTooltips(itemData, vminus$itemStack, false);
             for (String tooltipD : tooltips) {
                 list.add(Component.literal((tooltipD)));
             }
         }
+
+         */
         net.minecraftforge.event.ForgeEventFactory.onItemTooltip(vminus$itemStack, player, list, flag);
         if (flag.isAdvanced()) {
             String rarity = item.getRarity(vminus$itemStack).toString().toLowerCase();

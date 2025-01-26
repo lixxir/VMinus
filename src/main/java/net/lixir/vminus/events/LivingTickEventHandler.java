@@ -2,7 +2,7 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -94,12 +94,14 @@ public class LivingTickEventHandler {
             return;
         }
         JsonObject visionData = Vision.getData(mobEffect);
-        if (visionData != null && visionData.has("particle")) {
-            String effectString = VisionValueHandler.getFirstValidString(visionData, "particle");
-            ResourceLocation particleLocation = new ResourceLocation(effectString);
-            ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(particleLocation);
-            if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {
-                world.sendParticles(simpleParticleType, spawnCoords[0], spawnCoords[1], spawnCoords[2], 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
+            String effectString =  VisionProperties.getString(visionData, VisionProperties.Names.PARTICLE, mobEffect);
+
+            if (effectString != null) {
+                ResourceLocation particleLocation = new ResourceLocation(effectString);
+                ParticleType<?> particleType = ForgeRegistries.PARTICLE_TYPES.getValue(particleLocation);
+                if (particleType instanceof SimpleParticleType simpleParticleType && simpleParticleType != null) {
+                    world.sendParticles(simpleParticleType, spawnCoords[0], spawnCoords[1], spawnCoords[2], 1, 0, 0, 0, Mth.nextDouble(RandomSource.create(), 0.01, 0.03));
+                }
             }
         }// else {
         //	int color = effectInstance.getEffect().getColor();
@@ -107,4 +109,4 @@ public class LivingTickEventHandler {
         ////	spawnEffectParticles(color, isAmbient, world, x, y, z);
         //}
     }
-}
+

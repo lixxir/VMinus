@@ -3,7 +3,6 @@ package net.lixir.vminus.vision;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.util.VisionType;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -14,6 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -26,6 +26,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Mod.EventBusSubscriber
 public class Vision {
     public static final int EMPTY_KEY = -1;
+
+    public static final Map<String, SoundType> BLOCK_SOUND_TYPE_CACHE = new HashMap<>();
+    public static final List<ItemTabData> ITEM_TAB_DATA = new ArrayList<>();
+
 
     private static JsonObject scanVisionJsonKey(JsonObject mainVision, String key, String id, JsonObject mergedData,
                                                 @Nullable Object object, @Nullable ICondition.IContext context) {

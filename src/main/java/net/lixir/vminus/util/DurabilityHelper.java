@@ -2,7 +2,6 @@ package net.lixir.vminus.util;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -15,6 +14,8 @@ public class DurabilityHelper {
         JsonObject itemData = Vision.getData(itemstack);
         int maxDurability = itemstack.isDamageableItem() ? itemstack.getMaxDamage() : 0;
         int damage = itemstack.isDamageableItem() ? itemstack.getDamageValue() : 0;
+        int durability = itemstack.isDamageableItem() ? maxDurability - damage : 0;
+        /*
         if (itemData != null && itemData.has("fake_durability")) {
             int fakeDurability = VisionValueHandler.isNumberMet(itemData, "fake_durability", maxDurability, itemstack);
             maxDurability += fakeDurability;
@@ -23,7 +24,7 @@ public class DurabilityHelper {
             int fakeDurability = VisionValueHandler.isNumberMet(itemData, "fake_durability_multiplier", 1, itemstack);
             maxDurability *= fakeDurability;
         }
-        int durability = itemstack.isDamageableItem() ? maxDurability - damage : 0;
+
         if (itemData != null && itemData.has("fake_damage_multiplier")) {
             int fakeDamage = VisionValueHandler.isNumberMet(itemData, "fake_damage_multiplier", 0, itemstack);
             durability -= (fakeDamage * itemstack.getMaxDamage());
@@ -32,6 +33,8 @@ public class DurabilityHelper {
         if (tag != null && tag.contains("reinforcement")) {
             durability += tag.getInt("reinforcement");
         }
+
+         */
         if (max)
             return maxDurability;
         return durability;

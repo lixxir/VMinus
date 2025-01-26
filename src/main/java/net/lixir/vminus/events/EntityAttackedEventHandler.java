@@ -3,7 +3,7 @@ package net.lixir.vminus.events;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -112,7 +112,7 @@ public class EntityAttackedEventHandler {
                 }
             }
             // Enchantment particles
-            if (sourceentity != null && !(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
+            if (!(entity instanceof Player _plr && _plr.getAbilities().instabuild) && entity.isAlive() && sourceentity.isAlive() && entity instanceof LivingEntity) {
                 mainhand = (sourceentity instanceof LivingEntity _livEnt ? _livEnt.getMainHandItem() : ItemStack.EMPTY);
                 directEntity = damagesource.getDirectEntity();
                 if (!mainhand.isEmpty() && mainhand.isEnchanted()) {
@@ -128,15 +128,15 @@ public class EntityAttackedEventHandler {
                             if (visionData != null) {
                                 if (visionData.has("particle")) {
                                     // getting the string and resource location to add to the particle list
-                                    String particleString = VisionValueHandler.getFirstValidString(visionData, "particle");
-                                    if (!particleString.isEmpty() && particleString != null) {
+                                    String particleString = VisionProperties.getString(visionData, VisionProperties.Names.PARTICLE, mainhand);
+                                    if (particleString != null && !particleString.isEmpty()) {
                                         ResourceLocation particleLocation = new ResourceLocation(particleString);
-                                        if (particleLocation != null)
-                                            particles.add(particleLocation);
+                                        particles.add(particleLocation);
                                     }
                                 }
-                                if (visionData.has("sound")) {
-                                    String soundString = VisionValueHandler.getFirstValidString(visionData, "sound");
+
+                                    String soundString = VisionProperties.getString(visionData, VisionProperties.Names.BURP_SOUND, mainhand);
+                                if (soundString != null) {
                                     if (!world.isClientSide())
                                         world.playSound(null, BlockPos.containing(sourceentity.getX(),
                                                         sourceentity.getY() + 1,
@@ -146,6 +146,7 @@ public class EntityAttackedEventHandler {
                                                 (float) 0.8,
                                                 (float) 1);
                                 }
+
                             }
                         }
                     }

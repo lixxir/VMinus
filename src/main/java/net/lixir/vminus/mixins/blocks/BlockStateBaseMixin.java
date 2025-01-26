@@ -1,15 +1,9 @@
 package net.lixir.vminus.mixins.blocks;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,59 +13,41 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BlockStateBaseMixin {
     @Unique
-    private final BlockState vminus$state = (BlockState) (Object) this;
+    private final BlockBehaviour.BlockStateBase vminus$state = (BlockBehaviour.BlockStateBase) (Object) this;
 
-    @Inject(method = "getLightEmission", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getLightEmission", at = @At("RETURN"), cancellable = true)
     private void getLightEmission(CallbackInfoReturnable<Integer> cir) {
-        Block block = vminus$state.getBlock();
-        JsonObject blockData = Vision.getData(block);
-        if (blockData != null && blockData.has("light_level")) {
-            int lightLevel = VisionValueHandler.isNumberMet(blockData, "light_level", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
-            cir.setReturnValue(Math.min(Math.max(lightLevel, 0), 15));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.LIGHT_LEVEL, vminus$state) != null)
+            cir.setReturnValue(Math.min(16,Math.max(0, VisionProperties.getNumber(VisionProperties.Names.LIGHT_LEVEL, vminus$state, cir.getReturnValue()).intValue())));
     }
 
-    @Inject(method = "emissiveRendering", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "emissiveRendering", at = @At("RETURN"), cancellable = true)
     private void emissiveRendering(CallbackInfoReturnable<Boolean> cir) {
-        Block block = vminus$state.getBlock();
-        JsonObject blockData = Vision.getData(block);
-        if (blockData != null && blockData.has("emissive_rendering")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "emissive_rendering", block));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.EMISSIVE, vminus$state) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.EMISSIVE, vminus$state, cir.getReturnValue()));
     }
 
-    @Inject(method = "canOcclude", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canOcclude", at = @At("RETURN"), cancellable = true)
     private void canOcclude(CallbackInfoReturnable<Boolean> cir) {
-        Block block = vminus$state.getBlock();
-        JsonObject blockData = Vision.getData(block);
-        if (blockData != null && blockData.has("can_occlude")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "can_occlude", block));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.OCCLUDES, vminus$state) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.OCCLUDES, vminus$state, cir.getReturnValue()));
     }
 
-    @Inject(method = "isRedstoneConductor", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isRedstoneConductor", at = @At("RETURN"), cancellable = true)
     private void isRedstoneConductor(CallbackInfoReturnable<Boolean> cir) {
-        Block block = vminus$state.getBlock();
-        JsonObject blockData = Vision.getData(block);
-        if (blockData != null && blockData.has("redstone_conductor")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(blockData, "redstone_conductor", block));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.CONDUCTOR, vminus$state) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.CONDUCTOR, vminus$state, cir.getReturnValue()));
     }
 
-    @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     private void getDestroySpeed(BlockGetter p_60801_, BlockPos p_60802_, CallbackInfoReturnable<Float> cir) {
-        Block block = vminus$state.getBlock();
-        JsonObject blockData = Vision.getData(block);
-        if (blockData != null && blockData.has("destroy_time")) {
-            float destroyTime = VisionValueHandler.isNumberMet(blockData, "destroy_time", (cir.getReturnValue() != null ? cir.getReturnValue() : 0), block);
-            cir.setReturnValue(Math.max(-1, destroyTime));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.DESTROY_TIME, vminus$state) != null)
+            cir.setReturnValue(Math.max(-1, VisionProperties.getNumber(VisionProperties.Names.DESTROY_TIME, vminus$state, cir.getReturnValue()).floatValue()));
     }
 
-    @Inject(method = "isValidSpawn", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isValidSpawn", at = @At("RETURN"), cancellable = true)
     private void isValidSpawn(CallbackInfoReturnable<Boolean> cir) {
-        if (vminus$state.is(BlockTags.create(new ResourceLocation("vminus:override_valid_spawning")))) {
-            cir.setReturnValue(true);
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.VALID_SPAWN, vminus$state) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.VALID_SPAWN, vminus$state, cir.getReturnValue()));
     }
 }

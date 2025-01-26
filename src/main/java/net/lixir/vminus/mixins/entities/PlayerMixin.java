@@ -1,50 +1,39 @@
 package net.lixir.vminus.mixins.entities;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.vision.Vision;
-import net.minecraft.sounds.SoundEvent;
+import net.lixir.vminus.vision.VisionProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity {
-    protected PlayerMixin(EntityType<? extends LivingEntity> p_250508_, Level p_250289_) {
-        super(p_250508_, p_250289_);
-    }
+import java.util.Objects;
 
+@Mixin(Player.class)
+public abstract class PlayerMixin {
     @Unique
     private final Player vminus$player = (Player) (Object) this;
 
     @Inject(method = "eat", at = @At("HEAD"), cancellable = true)
     public void eat(Level level, ItemStack itemstack, CallbackInfoReturnable<ItemStack> cir) {
-        JsonObject itemData = Vision.getData(itemstack);
+        JsonObject visionData = Vision.getData(itemstack);
         vminus$player.getFoodData().eat(itemstack.getItem(), itemstack);
-        if (itemData != null && itemData.has("food_properties")) {
-            JsonArray foodPropertiesArray = itemData.getAsJsonArray("food_properties");
-            for (JsonElement element : foodPropertiesArray) {
-                if (element.isJsonObject()) {
-                    JsonObject foodProperties = element.getAsJsonObject();
-                    if (foodProperties.has("burp_sound")) {
-                        String soundName = foodProperties.get("b,urp_sound").getAsString();
-                        SoundEvent eatSound = SoundHelper.getSoundEventFromString(soundName);
-                        if (eatSound != null) {
-                            vminus$player.playSound(eatSound, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
-                        }
-                    }
-                }
-            }
+
+        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.BURP_SOUND, itemstack);
+        if (burpSound != null && !burpSound.isEmpty()) {
+            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
+            vminus$player.playSound(Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation)), 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
         }
-        cir.setReturnValue(super.eat(level, itemstack));
+
+        cir.setReturnValue(vminus$player.eat(level, itemstack));
     }
 }

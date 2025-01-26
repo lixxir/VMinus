@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,46 +15,25 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(MobEffect.class)
 public abstract class MobEffectMixin {
     @Unique
-    private final MobEffect effect = (MobEffect) (Object) this;
+    private final MobEffect vminus$effect = (MobEffect) (Object) this;
 
-    @Inject(method = "getColor", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getColor", at = @At("RETURN"), cancellable = true)
     private void getColor(CallbackInfoReturnable<Integer> cir) {
-        JsonObject visionData = Vision.getData(effect);
-        if (visionData != null && visionData.has("color")) {
-            String color = VisionValueHandler.getFirstValidString(visionData, "color");
-            if (color.startsWith("#")) {
-                int colorInt = Integer.parseInt(color.substring(1), 16);
-                cir.setReturnValue(colorInt);
-            } else {
-                VMinus.LOGGER.warn("Mob Effect color must begin with a \"#\": " + effect);
-            }
+        String colorString = VisionProperties.getString(VisionProperties.Names.COLOR, vminus$effect);
+        if (colorString != null && !colorString.isEmpty()) {
+            if (colorString.startsWith("#"))
+                colorString = colorString.substring(1);
+            int colorInt = Integer.parseInt(colorString, 16);
+            cir.setReturnValue(colorInt);
         }
     }
 
-    @Inject(method = "getCategory", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getCategory", at = @At("RETURN"), cancellable = true)
     public void getCategory(CallbackInfoReturnable<MobEffectCategory> cir) {
-        JsonObject visionData = Vision.getData(effect);
-        if (visionData != null && visionData.has("category")) {
-            String category = VisionValueHandler.getFirstValidString(visionData, "category");
-            MobEffectCategory customCategory = getCategoryFromString(category);
-            if (customCategory != null) {
-                cir.setReturnValue(customCategory);
-            }
+        String categoryString = VisionProperties.getString(VisionProperties.Names.CATEGORY, vminus$effect);
+        if (categoryString != null && !categoryString.isEmpty()) {
+            MobEffectCategory customCategory = MobEffectCategory.valueOf(categoryString);
+            cir.setReturnValue(customCategory);
         }
-    }
-
-    @Unique
-    private MobEffectCategory getCategoryFromString(String category) {
-        switch (category.toLowerCase()) {
-            case "harmful":
-                return MobEffectCategory.HARMFUL;
-            case "beneficial":
-                return MobEffectCategory.BENEFICIAL;
-            case "neutral":
-                return MobEffectCategory.NEUTRAL;
-            default:
-                VMinus.LOGGER.warn("Unknown Mob Effect Category: " + category);
-        }
-        return null;
     }
 }

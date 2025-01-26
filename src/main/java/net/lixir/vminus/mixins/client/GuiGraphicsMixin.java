@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -58,7 +57,7 @@ public abstract class GuiGraphicsMixin {
         ResourceLocation customTexture = vminus$getCustomTextureForItem(itemstack);
         if (customTexture != null) {
             RenderSystem.setShaderTexture(0, customTexture);
-            if (VisionValueHandler.isBooleanMet(visionData, "front", itemstack)) {
+            if (VisionProperties.getBoolean(visionData, "front", itemstack)) {
                 accessor.getPoseStack().translate(0.0F, 0.0F, 200.0F);
             } else {
                 accessor.getPoseStack().translate(0.0F, 0.0F, 0.0F);
@@ -73,7 +72,7 @@ public abstract class GuiGraphicsMixin {
     private ResourceLocation vminus$getCustomTextureForItem(ItemStack itemstack) {
         JsonObject visionData = Vision.getData(itemstack);
         String decoString = VisionProperties.getString(visionData, "decorator", itemstack);
-        if (itemstack.getTag() != null && !itemstack.getTag().getBoolean("tab_item")) {
+        if (itemstack.getTag() == null || !itemstack.getTag().getBoolean("tab_item")) {
             if (decoString != null && !decoString.isEmpty())
                 return new ResourceLocation(decoString);
         }

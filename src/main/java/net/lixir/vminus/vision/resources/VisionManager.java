@@ -3,8 +3,9 @@ package net.lixir.vminus.vision.resources;
 import com.google.common.collect.Maps;
 import com.google.gson.*;
 import net.lixir.vminus.VMinus;
+import net.lixir.vminus.events.LevelLoadedEventHandler;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionType;
+import net.lixir.vminus.vision.VisionType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -150,6 +151,10 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
 
         Vision.processAllVisionDataForType(this.visionType,context);
 
+        if (this.visionType == VisionType.ITEM) {
+            Vision.ITEM_TAB_DATA.clear();
+            LevelLoadedEventHandler.debounce = false;
+        }
         this.visionType.clearMainVision();
     }
 

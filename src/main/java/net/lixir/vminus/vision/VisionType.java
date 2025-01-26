@@ -1,4 +1,4 @@
-package net.lixir.vminus.vision.util;
+package net.lixir.vminus.vision;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.network.VminusModVariables;

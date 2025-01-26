@@ -3,7 +3,6 @@ package net.lixir.vminus.mixins.level;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.util.DirectionHelper;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -26,6 +25,7 @@ public abstract class LevelChunkSectionMixin {
         Block block = state.getBlock();
         JsonObject visionData = Vision.getData(block);
         // Replace takes priority over banning.
+        /*
         if (visionData != null) {
             if (visionData.has("replace")) {
                 String replaceString = VisionValueHandler.getFirstValidString(visionData, "replace", block);
@@ -56,5 +56,7 @@ public abstract class LevelChunkSectionMixin {
                 }
             }
         }
+
+         */
     }
 }

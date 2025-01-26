@@ -1,20 +1,14 @@
 package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.SoundHelper;
 import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.util.VisionValueHandler;
+import net.lixir.vminus.vision.VisionProperties;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.Random;
@@ -109,75 +102,27 @@ public abstract class LivingEntityMixin {
         ci.cancel();
     }
 
-    @Inject(method = "isSensitiveToWater", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isSensitiveToWater", at = @At("RETURN"), cancellable = true)
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("water_sensitive")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "water_sensitive", vminus$entity));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.WATER_SENSITIVE, vminus$entity) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.WATER_SENSITIVE, vminus$entity, cir.getReturnValue()));
     }
 
-    @Inject(method = "canDisableShield", at = @At("HEAD"), cancellable = true)
-    private void canDisableShield(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("disable_shields")) {
-            System.out.println("DISABLING SHIELDS!");
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "disable_shields", vminus$entity));
-        }
-    }
-
-    @Inject(method = "canBreatheUnderwater", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "canBreatheUnderwater", at = @At("RETURN"), cancellable = true)
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("underwater_breathing")) {
-            cir.setReturnValue(VisionValueHandler.isBooleanMet(visionData, "underwater_breathing", vminus$entity));
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity) != null)
+            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity, cir.getReturnValue()));
     }
 
-    @Inject(method = "getSoundVolume", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getSoundVolume", at = @At("RETURN"), cancellable = true)
     private void getSoundVolume(CallbackInfoReturnable<Float> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("volume")) {
-            float defaultVolume = 1f;
-            float totalVolume = VisionValueHandler.isNumberMet(visionData, "volume", defaultVolume, vminus$entity);
-            if (totalVolume != defaultVolume) {
-                cir.setReturnValue(Math.max(totalVolume, 0.0f));
-            }
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.VOLUME, vminus$entity) != null)
+            cir.setReturnValue(Math.max(0f, VisionProperties.getNumber(VisionProperties.Names.VOLUME, vminus$entity, cir.getReturnValue()).floatValue()));
     }
 
     @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
     private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("experience")) {
-            int experience = (int) VisionValueHandler.isNumberMet(visionData, "experience", 0, vminus$entity);
-            System.out.println("DROPPING NEW XP: " + experience);
-            cir.setReturnValue(Math.max(experience, 0));
-        }
-    }
-
-    @Nullable
-    @Inject(method = "getDeathSound", at = @At("HEAD"), cancellable = true)
-    private void getDeathSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("death_sound")) {
-            System.out.println("Trying deathsound");
-            String soundString = VisionValueHandler.getFirstValidString(visionData, "death_sound", vminus$entity);
-            SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
-            if (sound != null)
-                cir.setReturnValue(sound);
-        }
-    }
-
-    @Nullable
-    @Inject(method = "getHurtSound", at = @At("HEAD"), cancellable = true)
-    private void getHurtSound(DamageSource p_219440_, CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = Vision.getData(vminus$entity.getType());
-        if (visionData != null && visionData.has("hurt_sound")) {
-            String soundString = VisionValueHandler.getFirstValidString(visionData, "hurt_sound", vminus$entity);
-            SoundEvent sound = SoundHelper.getSoundEventFromString(soundString);
-            if (sound != null)
-                cir.setReturnValue(sound);
-        }
+        if (VisionProperties.findSearchObject(VisionProperties.Names.XP, vminus$entity) != null)
+            cir.setReturnValue(Math.max(0, VisionProperties.getNumber(VisionProperties.Names.XP, vminus$entity, cir.getReturnValue()).intValue()));
     }
 }
