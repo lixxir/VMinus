@@ -2,7 +2,7 @@
   "attribute.vminus.fire_protection": "Fire Protection",
   "attribute.vminus.health_lost_stat_boost": "Stat Boost per Health Lost",
   "attribute.vminus.magic_protection": "Magic Protection",
-  "attribute.vminus.protection": "Protection",
+  "attribute.vminus.protection": "All Protection",
   "attribute.vminus.fall_protection": "Fall Protection",
   "attribute.vminus.blast_protection": "Blast Protection",
   "attribute.vminus.critical_damage": "Critical Damage",

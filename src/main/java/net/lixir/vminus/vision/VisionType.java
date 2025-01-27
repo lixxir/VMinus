@@ -8,11 +8,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public enum VisionType {
-    ITEM((byte) 0, "item_visions", "items"),
-    BLOCK((byte) 1, "block_visions", "blocks"),
-    ENTITY((byte) 2, "entity_visions", "entities"),
-    EFFECT((byte) 3, "effect_visions", "effects"),
-    ENCHANTMENT((byte) 4, "enchantment_visions", "enchantments");
+    ITEM((byte) 0,  "items"),
+    BLOCK((byte) 1, "blocks"),
+    ENTITY((byte) 2,  "entities"),
+    EFFECT((byte) 3, "effects"),
+    ENCHANTMENT((byte) 4, "enchantments"),
+    CREATIVE_TAB((byte) 5, "creative_tabs");
 
     private final ConcurrentHashMap<String, Integer> visionKey = new ConcurrentHashMap<>();
     private final CopyOnWriteArrayList<JsonObject> visionCache = new CopyOnWriteArrayList<>();
@@ -20,32 +21,12 @@ public enum VisionType {
     private final byte id;
     private final String directory;
     private final String listType;
+    private JsonObject mainVision = new JsonObject();
 
-    VisionType(byte id, String directory, String listType) {
+    VisionType(byte id, String listType) {
         this.id = id;
-        this.directory = directory;
+        this.directory = "visions/" + listType;
         this.listType = listType;
-    }
-
-    public @Nullable JsonObject getMainVision() {
-        switch(id) {
-            case 0 -> {
-                return VminusModVariables.main_item_vision;
-            }
-            case 1 -> {
-                return VminusModVariables.main_block_vision;
-            }
-            case 2 -> {
-                return VminusModVariables.main_entity_vision;
-            }
-            case 3 -> {
-                return VminusModVariables.main_effect_vision;
-            }
-            case 4 -> {
-                return VminusModVariables.main_enchantment_vision;
-            }
-        }
-        return null;
     }
 
     public ConcurrentHashMap<String, Integer> getVisionKey() {
@@ -68,35 +49,23 @@ public enum VisionType {
         return this.listType;
     }
 
+    public void setMainVision(JsonObject visionData) {
+        this.mainVision = visionData;
+    }
+
+    public JsonObject getMainVision() {
+        return mainVision;
+    }
+
     public static VisionType getFromDirectory(String folderName) {
         return switch (folderName) {
-            case "item_visions" -> ITEM;
-            case "block_visions" -> BLOCK;
-            case "entity_visions" -> ENTITY;
-            case "effect_visions" -> EFFECT;
-            case  "enchantment_visions" -> ENCHANTMENT;
+            case "visions/items" -> ITEM;
+            case "visions/blocks" -> BLOCK;
+            case "visions/entities" -> ENTITY;
+            case "visions/effects" -> EFFECT;
+            case  "visions/enchantments" -> ENCHANTMENT;
+            case  "visions/creative_tabs" -> CREATIVE_TAB;
             default -> throw new IllegalStateException("Unexpected Folder Name: " + folderName);
         };
     }
-
-    public void setMainVision(JsonObject jsonObject) {
-        switch (id) {
-            case 0 -> VminusModVariables.main_item_vision = jsonObject;
-            case 1 -> VminusModVariables.main_block_vision = jsonObject;
-            case 2 -> VminusModVariables.main_entity_vision = jsonObject;
-            case 3 -> VminusModVariables.main_effect_vision = jsonObject;
-            case 4 -> VminusModVariables.main_enchantment_vision = jsonObject;
-        }
-    }
-
-    public void clearMainVision() {
-        switch (id) {
-            case 0 -> VminusModVariables.main_item_vision = new JsonObject();
-            case 1 -> VminusModVariables.main_block_vision = new JsonObject();
-            case 2 -> VminusModVariables.main_entity_vision = new JsonObject();
-            case 3 -> VminusModVariables.main_effect_vision = new JsonObject();
-            case 4 -> VminusModVariables.main_enchantment_vision = new JsonObject();
-        }
-    }
-
 }

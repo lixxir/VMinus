@@ -34,9 +34,8 @@ import java.util.*;
 @Mod.EventBusSubscriber
 public class ItemAttributeEventHandler {
     private static final ConcurrentHashMap<String, UUID> UUID_CACHE = new ConcurrentHashMap<>();
-    private static final Map<ItemStack, Set<String>> PROCESSED_ATTRIBUTES = new WeakHashMap<>();
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent
     public static void addAttributeModifier(ItemAttributeModifierEvent event) {
         ItemStack itemStack = event.getItemStack();
         String itemId = ForgeRegistries.ITEMS.getKey(itemStack.getItem()).toString();
@@ -45,16 +44,15 @@ public class ItemAttributeEventHandler {
         boolean miningFlag = false;
 
         if (visionData != null) {
-            PROCESSED_ATTRIBUTES.computeIfAbsent(itemStack, k -> new HashSet<>());
-
             int index = 0;
             while (true) {
+
                 JsonObject attributeObject = VisionProperties.findSearchObject(VisionProperties.Names.ATTRIBUTE, visionData, index);
                 if (attributeObject == null)
                     break;
                 index++;
                 String id = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.ID, itemStack);
-                if (id == null || PROCESSED_ATTRIBUTES.get(itemStack).contains(id))
+                if (id == null)
                     continue;
 
                 boolean replace = VisionProperties.getBoolean(attributeObject, visionData, VisionProperties.Names.REPLACE, itemStack, false);
@@ -78,8 +76,9 @@ public class ItemAttributeEventHandler {
                 AttributeModifier.Operation operation = getOperation(operationId);
 
                 Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(id));
+
                 if (attribute != null) {
-                    String compositeId = itemId + "|" + id;
+                    String compositeId = itemId + "|" + id  + "|" + operation;
 
                     UUID uuid = UUID_CACHE.computeIfAbsent(compositeId, k -> UUID.randomUUID());
                     EquipmentSlot slot = EquipmentSlot.MAINHAND;
@@ -93,7 +92,7 @@ public class ItemAttributeEventHandler {
                         continue;
                     }
 
-                    String name = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.NAME, itemStack);
+                    String name = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.NAME, itemStack, id);
                     if (name == null) {
                         if (id.contains(".")) {
                             name = id.substring(id.indexOf(".") + 1);
@@ -109,14 +108,29 @@ public class ItemAttributeEventHandler {
                     double value = VisionProperties.getNumber(attributeObject, visionData, VisionProperties.Names.VALUE, itemStack).doubleValue();
 
                     AttributeModifier modifier = new AttributeModifier(uuid, name, value, operation);
+                    boolean found = false;
+                    for (Attribute a : event.getModifiers().keySet()) {
+                        Collection<AttributeModifier> attributeModifiers = event.getModifiers().get(a);
+                        for (AttributeModifier m : attributeModifiers) {
+                            if (m.equals(modifier)) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                    if (found)
+                        continue;
+                    if (id.equals("vminus:mining_speed"))
+                        miningFlag = true;
                     event.addModifier(attribute, modifier);
-
-                    PROCESSED_ATTRIBUTES.get(itemStack).add(id);
                 }
             }
         }
 
         if (eventSlot == EquipmentSlot.MAINHAND) {
+
             handleMiningAttributes(event, itemStack, miningFlag);
         }
     }

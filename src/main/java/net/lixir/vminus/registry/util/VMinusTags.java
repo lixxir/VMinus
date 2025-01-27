@@ -22,7 +22,28 @@ public class VMinusTags {
     }
 
     public static class Items {
-        public static final TagKey<Item> banned = tag("banned");
+        public static final TagKey<Item> BANNED = tag("banned");
+
+        public static final TagKey<Item> WOODEN_TOOLS = tag("tools/wooden");
+        public static final TagKey<Item> STONE_TOOLS = tag("tools/stone");
+        public static final TagKey<Item> GOLDEN_TOOLS = tag("tools/golden");
+        public static final TagKey<Item> IRON_TOOLS = tag("tools/iron");
+        public static final TagKey<Item> DIAMOND_TOOLS = tag("tools/diamond");
+        public static final TagKey<Item> NETHERITE_TOOLS = tag("tools/netherite");
+
+        public static final TagKey<Item> LEATHER_ARMOR = tag("armor/leather");
+        public static final TagKey<Item> CHAINMAIL_ARMOR = tag("armor/chainmail");
+        public static final TagKey<Item> GOLDEN_ARMOR = tag("armor/golden");
+        public static final TagKey<Item> IRON_ARMOR = tag("armor/iron");
+        public static final TagKey<Item> DIAMOND_ARMOR = tag("armor/diamond");
+        public static final TagKey<Item> NETHERITE_ARMOR = tag("armor/netherite");
+
+        public static final TagKey<Item> GOLDEN_EQUIPMENT = tag("equipment/golden");
+        public static final TagKey<Item> IRON_EQUIPMENT = tag("equipment/iron");
+        public static final TagKey<Item> DIAMOND_EQUIPMENT = tag("equipment/diamond");
+        public static final TagKey<Item> NETHERITE_EQUIPMENT = tag("equipment/netherite");
+
+        public static final TagKey<Item> BANNER_PATTERNS = tag("banner_patterns");
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinus.ID, name));

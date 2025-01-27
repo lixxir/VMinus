@@ -86,6 +86,8 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
             @NotNull ResourceManager resourceManager,
             @NotNull ProfilerFiller profilerFiller) {
 
+        VMinus.LOGGER.info("testing:" + this.directory);
+
         JsonObject mainJsonObject = new JsonObject();
 
         for (Map.Entry<ResourceLocation, JsonElement> jsonFile : resourceLocationJsonElementMap.entrySet()) {
@@ -110,7 +112,7 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
         }
 
         // Processing for configs.
-        File configDir = new File("config/vminus/" + directory);
+        File configDir = new File("config/visions/" + directory);
         if (!configDir.exists() && !configDir.mkdirs()) {
             VMinus.LOGGER.error("Failed to create directory: {}", configDir.getPath());
         }
@@ -155,7 +157,9 @@ public class VisionManager extends SimpleJsonResourceReloadListener {
             Vision.ITEM_TAB_DATA.clear();
             LevelLoadedEventHandler.debounce = false;
         }
-        this.visionType.clearMainVision();
+
+        this.visionType.setMainVision(null);
+
     }
 
     // Needed to override for the correct directory.

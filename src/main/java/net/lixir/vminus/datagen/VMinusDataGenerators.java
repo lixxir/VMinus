@@ -4,6 +4,8 @@ import net.lixir.vminus.VMinus;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,8 +21,14 @@ public class VMinusDataGenerators {
         PackOutput packOutput = generator.getPackOutput();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+        CompletableFuture<TagsProvider.TagLookup<Block>> blockTagLookup = generator.addProvider(
+                event.includeServer(),
+                new VMinusBlockTagGenerator(packOutput, lookupProvider, existingFileHelper)
+        ).contentsGetter();
 
-        VMinusBlockTagGenerator blockTagGenerator = generator.addProvider(event.includeServer(),
-                new VMinusBlockTagGenerator(packOutput, lookupProvider, existingFileHelper));
+        generator.addProvider(
+                event.includeServer(),
+                new VMinusItemTagGenerator(packOutput, lookupProvider, blockTagLookup, existingFileHelper)
+        );
     }
 }

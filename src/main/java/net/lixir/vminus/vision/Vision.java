@@ -3,7 +3,10 @@ package net.lixir.vminus.vision;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.vision.resources.VisionManager;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
@@ -19,6 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import javax.json.Json;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -374,10 +378,6 @@ public class Vision {
 
         AbstractMap<String, Integer> visionKeyMap = visionType.getVisionKey();
         CopyOnWriteArrayList<JsonObject> visionCache = visionType.getVisionCache();
-        JsonObject mainVision = visionType.getMainVision();
-
-        if (mainVision == null) return null;
-
         /* Checking if the id is already found, if not then give -1 as the index.
             If it is not -1 then it can attempt to find a cache using that key
          */
@@ -388,6 +388,9 @@ public class Vision {
         /* Scans through the main vision and processes everything
             to figure out what applies to the current object using the given registry id.
          */
+        JsonObject mainVision = visionType.getMainVision();
+        if (mainVision == null) return null;
+
         JsonObject jsonObject = new JsonObject();
         for (String mainVisionKey : mainVision.keySet())
             jsonObject = scanVisionJsonKey(mainVision, mainVisionKey, id, jsonObject, object, context);

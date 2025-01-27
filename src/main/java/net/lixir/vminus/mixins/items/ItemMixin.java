@@ -85,9 +85,8 @@ public abstract class ItemMixin {
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemstack = new ItemStack(vminus$item);
-        JsonObject itemData = Vision.getData(itemstack);
-        if (itemData != null && itemData.has("food_properties")) {
+        JsonObject visionData = Vision.getData(vminus$item);
+        if (VisionProperties.findSearchObject(VisionProperties.Names.FOOD_PROPERTIES, visionData) != null) {
             cir.setReturnValue(true);
         }
     }
