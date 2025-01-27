@@ -15,7 +15,7 @@ classes/
 run/
 .run/
 
-src/generated/resources/.cache
+src/generated/
 
 # idea
 .idea/
