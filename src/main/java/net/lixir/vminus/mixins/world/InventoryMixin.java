@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.world;
 
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;

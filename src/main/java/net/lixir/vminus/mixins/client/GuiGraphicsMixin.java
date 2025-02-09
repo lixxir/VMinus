@@ -2,8 +2,8 @@ package net.lixir.vminus.mixins.client;
 
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -52,7 +52,7 @@ public abstract class GuiGraphicsMixin {
     @Unique
     private void vminus$renderCustomTexture(ItemStack itemstack, int x, int y) {
         GuiGraphicsAccessor accessor = (GuiGraphicsAccessor) vminus$guiGraphics;
-        JsonObject visionData = Vision.getData(itemstack);
+        JsonObject visionData = Visions.getData(itemstack);
         accessor.getPoseStack().pushPose();
         ResourceLocation customTexture = vminus$getCustomTextureForItem(itemstack);
         if (customTexture != null) {
@@ -70,7 +70,7 @@ public abstract class GuiGraphicsMixin {
 
     @Unique
     private ResourceLocation vminus$getCustomTextureForItem(ItemStack itemstack) {
-        JsonObject visionData = Vision.getData(itemstack);
+        JsonObject visionData = Visions.getData(itemstack);
         String decoString = VisionProperties.getString(visionData, "decorator", itemstack);
         if (itemstack.getTag() == null || !itemstack.getTag().getBoolean("tab_item")) {
             if (decoString != null && !decoString.isEmpty())

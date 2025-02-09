@@ -79,7 +79,6 @@ public class CapeHelper {
             CapeOwner.JACKDEDESTROYER,
             CapeOwner.HHUMANOID,
             CapeOwner.JIMBLES_JOESTAR,
-            CapeOwner.CRABCAKE,
             CapeOwner.STALLMAN1111,
             CapeOwner.VECTORV,
             CapeOwner.PONDEROSA
@@ -149,7 +148,8 @@ public class CapeHelper {
                         return true;
                 }
                 case "troll" -> {
-                    if (matchesUuid(playerUUID, CONTRIBUTORS) || DEV_NAME.equals(playerName))
+                    if (matchesUuid(playerUUID, CONTRIBUTORS)
+                            || matchesUuid(playerUUID, PHOTON_BUILDER) || DEV_NAME.equals(playerName))
                         return true;
                 }
             }

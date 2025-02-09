@@ -1,8 +1,7 @@
 package net.lixir.vminus.util;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.Vision;
-import net.minecraft.nbt.CompoundTag;
+import net.lixir.vminus.core.Visions;
 import net.minecraft.world.item.ItemStack;
 
 public class DurabilityHelper {
@@ -11,7 +10,7 @@ public class DurabilityHelper {
     }
 
     public static int getDurability(boolean max, ItemStack itemstack) {
-        JsonObject itemData = Vision.getData(itemstack);
+        JsonObject itemData = Visions.getData(itemstack);
         int maxDurability = itemstack.isDamageableItem() ? itemstack.getMaxDamage() : 0;
         int damage = itemstack.isDamageableItem() ? itemstack.getDamageValue() : 0;
         int durability = itemstack.isDamageableItem() ? maxDurability - damage : 0;

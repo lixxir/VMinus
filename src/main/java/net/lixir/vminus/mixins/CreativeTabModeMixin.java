@@ -1,10 +1,9 @@
 package net.lixir.vminus.mixins;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.vision.ItemTabData;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.util.ItemTabData;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -45,7 +44,7 @@ public abstract class CreativeTabModeMixin {
         CreativeTabModeAccessor accessor = (CreativeTabModeAccessor) vminus$creativeModeTab;
         List<ItemStack> itemsToRemove = new ArrayList<>();
         for (ItemStack itemStack : accessor.getDisplayItems()) {
-            JsonObject visionData = Vision.getData(itemStack);
+            JsonObject visionData = Visions.getData(itemStack);
             String hiddenTab = VisionProperties.getString(visionData, VisionProperties.Names.HIDDEN_TAB, itemStack);
             if (hiddenTab != null && !hiddenTab.isEmpty()) {
                 if (BuiltInRegistries.CREATIVE_MODE_TAB.get(new ResourceLocation(hiddenTab)).equals(vminus$creativeModeTab)) {
@@ -59,7 +58,7 @@ public abstract class CreativeTabModeMixin {
         accessor.getDisplayItems().removeAll(itemsToRemove);
         itemsToRemove.clear();
         for (ItemStack itemStack : accessor.getSearchItems()) {
-            JsonObject visionData = Vision.getData(itemStack);
+            JsonObject visionData = Visions.getData(itemStack);
 
             String hiddenTab = VisionProperties.getString(visionData, VisionProperties.Names.HIDDEN_TAB, itemStack);
             if (hiddenTab != null && !hiddenTab.isEmpty()) {
@@ -72,8 +71,8 @@ public abstract class CreativeTabModeMixin {
         }
         itemsToRemove.forEach(accessor.getSearchItems()::remove);
 
-        if (!Vision.ITEM_TAB_DATA.isEmpty()) {
-            for (ItemTabData data : Vision.ITEM_TAB_DATA) {
+        if (!Visions.ITEM_TAB_DATA.isEmpty()) {
+            for (ItemTabData data : Visions.ITEM_TAB_DATA) {
                 Item targetItem = data.matchItem();
                 Item item = data.item();
                 vminus$addItemsToTab(targetItem, item, data.before(), data.tabId());
@@ -81,7 +80,7 @@ public abstract class CreativeTabModeMixin {
 
 
             Map<Item, Item> waitingListCopy = new HashMap<>(WAITING_LIST);
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 1000; i++) {
                 for (Map.Entry<Item, Item> entry : waitingListCopy.entrySet()) {
                     Item item = entry.getKey();
                     Item targetItem = entry.getValue();

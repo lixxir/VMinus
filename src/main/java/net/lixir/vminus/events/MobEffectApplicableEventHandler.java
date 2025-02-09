@@ -1,8 +1,6 @@
 package net.lixir.vminus.events;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.Event;

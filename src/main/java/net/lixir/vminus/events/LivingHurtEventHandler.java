@@ -1,59 +1,71 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.util.ProtectionHelper;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.util.AttributeHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.util.ISpeedGetter;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Collection;
+import java.util.List;
 
 @Mod.EventBusSubscriber
 public class LivingHurtEventHandler {
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLivingHurt(LivingHurtEvent event) {
-        Entity entity = event.getSource().getEntity();
-        if (entity == null)
+        Entity entity = event.getEntity();
+        if (!(entity instanceof LivingEntity _entity)) {
             return;
-        if (!(entity instanceof LivingEntity _entity))
-            return;
+        }
+        CompoundTag nbt = entity.getPersistentData();
+        nbt.putDouble(VMinusAttributes.MOMENTUM_NBT_KEY, 0);
 
         DamageSource damageSource = event.getSource();
-        float amount = event.getAmount();
+        final float amount = event.getAmount();
         float damage = amount;
 
-        float modifierSum = 0.0f;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            ItemStack itemStack = _entity.getItemBySlot(slot);
-            if (!itemStack.isEmpty()) {
-                for (int i = (int) _entity.getMaxHealth(); i > _entity.getHealth(); i--) {
-                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTHLOSTSTATBOOST.get());
+        List<ProtectionConfig> protectionTypes = List.of(
+                new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/fire")),
+                new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/magic")),
+                new ProtectionConfig(VMinusAttributes.FALL_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/fall")),
+                new ProtectionConfig(VMinusAttributes.BLUNT_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/blunt"))
+        );
+
+        for (ProtectionConfig protectionConfig : protectionTypes) {
+            damage = AttributeHelper.applyProtection(damage, _entity, damageSource, protectionConfig.attribute(), protectionConfig.damageTag());
+        }
+
+        float healthBoost = 0.0f;
+
+
+
+        if (damageSource.getEntity() != null) {
+            Entity sourceEntity = damageSource.getEntity();
+            CompoundTag sourceNbt = entity.getPersistentData();
+            if (sourceNbt.contains(VMinusAttributes.MOMENTUM_NBT_KEY))
+                sourceNbt.putDouble(VMinusAttributes.MOMENTUM_NBT_KEY, sourceNbt.getDouble(VMinusAttributes.MOMENTUM_NBT_KEY)*0.5);
+            if (sourceEntity instanceof ISpeedGetter speedGetter && sourceEntity instanceof LivingEntity attacker) {
+                        if (Traits.hasTrait(attacker.getMainHandItem(), Traits.SURGE.get())) {
+                            double speed = Math.max(0, Math.sqrt(speedGetter.vminus$getSpeed()));
+                            float speedMultiplier = 1.0f + (float) ((speed / 0.15) * 0.75);
+                            damage *= Math.min(speedMultiplier, 5f);
+                        }
                 }
             }
-        }
 
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fire_protection", "vminus:protection/fire");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blast_protection", "vminus:protection/blast");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:magic_protection", "vminus:protection/magic");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:fall_protection", "vminus:protection/fall");
-        damage = ProtectionHelper.applyProtection(damage, _entity, damageSource, "vminus:blunt_protection", "vminus:protection/blast");
 
-        event.setAmount(damage + (amount * modifierSum));
+        event.setAmount(damage + (amount * healthBoost));
     }
 
-    private static float getAttributeValueFromItem(ItemStack itemStack, EquipmentSlot slot, Attribute attribute) {
-        Collection<AttributeModifier> modifiers = itemStack.getAttributeModifiers(slot).get(attribute);
-        if (modifiers != null && !modifiers.isEmpty()) {
-            return (float) modifiers.stream().mapToDouble(AttributeModifier::getAmount).sum();
-        }
-        return 0.0f;
-    }
+
+    private record ProtectionConfig(Attribute attribute, ResourceLocation damageTag) {}
 }

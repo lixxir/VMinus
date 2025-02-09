@@ -1,9 +1,6 @@
 package net.lixir.vminus.mixins;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import org.spongepowered.asm.mixin.Mixin;

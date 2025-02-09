@@ -27,7 +27,7 @@ public class BreakSpeedEventHandler {
             ItemStack itemStack = entity.getItemBySlot(slot);
             if (!itemStack.isEmpty()) {
                 for (int i = (int) entity.getMaxHealth(); i > entity.getHealth(); i--) {
-                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTHLOSTSTATBOOST.get());
+                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTH_LOST_STAT_BOOST.get());
                 }
             }
         }

@@ -11,6 +11,5 @@ public interface ItemAccessor {
     @Accessor("rarity")
     Rarity getRarity();
 
-    @Accessor("foodProperties")
-    void setFoodProperties(FoodProperties foodProperties);
+
 }

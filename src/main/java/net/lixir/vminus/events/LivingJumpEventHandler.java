@@ -21,7 +21,7 @@ public class LivingJumpEventHandler {
             if (entity.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D && entity.isSprinting()) {
                 movementSpeed = ((LivingEntity) entity).getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).getValue()
                         - ((LivingEntity) entity).getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MOVEMENT_SPEED).getBaseValue();
-                movementSpeed = movementSpeed * 5.5;
+                movementSpeed = movementSpeed * 3.5;
                 movementSpeed = movementSpeed - 0.2;
                 entity.setDeltaMovement(new Vec3((entity.getDeltaMovement().x() + entity.getLookAngle().x * movementSpeed), (entity.getDeltaMovement().y()), (entity.getDeltaMovement().z() + entity.getLookAngle().z * movementSpeed)));
             }

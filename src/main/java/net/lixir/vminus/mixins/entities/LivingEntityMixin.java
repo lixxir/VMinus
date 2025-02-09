@@ -1,14 +1,17 @@
 package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -40,6 +43,20 @@ public abstract class LivingEntityMixin {
             }
         }
     }
+
+    @Inject(method = "canFreeze", at = @At("RETURN"), cancellable = true)
+    public void canFreeze(CallbackInfoReturnable<Boolean> cir) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
+                ItemStack armorPiece = vminus$entity.getItemBySlot(slot);
+                if (Traits.hasTrait(armorPiece, Traits.INSULATED.get())) {
+                    cir.setReturnValue(Traits.getTrait(armorPiece, Traits.INSULATED.get()));
+                    return;
+                }
+            }
+        }
+    }
+
 
     @Inject(method = "tickEffects", at = @At("HEAD"), cancellable = true)
     private void tickEffects(CallbackInfo ci) {
@@ -74,7 +91,7 @@ public abstract class LivingEntityMixin {
 
         for (MobEffectInstance effectInstance : accessor.getActiveEffects().values()) {
             if (!effectInstance.getEffect().isInstantenous()) {
-                JsonObject visionData = Vision.getData(effectInstance.getEffect());
+                JsonObject visionData = Visions.getData(effectInstance.getEffect());
                 if (visionData == null || !visionData.has("particle")) {
                     i = effectInstance.getEffect().getColor();
                     flag1 = effectInstance.getEffect().getCategory() == MobEffectCategory.BENEFICIAL;
@@ -104,25 +121,27 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "isSensitiveToWater", at = @At("RETURN"), cancellable = true)
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.WATER_SENSITIVE, vminus$entity) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.WATER_SENSITIVE, vminus$entity) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.WATER_SENSITIVE, vminus$entity, cir.getReturnValue()));
     }
 
     @Inject(method = "canBreatheUnderwater", at = @At("RETURN"), cancellable = true)
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity, cir.getReturnValue()));
     }
 
     @Inject(method = "getSoundVolume", at = @At("RETURN"), cancellable = true)
     private void getSoundVolume(CallbackInfoReturnable<Float> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.VOLUME, vminus$entity) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.VOLUME, vminus$entity) != null)
             cir.setReturnValue(Math.max(0f, VisionProperties.getNumber(VisionProperties.Names.VOLUME, vminus$entity, cir.getReturnValue()).floatValue()));
     }
 
     @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
     private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.XP, vminus$entity) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.XP, vminus$entity) != null)
             cir.setReturnValue(Math.max(0, VisionProperties.getNumber(VisionProperties.Names.XP, vminus$entity, cir.getReturnValue()).intValue()));
     }
+
+
 }

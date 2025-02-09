@@ -2,8 +2,8 @@ package net.lixir.vminus.mixins.commands;
 
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -36,7 +36,7 @@ public abstract class SummonCommandMixin {
                     return SharedSuggestionProvider.suggestResource(
                             BuiltInRegistries.ENTITY_TYPE.stream()
                                     .filter(entityType -> {
-                                        JsonObject visionData = Vision.getData(entityType);
+                                        JsonObject visionData = Visions.getData(entityType);
                                         return !VisionProperties.getBoolean(visionData, "banned", entityType);
                                     }),
                             builder,

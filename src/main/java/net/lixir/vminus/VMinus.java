@@ -2,7 +2,9 @@ package net.lixir.vminus;
 
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacketHandler;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.registry.VMinusSounds;
+import net.lixir.vminus.traits.Traits;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -47,6 +49,8 @@ public class VMinus {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         VMinusSounds.SOUNDS.register(bus);
+        Traits.TRAITS.register(bus);
+        VMinusAttributes.ATTRIBUTES.register(bus);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
         registerNetworkMessages();

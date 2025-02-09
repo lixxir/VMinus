@@ -1,5 +1,7 @@
 package net.lixir.vminus.mixins.blocks;
 
+import net.lixir.vminus.traits.Trait;
+import net.lixir.vminus.traits.Traits;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -18,20 +20,17 @@ public class PowderSnowBlockMixin {
     private static void canEntityWalkOnPowderSnow(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (entity instanceof LivingEntity livingEntity) {
             ItemStack boots = livingEntity.getItemBySlot(EquipmentSlot.FEET);
-            CompoundTag tag = boots.getTag();
-            if (tag != null && tag.getBoolean("lightfooted") && !tag.getBoolean("broken")) {
-                cir.setReturnValue(true);
+            if (Traits.hasTrait(boots, Traits.LIGHTFOOTED.get())) {
+                cir.setReturnValue(Traits.getTrait(boots, Traits.LIGHTFOOTED.get()));
                 return;
             }
+
             if (livingEntity instanceof Horse horse) {
-                ItemStack chestSlot = horse.getItemBySlot(EquipmentSlot.CHEST);
-                tag = chestSlot.getTag();
-                if (tag != null && tag.getBoolean("lightfooted") && !tag.getBoolean("broken")) {
-                    cir.setReturnValue(true);
-                    return;
+                ItemStack horseArmor = horse.getItemBySlot(EquipmentSlot.CHEST);
+                if (Traits.hasTrait(horseArmor, Traits.LIGHTFOOTED.get())) {
+                    cir.setReturnValue(Traits.getTrait(boots, Traits.LIGHTFOOTED.get()));
                 }
             }
         }
-        cir.setReturnValue(false);
     }
 }

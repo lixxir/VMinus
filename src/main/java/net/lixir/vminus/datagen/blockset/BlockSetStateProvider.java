@@ -106,7 +106,7 @@ public class BlockSetStateProvider extends BlockStateProvider {
     }
 
 
-    private void blockItem(Block block) {
+    public void blockItem(Block block) {
         simpleBlockItem(block, new ModelFile.UncheckedModelFile(modId +
                 ":block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath()));
     }

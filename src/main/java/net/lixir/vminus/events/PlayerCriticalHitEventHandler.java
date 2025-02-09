@@ -29,7 +29,7 @@ public class PlayerCriticalHitEventHandler {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack itemStack = entity.getItemBySlot(slot);
             if (!itemStack.isEmpty()) {
-                modifierSum += getCritValueFromItem(itemStack, slot, VMinusAttributes.CRITICALDAMAGE.get());
+                modifierSum += getCritValueFromItem(itemStack, slot, VMinusAttributes.CRITICAL_DAMAGE.get());
             }
         }
         if (ModList.get().isLoaded("detour")) {

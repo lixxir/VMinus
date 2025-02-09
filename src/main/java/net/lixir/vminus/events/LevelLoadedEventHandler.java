@@ -1,9 +1,10 @@
 package net.lixir.vminus.events;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.ItemTabData;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.util.ItemTabData;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -25,16 +26,22 @@ public class LevelLoadedEventHandler {
 
         for (Map.Entry<ResourceKey<Item>, Item> entry : ForgeRegistries.ITEMS.getEntries()) {
             Item item = entry.getValue();
-            JsonObject visionData = Vision.getData(item);
+            JsonObject visionData = Visions.getData(item);
 
             if (VisionProperties.isHiddenInCreative(item, visionData) && !VisionProperties.isUnalteredHidden(item, visionData))
                 continue;
 
             int index = 0;
             while (true) {
-                JsonObject creativeObject = VisionProperties.findSearchObject(VisionProperties.Names.CREATIVE_ORDER, visionData, index);
-                if (creativeObject == null)
+                JsonElement creativeElement = VisionProperties.searchElement(VisionProperties.Names.CREATIVE_ORDER, visionData, item, index);
+                if (creativeElement == null)
                     break;
+                JsonObject creativeObject;
+                if (creativeElement.isJsonObject())
+                    creativeObject = creativeElement.getAsJsonObject();
+                else
+                    break;
+
 
                 index++;
                 String tabId = VisionProperties.getString(creativeObject, visionData, VisionProperties.Names.TAB, item);
@@ -54,11 +61,11 @@ public class LevelLoadedEventHandler {
 
                 boolean before = VisionProperties.getBoolean(creativeObject, visionData, VisionProperties.Names.BEFORE, item, false);
 
-                Vision.ITEM_TAB_DATA.add(new ItemTabData(item, tabId, matchItem, before));
+                Visions.ITEM_TAB_DATA.add(new ItemTabData(item, tabId, matchItem, before));
             }
 
         }
-        Collections.reverse(Vision.ITEM_TAB_DATA);
+        Collections.reverse(Visions.ITEM_TAB_DATA);
         debounce = true;
 
     }

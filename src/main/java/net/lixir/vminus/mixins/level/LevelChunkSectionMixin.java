@@ -1,14 +1,10 @@
 package net.lixir.vminus.mixins.level;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.util.DirectionHelper;
-import net.lixir.vminus.vision.Vision;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.lixir.vminus.core.Visions;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +19,7 @@ public abstract class LevelChunkSectionMixin {
     @Inject(method = "setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), cancellable = true)
     private void setBlockState(int x, int y, int z, BlockState state, boolean flag, CallbackInfoReturnable<BlockState> cir) {
         Block block = state.getBlock();
-        JsonObject visionData = Vision.getData(block);
+        JsonObject visionData = Visions.getData(block);
         // Replace takes priority over banning.
         /*
         if (visionData != null) {

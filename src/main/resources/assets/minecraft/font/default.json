@@ -2,175 +2,175 @@
    "providers": [
         {
           "type": "bitmap",
-           "file": "vminus:customunicode/attack_speed.png",
+           "file": "vminus:unicode/attack_speed.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF1" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/attack_damage.png",
+           "file": "vminus:unicode/attack_damage.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF2" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/attack_reach.png",
+           "file": "vminus:unicode/attack_reach.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF3" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/sword.png",
+           "file": "vminus:unicode/sword.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF4" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/pickaxe.png",
+           "file": "vminus:unicode/pickaxe.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF5" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/axe.png",
+           "file": "vminus:unicode/axe.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF6" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/shovel.png",
+           "file": "vminus:unicode/shovel.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF7" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/hoe.png",
+           "file": "vminus:unicode/hoe.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uFFF8" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/helmet.png",
+           "file": "vminus:unicode/helmet.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF1" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/chestplate.png",
+           "file": "vminus:unicode/chestplate.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF2" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/leggings.png",
+           "file": "vminus:unicode/leggings.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF3" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/boots.png",
+           "file": "vminus:unicode/boots.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF4" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/horse_armor.png",
+           "file": "vminus:unicode/horse_armor.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF5" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/bow.png",
+           "file": "vminus:unicode/bow.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF6" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/crossbow.png",
+           "file": "vminus:unicode/crossbow.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF7" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/fishing_rod.png",
+           "file": "vminus:unicode/fishing_rod.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF8" ]
        },
             {
           "type": "bitmap",
-           "file": "vminus:customunicode/repeater.png",
+           "file": "vminus:unicode/repeater.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF9" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/anvil.png",
+           "file": "vminus:unicode/anvil.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE0" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/rune.png",
+           "file": "vminus:unicode/rune.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE1" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/reinforced.png",
+           "file": "vminus:unicode/reinforced.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE2" ]
        },
          {
           "type": "bitmap",
-           "file": "vminus:customunicode/critical_damage.png",
+           "file": "vminus:unicode/critical_damage.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE3" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/fire_protection.png",
+           "file": "vminus:unicode/fire_protection.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE4" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/blast_protection.png",
+           "file": "vminus:unicode/blast_protection.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE5" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/magic_protection.png",
+           "file": "vminus:unicode/magic_protection.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE6" ]
        },
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/fall_protection.png",
+           "file": "vminus:unicode/fall_protection.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE7" ]
@@ -178,140 +178,140 @@
      
           {
           "type": "bitmap",
-           "file": "vminus:customunicode/speed.png",
+           "file": "vminus:unicode/speed.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFE9" ]
        },
              {
           "type": "bitmap",
-           "file": "vminus:customunicode/armor_toughness.png",
+           "file": "vminus:unicode/armor_toughness.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEFF0" ]
        },
                     {
           "type": "bitmap",
-           "file": "vminus:customunicode/knockback_resistance.png",
+           "file": "vminus:unicode/knockback_resistance.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE0" ]
        },
                     {
           "type": "bitmap",
-           "file": "vminus:customunicode/luck.png",
+           "file": "vminus:unicode/luck.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE1" ]
        },
                    {
           "type": "bitmap",
-           "file": "vminus:customunicode/health.png",
+           "file": "vminus:unicode/health.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE2" ]
        },
                   {
           "type": "bitmap",
-           "file": "vminus:customunicode/jump_strength.png",
+           "file": "vminus:unicode/jump_strength.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE3" ]
        },
                      {
           "type": "bitmap",
-           "file": "vminus:customunicode/inspect.png",
+           "file": "vminus:unicode/inspect.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE4" ]
        },
                   {
           "type": "bitmap",
-           "file": "vminus:customunicode/inspect_held.png",
+           "file": "vminus:unicode/inspect_held.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE5" ]
        },
                          {
           "type": "bitmap",
-           "file": "vminus:customunicode/shimmered.png",
+           "file": "vminus:unicode/shimmered.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE6" ]
        },
             {
           "type": "bitmap",
-           "file": "vminus:customunicode/inspect_bauble.png",
+           "file": "vminus:unicode/inspect_bauble.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE7" ]
        },
             {
           "type": "bitmap",
-           "file": "vminus:customunicode/shield.png",
+           "file": "vminus:unicode/shield.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE8" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/saturation.png",
+           "file": "vminus:unicode/saturation.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEEE9" ]
        },
             {
           "type": "bitmap",
-           "file": "vminus:customunicode/hunger.png",
+           "file": "vminus:unicode/hunger.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF0E" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/fast_hunger_shank.png",
+           "file": "vminus:unicode/fast_hunger_shank.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF1E" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/slow_hunger_shank.png",
+           "file": "vminus:unicode/slow_hunger_shank.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF2E" ]
        },
            {
           "type": "bitmap",
-           "file": "vminus:customunicode/eating_duration.png",
+           "file": "vminus:unicode/eating_duration.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF3E" ]
        },
                   {
           "type": "bitmap",
-           "file": "vminus:customunicode/effect.png",
+           "file": "vminus:unicode/effect.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF4E" ]
        },
                   {
           "type": "bitmap",
-           "file": "vminus:customunicode/bad_effect.png",
+           "file": "vminus:unicode/bad_effect.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF5E" ]
        },
                 {
           "type": "bitmap",
-           "file": "vminus:customunicode/block_reach.png",
+           "file": "vminus:unicode/block_reach.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF6E" ]
        },
                 {
           "type": "bitmap",
-           "file": "vminus:customunicode/mob_detection_range.png",
+           "file": "vminus:unicode/mob_detection_range.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF7E" ]
@@ -319,24 +319,40 @@
        
                 {
           "type": "bitmap",
-           "file": "vminus:customunicode/luminance.png",
+           "file": "vminus:unicode/luminance.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF8E" ]
        },
                  {
           "type": "bitmap",
-           "file": "vminus:customunicode/stat_boost_health_lost.png",
+           "file": "vminus:unicode/stat_boost_health_lost.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF9E" ]
        },
                   {
           "type": "bitmap",
-           "file": "vminus:customunicode/death_durability.png",
+           "file": "vminus:unicode/death_durability.png",
            "ascent": 8,
            "height": 9,
            "chars": [ "\uEF01" ]
-       }
+       },
+     {
+       "type": "bitmap",
+       "file": "vminus:unicode/momentum.png",
+       "ascent": 8,
+       "height": 9,
+       "chars": [ "\uEF02" ]
+     },
+     {
+       "type": "bitmap",
+       "file": "vminus:unicode/translucence.png",
+       "ascent": 8,
+       "height": 9,
+       "chars": [
+         "\uEF03"
+       ]
+     }
    ]
 }

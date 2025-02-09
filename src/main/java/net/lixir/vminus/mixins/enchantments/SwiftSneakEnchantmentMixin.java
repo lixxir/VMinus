@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.enchantments;
 
-import net.lixir.vminus.vision.util.EnchantmentVisionHelper;
+import net.lixir.vminus.core.util.EnchantmentVisionHelper;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.SwiftSneakEnchantment;
 import org.spongepowered.asm.mixin.Mixin;

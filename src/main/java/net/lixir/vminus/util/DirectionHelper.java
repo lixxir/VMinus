@@ -7,25 +7,6 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 
 public class DirectionHelper {
-    public static Direction getDirectionFromString(String directionString) {
-        switch (directionString.toLowerCase()) {
-            case "up":
-                return Direction.UP;
-            case "down":
-                return Direction.DOWN;
-            case "north":
-                return Direction.NORTH;
-            case "south":
-                return Direction.SOUTH;
-            case "west":
-                return Direction.WEST;
-            case "east":
-                return Direction.EAST;
-            default:
-                return null;
-        }
-    }
-
     public static BlockState applyDirectionToBlockState(BlockState state, Direction direction) {
         Property<?> property = state.getBlock().getStateDefinition().getProperty("facing");
         if (property instanceof DirectionProperty directionProperty && directionProperty.getPossibleValues().contains(direction)) {

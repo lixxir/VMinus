@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.client;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +33,7 @@ public abstract class ClientPacketListenerMixin {
 
         if (entity instanceof ItemEntity itemEntity) {
             ItemStack itemStack = itemEntity.getItem();
-            JsonObject visionData = Vision.getData(itemStack);
+            JsonObject visionData = Visions.getData(itemStack);
             String soundString = VisionProperties.getString(visionData, "pick_up_sound", itemStack);
             if (soundString != null && !soundString.isEmpty()) {
                 ResourceLocation resourceLocation = new ResourceLocation(soundString);

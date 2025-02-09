@@ -1,15 +1,19 @@
 package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.core.conditions.VisionConditionArguments;
+import net.lixir.vminus.core.util.VisionAttribute;
+import net.lixir.vminus.core.visions.ItemVision;
+import net.lixir.vminus.core.visions.visionable.IItemVisionable;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
-import net.minecraft.nbt.CompoundTag;
+import net.lixir.vminus.traits.Trait;
+import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -17,15 +21,11 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,32 +38,24 @@ public class ItemAttributeEventHandler {
     @SubscribeEvent
     public static void addAttributeModifier(ItemAttributeModifierEvent event) {
         ItemStack itemStack = event.getItemStack();
-        String itemId = ForgeRegistries.ITEMS.getKey(itemStack.getItem()).toString();
-        JsonObject visionData = Vision.getData(itemStack);
+        Item item = itemStack.getItem();
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
+        if (item instanceof IItemVisionable iItemVisionable) {
+            ItemVision itemVision = iItemVisionable.vminus$getVision();
+            List<VisionAttribute> visionAttributes = itemVision.attribute.getValues(new VisionConditionArguments.Builder().passItemStack(itemStack).build());
 
-        if (visionData != null) {
-            int index = 0;
-            while (true) {
 
-                JsonObject attributeObject = VisionProperties.findSearchObject(VisionProperties.Names.ATTRIBUTE, visionData, index);
-                if (attributeObject == null)
-                    break;
-                index++;
-                String id = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.ID, itemStack);
-                if (id == null)
-                    continue;
-
-                boolean replace = VisionProperties.getBoolean(attributeObject, visionData, VisionProperties.Names.REPLACE, itemStack, false);
-                boolean remove = VisionProperties.getBoolean(attributeObject, visionData, VisionProperties.Names.REMOVE, itemStack, false);
+            for (VisionAttribute visionAttribute : visionAttributes) {
+                boolean replace = visionAttribute.replace();
+                boolean remove = visionAttribute.remove();
 
                 if (replace || remove) {
                     Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
                     for (Attribute a : originalModifiers.keySet()) {
                         for (AttributeModifier modifier : originalModifiers.get(a)) {
-                            String modifierId = ForgeRegistries.ATTRIBUTES.getKey(a).toString();
-                            if (modifierId.equals(id)) {
+                            String modifierId = Objects.requireNonNull(ForgeRegistries.ATTRIBUTES.getKey(a)).toString();
+                            if (modifierId.equals(visionAttribute.id())) {
                                 event.removeModifier(a, modifier);
                             }
                         }
@@ -71,68 +63,54 @@ public class ItemAttributeEventHandler {
                     if (remove)
                         continue;
                 }
-
-                String operationId = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.OPERATION, itemStack);
-                AttributeModifier.Operation operation = getOperation(operationId);
-
-                Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(id));
-
-                if (attribute != null) {
-                    String compositeId = itemId + "|" + id  + "|" + operation;
-
-                    UUID uuid = UUID_CACHE.computeIfAbsent(compositeId, k -> UUID.randomUUID());
-                    EquipmentSlot slot = EquipmentSlot.MAINHAND;
-                    String slotId = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.SLOT, itemStack);
-                    if (slotId != null && !slotId.isEmpty()) {
-                        slot = EquipmentSlot.valueOf(slotId.toUpperCase());
-                    } else if (itemStack.getItem() instanceof Equipable equipable) {
-                        slot = equipable.getEquipmentSlot();
+                EquipmentSlot equipmentSlot = visionAttribute.equipmentSlot();
+                if (equipmentSlot == null) {
+                    if (item instanceof Equipable equipable) {
+                        equipmentSlot = equipable.getEquipmentSlot();
+                    } else {
+                        equipmentSlot = EquipmentSlot.MAINHAND;
                     }
-                    if (eventSlot != slot) {
-                        continue;
-                    }
-
-                    String name = VisionProperties.getString(attributeObject, visionData, VisionProperties.Names.NAME, itemStack, id);
-                    if (name == null) {
-                        if (id.contains(".")) {
-                            name = id.substring(id.indexOf(".") + 1);
-                        } else if (id.contains(":")) {
-                            name = id.substring(id.indexOf(":") + 1);
-                        }
-                        if (name != null)
-                            name = name.replaceAll("_", " ");
-                    }
-                    if (name == null)
-                        continue;
-
-                    double value = VisionProperties.getNumber(attributeObject, visionData, VisionProperties.Names.VALUE, itemStack).doubleValue();
-
-                    AttributeModifier modifier = new AttributeModifier(uuid, name, value, operation);
-                    boolean found = false;
-                    for (Attribute a : event.getModifiers().keySet()) {
-                        Collection<AttributeModifier> attributeModifiers = event.getModifiers().get(a);
-                        for (AttributeModifier m : attributeModifiers) {
-                            if (m.equals(modifier)) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                            break;
-                    }
-                    if (found)
-                        continue;
-                    if (id.equals("vminus:mining_speed"))
-                        miningFlag = true;
-                    event.addModifier(attribute, modifier);
                 }
+                if (eventSlot == equipmentSlot)
+                    event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
             }
         }
 
+
+        /*
+            index = 0;
+            while (true) {
+                String traitId = VisionProperties.getString(visionData, VisionProperties.Names.TRAIT, itemStack, index);
+                if (traitId == null)
+                    break;
+                index++;
+                if (!traitId.contains("="))
+                    continue;
+                String validId = traitId.substring(0, traitId.indexOf('='));
+                boolean value;
+                if (traitId.endsWith("true")) {
+                    value = true;
+                } else  if (traitId.endsWith("false")) {
+                    value = false;
+                } else {
+                    continue;
+                }
+
+                Trait trait = Traits.TRAIT_REGISTRY.get().getValue(new ResourceLocation(validId));
+                if (trait == null)
+                    continue;
+                if (!Traits.hasTrait(itemStack, trait))
+                    Traits.setTrait(itemStack, trait, value);
+            }
+
+
+         */
         if (eventSlot == EquipmentSlot.MAINHAND) {
 
             handleMiningAttributes(event, itemStack, miningFlag);
         }
+
+
     }
 
     private static void handleMiningAttributes(ItemAttributeModifierEvent event, ItemStack itemStack, boolean miningFlag) {
@@ -140,13 +118,13 @@ public class ItemAttributeEventHandler {
         if (efficiencyLevel > 0) {
             double miningSpeedValue = efficiencyLevel * efficiencyLevel + 1;
             AttributeModifier miningSpeedModifier = new AttributeModifier(UUID.fromString("83e34d00-65ae-11ef-814d-325096b39f47"), "Efficiency Mining Speed", miningSpeedValue, AttributeModifier.Operation.ADDITION);
-            event.addModifier(VMinusAttributes.MININGSPEED.get(), miningSpeedModifier);
+            event.addModifier(VMinusAttributes.MINING_SPEED.get(), miningSpeedModifier);
         }
         if (itemStack.getItem() instanceof TieredItem tieredItem) {
             if (!miningFlag) {
                 double tierMiningSpeed = tieredItem.getTier().getSpeed();
                 AttributeModifier tierMiningSpeedModifier = new AttributeModifier(UUID.fromString("e14d7c20-65ae-11ef-814d-325096b39f47"), "Tier Mining Speed", tierMiningSpeed, AttributeModifier.Operation.ADDITION);
-                event.addModifier(VMinusAttributes.MININGSPEED.get(), tierMiningSpeedModifier);
+                event.addModifier(VMinusAttributes.MINING_SPEED.get(), tierMiningSpeedModifier);
             }
         }
     }

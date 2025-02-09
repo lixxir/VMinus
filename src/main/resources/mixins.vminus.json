@@ -53,6 +53,7 @@
     "entities.ItemEntityMixin",
     "entities.LivingEntityAccessor",
     "entities.LivingEntityMixin",
+    "entities.LookAtPlayerGoalMixin",
     "entities.PlayerMixin",
     "entities.SlimeMixin",
     "items.BowlFoodItemMixin",
@@ -105,7 +106,10 @@
     "client.entityrenderers.SlimeRendererMixin",
     "client.entityrenderers.SpiderRendererMixin",
     "client.entityrenderers.SquidRendererMixin",
-    "items.ItemPredicateBuilderMixin"
+    "client.renderer.EntityRenderDispatcherMixin",
+    "client.renderer.HumanoidArmorLayerMixin",
+    "client.renderer.LivingEntityRendererMixin",
+    "client.renderer.PlayerEntityRendererMixin",
   ],
   "minVersion": "0.8"
 }

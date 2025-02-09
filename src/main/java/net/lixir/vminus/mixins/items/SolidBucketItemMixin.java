@@ -23,6 +23,8 @@ public abstract class SolidBucketItemMixin extends BlockItem {
     private void useOn(UseOnContext context, CallbackInfoReturnable<InteractionResult> cir) {
         Player player = context.getPlayer();
         ItemStack itemStack = context.getItemInHand();
+        if (itemStack.getMaxStackSize() == 1)
+            return;
         InteractionResult interactionResult = super.useOn(context);
         if (interactionResult.consumesAction() && player != null && !player.isCreative()) {
             ItemStack emptyBucket = new ItemStack(Items.BUCKET);

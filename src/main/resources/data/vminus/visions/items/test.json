@@ -1,0 +1,7 @@
+{
+  "item": "bread",
+  "food": {
+    "nutrition": 4,
+    "saturation": 0
+  }
+}

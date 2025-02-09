@@ -3,15 +3,20 @@ package net.lixir.vminus.mixins.items;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.IconHandler;
-import net.lixir.vminus.VMinus;
 import net.lixir.vminus.VMinusConfig;
+import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.conditions.VisionConditionArguments;
+import net.lixir.vminus.core.util.EnchantmentVisionHelper;
+import net.lixir.vminus.core.util.VisionFoodProperties;
+import net.lixir.vminus.core.visions.ItemVision;
+import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.traits.Trait;
+import net.lixir.vminus.traits.Traits;
 import net.lixir.vminus.util.DurabilityHelper;
 import net.lixir.vminus.util.EnchantAndCurseHelper;
-import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.util.EnchantmentVisionHelper;
+import net.lixir.vminus.util.IconHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -25,21 +30,21 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LightBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.extensions.IForgeItemStack;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
@@ -54,53 +59,72 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 @Mixin(ItemStack.class)
-public abstract class ItemStackMixin {
+public abstract class ItemStackMixin implements IForgeItemStack {
     @Unique
     private final ItemStack vminus$itemStack = (ItemStack) (Object) this;
 
-    @Inject(method = "hurt", at = @At(value = "RETURN"), cancellable = true)
-    public void vminus$hurt(int i, RandomSource random, ServerPlayer player, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) {
-            JsonObject visionData = Vision.getData(vminus$itemStack);
-            String replaceId = VisionProperties.getString(VisionProperties.Names.BREAK_REPLACEMENT, visionData, VisionProperties.Names.ID, vminus$itemStack);
-            if (replaceId != null && !replaceId.isEmpty()) {
-                final ItemStack findItem = vminus$itemStack;
-                CompoundTag tag = findItem.getOrCreateTag();
-                ItemStack replacementStack = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(replaceId))));
-                int slotIndex = player.getInventory().findSlotMatchingItem(findItem);
-                if (slotIndex == -1) {
-                    for (int j = 0; j < player.getInventory().armor.size(); j++) {
-                        if (player.getInventory().armor.get(j).equals(findItem)) {
-                            slotIndex = 100 + j;
-                            break;
-                        }
-                    }
-                }
-                if (slotIndex == -1) {
-                    if (player.getInventory().offhand.get(0).equals(findItem)) {
-                        slotIndex = 150;
-                    }
-                }
-                player.awardStat(Stats.ITEM_BROKEN.get(findItem.getItem()));
-                if (slotIndex != -1) {
-                    if (VisionProperties.getBoolean(VisionProperties.Names.BREAK_REPLACEMENT, visionData, VisionProperties.Names.CARRY_NBT, vminus$itemStack)) {
-                        replacementStack.setTag(tag);
-                    }
-                    if (slotIndex < 100) {
-                        player.getInventory().setItem(slotIndex, replacementStack);
-                    } else if (slotIndex < 150) {
-                        player.getInventory().armor.set(slotIndex - 100, replacementStack);
-                    } else {
-                        player.getInventory().offhand.set(0, replacementStack);
-                    }
-                } else {
-                    vminus$itemStack.shrink(1);
-                }
-                cir.setReturnValue(false);
-                cir.cancel();
-            }
-        }
+    @Unique
+    private ItemVision vminus$itemVision = null;
+
+    @Inject(method = "shouldShowInTooltip", at = @At(value = "HEAD"), cancellable = true)
+    private static void vminus$shouldShowInTooltip(int p_41627_, ItemStack.TooltipPart p_41628_, CallbackInfoReturnable<Boolean> cir) {
+        if (!VMinusConfig.TOOLTIP_REWORK.get())
+            return;
+        cir.setReturnValue(true);
+        cir.cancel();
     }
+
+    @Inject(method = "appendEnchantmentNames", at = @At(value = "HEAD"), cancellable = true)
+    private static void appendEnchantmentNames(List<Component> enchantmentList, ListTag enchantments, CallbackInfo ci) {
+        if (!VMinusConfig.TOOLTIP_REWORK.get())
+            return;
+        for (int i = 0; i < enchantments.size(); ++i) {
+            CompoundTag compoundTag = enchantments.getCompound(i);
+            // MutableComponent iconComponent = Component.literal(" " + IconHandler.getIcon("effect")).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
+            BuiltInRegistries.ENCHANTMENT.getOptional(EnchantmentHelper.getEnchantmentId(compoundTag)).ifPresent((enchantment) -> {
+                enchantmentList.add(Component.literal(" ").append(enchantment.getFullname(EnchantmentHelper.getEnchantmentLevel(compoundTag))));
+            });
+        }
+        ci.cancel();
+    }
+
+    @Unique
+    public ItemVision vminus$getVision() {
+        if (vminus$itemStack.getItem() instanceof IItemVisionable iItemVisionable) {
+            return iItemVisionable.vminus$getVision();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean makesPiglinsNeutral(LivingEntity wearer) {
+        if (Traits.hasTrait(vminus$itemStack, Traits.PIGLIN_CHARM.get()))
+            return (Traits.getTrait(vminus$itemStack, Traits.PIGLIN_CHARM.get()));
+        return vminus$itemStack.getItem().makesPiglinsNeutral(vminus$itemStack, wearer);
+    }
+
+    @Override
+    public int getBurnTime(@org.jetbrains.annotations.Nullable RecipeType<?> recipeType) {
+        Integer value = vminus$getVision().fuelTime.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) return value;
+        return vminus$itemStack.getItem().getBurnTime(vminus$itemStack, recipeType);
+    }
+
+
+    @Override
+    public EquipmentSlot getEquipmentSlot() {
+        EquipmentSlot value = vminus$getVision().equipSlot.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) return value;
+        return vminus$itemStack.getItem().getEquipmentSlot(vminus$itemStack);
+    }
+
+    @Override
+    public boolean canEquip(EquipmentSlot armorType, Entity entity) {
+        Boolean value = vminus$getVision().canEquip.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
+        if (value != null) return value;
+        return vminus$itemStack.getItem().canEquip(vminus$itemStack, armorType, entity);
+    }
+
 
     @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
     public void getBarWidth(CallbackInfoReturnable<Integer> cir) {
@@ -117,6 +141,7 @@ public abstract class ItemStackMixin {
                 cir.setReturnValue(Math.min(barWidth, 13));
             });
         }
+        /*
         if (vminus$itemStack.hasTag() && vminus$itemStack.getTag().contains("reinforcement")) {
             float durabilityRatio = (float) vminus$itemStack.getTag().getInt("reinforcement") / (float) vminus$itemStack.getTag().getInt("max_reinforcement");
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
@@ -126,12 +151,14 @@ public abstract class ItemStackMixin {
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
         }
+
+         */
     }
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
     public void getBarColor(CallbackInfoReturnable<Integer> cir) {
         /*
-        JsonObject itemData = Vision.getData(vminus$itemStack);
+        JsonObject itemData = Visions.getData(vminus$itemStack);
         if (itemData != null && itemData.has("bar")) {
             int startColor = 4384126;
             int endColor = 2186818;
@@ -206,7 +233,9 @@ public abstract class ItemStackMixin {
         }
         ItemStack itemstack = (ItemStack) (Object) this;
         CompoundTag tag = itemstack.getOrCreateTag();
-        int enchLimit = tag.contains("enchantment_limit") ? tag.getInt("enchantment_limit") : 999;
+        if (!tag.contains("enchantment_limit"))
+            return;
+        int enchantmentLimit = tag.getInt("enchantment_limit");
         double currentTotalEnchantmentLevel = 0.0;
         if (itemstack.isEnchanted()) {
             Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(itemstack);
@@ -214,11 +243,11 @@ public abstract class ItemStackMixin {
                 currentTotalEnchantmentLevel += entry.getValue();
             }
         }
-        if (currentTotalEnchantmentLevel + level > enchLimit)
+        if (currentTotalEnchantmentLevel + level > enchantmentLimit)
             ci.cancel();
     }
 
-    @Inject(method = "isBarVisible", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isBarVisible", at = @At("RETURN"), cancellable = true)
     public void isBarVisible(CallbackInfoReturnable<Boolean> cir) {
         if (vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:containers")))) {
             vminus$itemStack.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(capability -> {
@@ -232,6 +261,7 @@ public abstract class ItemStackMixin {
                 cir.setReturnValue(hasItems);
             });
         }
+        /*
         if (vminus$itemStack.hasTag() && vminus$itemStack.getTag().contains("reinforcement")) {
             if (vminus$itemStack.getTag().getInt("reinforcement") < vminus$itemStack.getTag().getInt("max_reinforcement")) {
                 cir.setReturnValue(true);
@@ -239,104 +269,58 @@ public abstract class ItemStackMixin {
         } else if (DurabilityHelper.getDurability(vminus$itemStack) < DurabilityHelper.getDurability(true, vminus$itemStack)) {
             cir.setReturnValue(true);
         }
+
+         */
     }
 
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.DURABILITY, vminus$itemStack) != null)
-            cir.setReturnValue(Math.max(0,VisionProperties.getNumber(VisionProperties.Names.DURABILITY, vminus$itemStack, cir.getReturnValue()).intValue()));
+        Integer value = vminus$getVision().maxDamage.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.DAMAGEABLE, vminus$itemStack) != null)
-            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.DAMAGEABLE, vminus$itemStack, cir.getReturnValue()));
+        Boolean value = vminus$getVision().damageable.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(value);
     }
 
-    @Inject(method = "isEnchantable", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isEnchantable", at = @At("RETURN"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.ENCHANTABLE, vminus$itemStack) != null)
-            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.ENCHANTABLE, vminus$itemStack, cir.getReturnValue()));
+        Boolean value = vminus$getVision().enchantable.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(value);
     }
 
-    @Inject(method = "isEdible", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        JsonObject itemData = Vision.getData(vminus$itemStack);
-        if (itemData != null && itemData.has("food_properties")) {
-            cir.setReturnValue(true);
-        }
+        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(true);
     }
 
     @Inject(method = "getDrinkingSound", at = @At("RETURN"), cancellable = true)
     private void getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = Vision.getData(vminus$itemStack);
-        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.EAT_SOUND, vminus$itemStack);
-        if (burpSound != null && !burpSound.isEmpty()) {
-            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
-            cir.setReturnValue(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation));
-        }
+        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null && value.getEatSound() != null)
+            cir.setReturnValue(value.getEatSound());
     }
 
     @Inject(method = "hasFoil", at = @At("RETURN"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.GLINT, vminus$itemStack) != null)
-            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.GLINT, vminus$itemStack, cir.getReturnValue()));
+        Boolean value = vminus$getVision().hasGlint.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getEatingSound", at = @At("RETURN"), cancellable = true)
     private void getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        JsonObject visionData = Vision.getData(vminus$itemStack);
-        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.EAT_SOUND, vminus$itemStack);
-        if (burpSound != null && !burpSound.isEmpty()) {
-            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
-            cir.setReturnValue(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation));
-        }
+        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null && value.getEatSound() != null)
+            cir.setReturnValue(value.getEatSound());
     }
 
-    @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.USE_DURATION, vminus$itemStack) != null)
-            cir.setReturnValue(Math.max(0,VisionProperties.getNumber(VisionProperties.Names.USE_DURATION, vminus$itemStack, cir.getReturnValue()).intValue()));
-    }
-
-    @Unique
-    private int vminus$rgbToColor(float red, float green, float blue) {
-        int r = Math.round(red * 255);
-        int g = Math.round(green * 255);
-        int b = Math.round(blue * 255);
-        return (r << 16) | (g << 8) | b;
-    }
-
-    @Unique
-    private int vminus$interpolateColor(int startColor, int endColor, float ratio) {
-        int r1 = (startColor >> 16) & 0xFF;
-        int g1 = (startColor >> 8) & 0xFF;
-        int b1 = startColor & 0xFF;
-        int r2 = (endColor >> 16) & 0xFF;
-        int g2 = (endColor >> 8) & 0xFF;
-        int b2 = endColor & 0xFF;
-        int r = Math.max(0, Math.min(255, (int) (r1 + (r2 - r1) * ratio)));
-        int g = Math.max(0, Math.min(255, (int) (g1 + (g2 - g1) * ratio)));
-        int b = Math.max(0, Math.min(255, (int) (b1 + (b2 - b1) * ratio)));
-        return (r << 16) | (g << 8) | b;
-    }
-
-    @Inject(method = "shouldShowInTooltip", at = @At(value = "HEAD"), cancellable = true)
-    private static void vminus$shouldShowInTooltip(int p_41627_, ItemStack.TooltipPart p_41628_, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(true);
-        cir.cancel();
-    }
-
-    @Inject(method = "appendEnchantmentNames", at = @At(value = "HEAD"), cancellable = true)
-    private static void appendEnchantmentNames(List<Component> enchantmentList, ListTag enchantments, CallbackInfo ci) {
-        for (int i = 0; i < enchantments.size(); ++i) {
-            CompoundTag compoundTag = enchantments.getCompound(i);
-            // MutableComponent iconComponent = Component.literal(" " + IconHandler.getIcon("effect")).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE));
-            BuiltInRegistries.ENCHANTMENT.getOptional(EnchantmentHelper.getEnchantmentId(compoundTag)).ifPresent((enchantment) -> {
-                enchantmentList.add(Component.literal(" ").append(enchantment.getFullname(EnchantmentHelper.getEnchantmentLevel(compoundTag))));
-            });
-        }
-        ci.cancel();
+        Integer value = vminus$getVision().useDuration.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getTooltipLines", at = @At(value = "HEAD"), cancellable = true)
@@ -349,7 +333,7 @@ public abstract class ItemStackMixin {
 
         List<Component> list = cir.getReturnValue() != null ? cir.getReturnValue() : Lists.newArrayList();
 
-        JsonObject itemData = Vision.getData(vminus$itemStack);
+        JsonObject itemData = Visions.getData(vminus$itemStack);
 
         CompoundTag tag = vminus$itemStack.getTag();
 
@@ -442,16 +426,17 @@ public abstract class ItemStackMixin {
                 });
             }
         }
-        if (item instanceof BlockItem) {
-            Block block = ((BlockItem) item).getBlock();
-            if (!(block instanceof LightBlock)) {
-                BlockState blockState = block.defaultBlockState();
-                int light = blockState.getLightEmission();
-                if (light > 0)
-                    list.add(Component.literal(" " + IconHandler.getIcon("luminance") + IconHandler.getIcon("blueColor") + " " + light + " Luminance"));
+        List<Component> tempList = new ArrayList<>();
+
+        for (Trait trait : Traits.getTraits(vminus$itemStack)) {
+            if (!trait.isHidden()) {
+                MutableComponent mutableComponent = Component.literal(" ");
+                mutableComponent.append(Component.translatable("trait." + trait.getNamespace() + "." + trait.getName()).withStyle(ChatFormatting.BLUE));
+                list.add(mutableComponent);
             }
         }
-        List<Component> tempList = new ArrayList<>();
+
+
         for (Map.Entry<EquipmentSlot, Map<Attribute, AttributeModifier>> entry : mergedAttributes.entrySet()) {
             EquipmentSlot slot = entry.getKey();
             Map<Attribute, AttributeModifier> attributes = entry.getValue();
@@ -530,7 +515,7 @@ public abstract class ItemStackMixin {
                     }
                     if (modifierComponent != null) {
                         Boolean dontRenderAttribute = false;
-                        if (attribute == VMinusAttributes.MININGSPEED.get() && vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:tooltip/hide_mining_speed"))))
+                        if (attribute == VMinusAttributes.MINING_SPEED.get() && vminus$itemStack.is(ItemTags.create(new ResourceLocation("vminus:tooltip/hide_mining_speed"))))
                             dontRenderAttribute = true;
                         if (!dontRenderAttribute) {
                             tempList.add(iconComponent.append(modifierComponent));
@@ -660,7 +645,6 @@ public abstract class ItemStackMixin {
             if (player != null && player.getAbilities().instabuild) {
                 list.add((Component.literal(ForgeRegistries.ITEMS.getKey(vminus$itemStack.getItem()).toString())).withStyle(ChatFormatting.DARK_GRAY));
                 if (vminus$itemStack.hasTag()) {
-                    list.add(Component.translatable("item.nbt_tags", vminus$itemStack.getTag().getAllKeys().size()).withStyle(ChatFormatting.DARK_GRAY));
                     if (tag != null) {
                         String json = tag.toString();
                         Component nbtText = Component.literal(json).withStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY));

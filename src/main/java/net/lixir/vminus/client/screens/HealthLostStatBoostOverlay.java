@@ -36,7 +36,7 @@ public class HealthLostStatBoostOverlay {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 ItemStack itemStack = entity.getItemBySlot(slot);
                 if (!itemStack.isEmpty()) {
-                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTHLOSTSTATBOOST.get());
+                    modifierSum += getAttributeValueFromItem(itemStack, slot, VMinusAttributes.HEALTH_LOST_STAT_BOOST.get());
                 }
             }
             if (modifierSum > 0) {

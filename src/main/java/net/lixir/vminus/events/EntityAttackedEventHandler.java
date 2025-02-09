@@ -2,8 +2,8 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -124,7 +124,7 @@ public class EntityAttackedEventHandler {
                         for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
                             Enchantment enchantment = entry.getKey();
                             // getting the vision data from the enchantment
-                            JsonObject visionData = Vision.getData(enchantment);
+                            JsonObject visionData = Visions.getData(enchantment);
                             if (visionData != null) {
                                 if (visionData.has("particle")) {
                                     // getting the string and resource location to add to the particle list

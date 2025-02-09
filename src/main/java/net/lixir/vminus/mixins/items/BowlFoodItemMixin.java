@@ -14,14 +14,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BowlFoodItem.class)
 public class BowlFoodItemMixin {
     @Inject(method = "finishUsingItem", at = @At("HEAD"), cancellable = true)
-    public void vminus$finishUsingItem(ItemStack stack, Level p_40685_, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
+    public void vminus$finishUsingItem(ItemStack itemStack, Level p_40685_, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
+        if (itemStack.getMaxStackSize() == 1)
+            return;
         if (entity instanceof Player player && !player.getAbilities().instabuild) {
-            stack.shrink(1);
+            itemStack.shrink(1);
             ItemStack bowl = new ItemStack(Items.BOWL);
             if (!player.getInventory().add(bowl)) {
                 player.drop(bowl, false);
             }
         }
-        cir.setReturnValue(stack);
+        cir.setReturnValue(itemStack);
     }
 }

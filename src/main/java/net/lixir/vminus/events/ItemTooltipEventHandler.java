@@ -1,8 +1,8 @@
 package net.lixir.vminus.events;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.IconHandler;
-import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.util.IconHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -35,6 +35,7 @@ public class ItemTooltipEventHandler {
             boolean inspectable = false;
             int inspectNum = 1;
             boolean altDown = Screen.hasAltDown();
+            boolean shiftDown = Screen.hasShiftDown();
             String inspectStart = IconHandler.getIcon("inspect_bauble") + IconHandler.getIcon("darkGreenColor");
             while (true) {
                 String validInspect = itemId.replaceAll(":", ".");
@@ -51,13 +52,14 @@ public class ItemTooltipEventHandler {
                 }
                 inspectNum++;
             }
-            if (inspectable) {
-                if (!altDown) {
-                    tooltip.add(Component.literal("§9[ALT" + IconHandler.getIcon("inspect") + "§9]"));
-                } else {
-                    tooltip.add(Component.literal("§8[ALT" + IconHandler.getIcon("inspect_held") + "§8]"));
+
+                if (shiftDown && inspectable) {
+                    if (!altDown) {
+                        tooltip.add(Component.literal("§9[ALT" + IconHandler.getIcon("inspect") + "§9]"));
+                    } else {
+                        tooltip.add(Component.literal("§8[ALT" + IconHandler.getIcon("inspect_held") + "§8]"));
+                    }
                 }
-            }
         }
     }
 }

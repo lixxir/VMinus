@@ -28,6 +28,8 @@ public class RecordItemMixin {
         BlockState blockState = level.getBlockState(blockPos);
         if (blockState.is(Blocks.JUKEBOX) && !blockState.getValue(JukeboxBlock.HAS_RECORD)) {
             ItemStack itemStack = context.getItemInHand();
+            if (itemStack.getMaxStackSize() == 1)
+                return;
             if (!level.isClientSide) {
                 Player player = context.getPlayer();
                 BlockEntity blockEntity = level.getBlockEntity(blockPos);

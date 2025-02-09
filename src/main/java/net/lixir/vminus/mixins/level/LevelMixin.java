@@ -12,7 +12,7 @@ public abstract class LevelMixin {
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", at = @At("HEAD"), cancellable = true)
     private void setBlock(BlockPos pos, BlockState state, int i, CallbackInfoReturnable<Boolean> cir) {
         Block block = state.getBlock();
-        JsonObject visionData = Vision.getData(block);
+        JsonObject visionData = Visions.getData(block);
         if (visionData != null) {
             if (visionData.has("replace")) {
                 String replaceString = VisionValueHandler.getFirstValidString(visionData, "replace", block);

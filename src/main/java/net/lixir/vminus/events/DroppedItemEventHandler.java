@@ -2,8 +2,8 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.VMinusSounds;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -34,18 +34,18 @@ public class DroppedItemEventHandler {
         double z = entity.getZ();
 
         if (world instanceof Level _level) {
-            JsonObject visionData = Vision.getData(item);
+            JsonObject visionData = Visions.getData(item);
             String soundString = VisionProperties.getString(visionData, "drop_sound", item);
             if (soundString != null && !soundString.isEmpty()) {
                 ResourceLocation resourceLocation = new ResourceLocation(soundString);
                 _level.playSound(null, x, y, z,
                         Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation)),
-                        SoundSource.PLAYERS, (float) 0.2,
+                        SoundSource.PLAYERS, (float) 0.4,
                         (float) (1 + Mth.nextDouble(RandomSource.create(), -0.1, 0.1)));
             }
             _level.playSound(null, x, y, z,
                     VMinusSounds.ITEM_DROP.get(),
-                    SoundSource.PLAYERS, (float) 0.2,
+                    SoundSource.PLAYERS, (float) 0.4,
                     (float) (1 + Mth.nextDouble(RandomSource.create(), -0.1, 0.1)));
         }
     }

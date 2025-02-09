@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.util.MobVariantHelper;
 import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -29,13 +29,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class EntityJoinLevelEventHandler {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
-
         Entity entity = event.getEntity();
         if (entity == null)
             return;
+        JsonObject visionData = Visions.getData(entity.getType());
 
-        JsonObject visionData = Vision.getData(entity.getType());
         // Banning banned entities
         if (VisionProperties.isBanned(entity)) {
             if (event.isCancelable())
@@ -44,7 +42,7 @@ public class EntityJoinLevelEventHandler {
         }
 
         // Changing base attributes if it applies
-        if (entity instanceof LivingEntity) {
+        if (entity instanceof LivingEntity livingEntity) {
             if (visionData != null) {
                 if (visionData.has("base_attributes")) {
                     JsonArray baseAttributesArray = visionData.getAsJsonArray("base_attributes");
@@ -53,11 +51,11 @@ public class EntityJoinLevelEventHandler {
                         if (elementData.has("id") && elementData.has("value")) {
                             String attributeId = elementData.get("id").getAsString();
                             double value = elementData.get("value").getAsDouble();
-                            LivingEntity livingEntity = (LivingEntity) entity;
                             Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attributeId));
                             if (attribute != null) {
                                 AttributeInstance attributeInstance = livingEntity.getAttribute(attribute);
                                 if (attributeInstance != null) {
+                                    VMinus.LOGGER.info("Attribute ({}) set for {}", attribute, livingEntity);
                                     attributeInstance.setBaseValue(value);
                                 }
                             }
@@ -70,7 +68,7 @@ public class EntityJoinLevelEventHandler {
         // Attempts to replace / ban an in-world item entity if needed.
         if (entity instanceof ItemEntity) {
             ItemStack itemstack = (entity instanceof ItemEntity _itemEnt ? _itemEnt.getItem() : ItemStack.EMPTY);
-            JsonObject itemVisionData = Vision.getData(itemstack);
+            JsonObject itemVisionData = Visions.getData(itemstack);
             ItemStack replacementStack = VisionProperties.getReplacementStack(itemstack);
             if (replacementStack != null && !replacementStack.isEmpty()) {
                         replacementStack.setCount(itemstack.getCount());
@@ -101,6 +99,8 @@ public class EntityJoinLevelEventHandler {
                 _entity.setHealth((float) _entity.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH).getBaseValue());
             entity.getPersistentData().putBoolean("health_adjust", true);
         }
+
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
 
         if (visionData != null && visionData.has("variants")) {
             final String chosenVariant = MobVariantHelper.setOrGetVariant(entity, visionData);

@@ -27,7 +27,6 @@ public enum CapeOwner {
     KRELOX(UUID.fromString("ff22b184-dabb-41bd-8dee-17d045d021b4")),
     PONDEROSA(UUID.fromString("3e49c6dd-b06b-4110-bd27-d7d18bc52b79")),
     STALLMAN1111(UUID.fromString("00a4bb78-a4d6-4a21-b1f4-781ffbba9300")),
-    CRABCAKE(UUID.fromString("92252782-2ebd-4bce-989e-d8e1729b7c31")),
     WISYCHU(UUID.fromString("93112bbd-f18e-478a-9c30-67682579fd22")),
     MIMICROW(UUID.fromString("55f2f1c7-8275-4605-8b95-b02a73a445fc")),
     MAYD(UUID.fromString("16bfd8ae-077e-43c2-a945-ec84ecc3a525")),

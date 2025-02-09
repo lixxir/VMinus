@@ -13,8 +13,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MilkBucketItem.class)
 public class MilkBucketItemMixin {
-    @Inject(method = "finishUsingItem", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "finishUsingItem", at = @At("RETURN"))
     private void finishUsingItem(ItemStack itemstack, Level level, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
+        if (itemstack.getMaxStackSize() == 1)
+            return;
         if (entity instanceof Player player && !player.getAbilities().instabuild && !itemstack.isEmpty()) {
             ItemStack emptyBucket = new ItemStack(Items.BUCKET);
             if (!player.getInventory().add(emptyBucket)) {

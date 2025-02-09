@@ -1,9 +1,10 @@
 package net.lixir.vminus.mixins.blocks;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.SoundHelper;
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.util.SoundHelper;
+import net.lixir.vminus.core.Visions;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,40 +24,47 @@ public abstract class BlockRealMixin {
 
     @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
     private void getSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.SPEED_FACTOR, vminus$block) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.SPEED_FACTOR, vminus$block) != null)
             cir.setReturnValue(VisionProperties.getNumber(VisionProperties.Names.SPEED_FACTOR, vminus$block, cir.getReturnValue()).floatValue());
     }
 
     @Inject(method = "getFriction", at = @At("RETURN"), cancellable = true)
     private void getFriction(CallbackInfoReturnable<Float> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.FRICTION, vminus$block) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.FRICTION, vminus$block) != null)
             cir.setReturnValue(VisionProperties.getNumber(VisionProperties.Names.FRICTION, vminus$block, cir.getReturnValue()).floatValue());
     }
 
     @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
     private void getJumpFactor(CallbackInfoReturnable<Float> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.JUMP_FACTOR, vminus$block) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.JUMP_FACTOR, vminus$block) != null)
             cir.setReturnValue(VisionProperties.getNumber(VisionProperties.Names.JUMP_FACTOR, vminus$block, cir.getReturnValue()).floatValue());
     }
 
     @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
     private void getExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        if (VisionProperties.findSearchObject(VisionProperties.Names.BLAST_RESISTANCE, vminus$block) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.BLAST_RESISTANCE, vminus$block) != null)
             cir.setReturnValue(VisionProperties.getNumber(VisionProperties.Names.BLAST_RESISTANCE, vminus$block, cir.getReturnValue()).floatValue());
     }
 
     @Inject(method = "getSoundType", at = @At("RETURN"), cancellable = true)
     private void getSoundType(BlockState state, CallbackInfoReturnable<SoundType> cir) {
-        JsonObject visionData = Vision.getData(vminus$block);
+        JsonObject visionData = Visions.getData(vminus$block);
         if (visionData == null) return;
 
-        JsonObject soundObject = VisionProperties.findSearchObject(VisionProperties.Names.SOUND, visionData);
-        if (soundObject == null) return;
+        JsonElement soundElement = VisionProperties.searchElement(VisionProperties.Names.SOUND, visionData, vminus$block);
+        if (soundElement == null)
+            return;
+        JsonObject soundObject;
+
+        if (soundElement.isJsonObject()) {
+            soundObject = soundElement.getAsJsonObject();
+        } else
+            return;
 
         String stateId = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(state.getBlock())).toString();
 
-        if (Vision.BLOCK_SOUND_TYPE_CACHE.containsKey(stateId)) {
-            cir.setReturnValue(Vision.BLOCK_SOUND_TYPE_CACHE.get(stateId));
+        if (Visions.BLOCK_SOUND_TYPE_CACHE.containsKey(stateId)) {
+            cir.setReturnValue(Visions.BLOCK_SOUND_TYPE_CACHE.get(stateId));
             return;
         }
 
@@ -68,7 +76,7 @@ public abstract class BlockRealMixin {
 
         SoundType soundType = SoundHelper.CreateBlockSoundType(breakSound, stepSound, placeSound, hitSound, fallSound);
 
-        Vision.BLOCK_SOUND_TYPE_CACHE.put(stateId, soundType);
+        Visions.BLOCK_SOUND_TYPE_CACHE.put(stateId, soundType);
 
         cir.setReturnValue(soundType);
     }

@@ -1,0 +1,28 @@
+{
+  "item": "diamond_chestplate",
+  "attribute": [
+    {
+      "id": "minecraft:generic.armor",
+      "remove": true
+    },
+    {
+      "id": "minecraft:generic.armor_toughness",
+      "remove": true
+    },
+    {
+      "id": "vminus:blunt_protection",
+      "value": 0.24,
+      "operation": "multiply_base"
+    },
+    {
+      "id": "vminus:fire_protection",
+      "value": 0.16,
+      "operation": "multiply_base"
+    },
+    {
+      "id": "vminus:protection",
+      "value": 0.05,
+      "operation": "multiply_base"
+    }
+  ]
+}

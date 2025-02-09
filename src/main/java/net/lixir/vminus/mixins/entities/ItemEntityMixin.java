@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.world.entity.item.ItemEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -17,7 +17,7 @@ public class ItemEntityMixin {
     @Inject(at = @At("RETURN"), method = "fireImmune()Z", cancellable = true)
     private void fireImmune(CallbackInfoReturnable<Boolean> cir) {
 
-        if (VisionProperties.findSearchObject(VisionProperties.Names.FIRE_RESISTANT, vminus$item) != null)
+        if (VisionProperties.searchElement(VisionProperties.Names.FIRE_RESISTANT, vminus$item) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.FIRE_RESISTANT, vminus$item, cir.getReturnValue()));
     }
 }

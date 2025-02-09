@@ -37,6 +37,7 @@ public class VMinusBlockTagGenerator extends BlockTagsProvider {
 
         var mob_heads = tag(VMinusTags.Blocks.MOB_HEADS);
         var concrete_powder = tag(VMinusTags.Blocks.CONCRETE_POWDER);
+        var brushableBlocks = tag(VMinusTags.Blocks.BRUSHABLE_BLOCKS);
 
         for (Map.Entry<ResourceKey<Block>, Block> entry : ForgeRegistries.BLOCKS.getEntries()) {
             Block block = entry.getValue();
@@ -44,6 +45,8 @@ public class VMinusBlockTagGenerator extends BlockTagsProvider {
                 concrete_powder.add(block);
             } else if (block instanceof SkullBlock || block instanceof WallSkullBlock) {
                 mob_heads.add(block);
+            }else if (block instanceof BrushableBlock) {
+                brushableBlocks.add(block);
             }
         }
     }
