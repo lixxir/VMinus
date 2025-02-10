@@ -1,16 +1,9 @@
 package net.lixir.vminus.mixins.items;
 
-import com.google.gson.JsonObject;
-import com.mojang.datafixers.util.Pair;
-import net.lixir.vminus.VMinus;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.VisionFoodProperties;
-import net.lixir.vminus.registry.VMinusRarities;
 import net.lixir.vminus.core.visions.visionable.IItemVisionable;
 import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,8 +12,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-
 @Mixin(Item.class)
 public class ItemMixin implements IItemVisionable {
 
@@ -28,7 +19,7 @@ public class ItemMixin implements IItemVisionable {
     private final Item vminus$item = (Item) (Object) this;
 
     @Unique
-    private ItemVision vminus$itemVision = null;
+    private ItemVision vminus$itemVision = new ItemVision();
 
     /*
     @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)

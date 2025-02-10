@@ -1,8 +1,6 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
 import net.lixir.vminus.util.IconHandler;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;

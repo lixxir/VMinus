@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.UseAnim;
 
-public class ItemVision extends Vision implements IMergableVision<ItemVision> {
+public class ItemVision extends Vision<ItemVision> {
     public final VisionProperty<BasicVisionValue<Integer>, Integer> maxStackSize = new VisionProperty<>("max_stack_size");
     public final VisionProperty<BasicVisionValue<Integer>, Integer> enchantability = new VisionProperty<>("enchantability");
     public final VisionProperty<BasicVisionValue<Integer>, Integer> useDuration = new VisionProperty<>("use_duration");

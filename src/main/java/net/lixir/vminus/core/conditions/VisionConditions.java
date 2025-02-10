@@ -19,6 +19,7 @@ public class VisionConditions {
         CONDITIONS.put("rarity", new RarityCondition());
         CONDITIONS.put("mod_loaded", new ModLoadedCondition());
         CONDITIONS.put("block_item", new BlockItemCondition());
+        CONDITIONS.put("durability", new DurabilityCondition());
     }
 
     public static List<VisionValue.ConditionEntry> resolveConditions(JsonObject arrayObject) throws JsonParseException {

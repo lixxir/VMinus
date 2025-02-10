@@ -22,7 +22,7 @@ public class GlassStairsBlock extends StairBlock {
     public GlassStairsBlock(Supplier<BlockState> state, Properties properties) {
         super(state, properties);
     }
-    @SuppressWarnings("deprecation")
+
     @Override
     public boolean skipRendering(BlockState state, BlockState stateFrom, Direction direction) {
         Block blockFrom = stateFrom.getBlock();

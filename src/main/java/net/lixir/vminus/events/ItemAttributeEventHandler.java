@@ -1,19 +1,11 @@
 package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.lixir.vminus.VMinus;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.VisionAttribute;
 import net.lixir.vminus.core.visions.ItemVision;
 import net.lixir.vminus.core.visions.visionable.IItemVisionable;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.traits.Trait;
-import net.lixir.vminus.traits.Traits;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -41,8 +33,8 @@ public class ItemAttributeEventHandler {
         Item item = itemStack.getItem();
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
-        if (item instanceof IItemVisionable iItemVisionable) {
-            ItemVision itemVision = iItemVisionable.vminus$getVision();
+        if (item instanceof IItemVisionable iVisionable) {
+            ItemVision itemVision = iVisionable.vminus$getVision();
             List<VisionAttribute> visionAttributes = itemVision.attribute.getValues(new VisionConditionArguments.Builder().passItemStack(itemStack).build());
 
 

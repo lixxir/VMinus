@@ -14,6 +14,7 @@ import net.lixir.vminus.registry.VMinusRarities;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,9 +23,12 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -171,7 +175,20 @@ public class VisionProcessor {
 
             int value = arrayObject.getAsJsonPrimitive("value").getAsInt();
             if (value > max || value < min) {
-                throw new JsonParseException(value + " is not an accepted value for " + key + ". Must be within " + min + " to " + max);
+                throw new JsonParseException(value + " is not an accepted integer value for " + key + ". Must be within " + min + " to " + max);
+            }
+            addBasicVisionValue(property, value, arrayObject, jsonObject, key);
+        }
+    }
+
+    public static void parseFloat(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<Float>, Float> property, float min, float max) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            float value = arrayObject.getAsJsonPrimitive("value").getAsFloat();
+            if (value > max || value < min) {
+                throw new JsonParseException(value + " is not an accepted float value for " + key + ". Must be within " + min + " to " + max);
             }
             addBasicVisionValue(property, value, arrayObject, jsonObject, key);
         }
@@ -251,6 +268,27 @@ public class VisionProcessor {
         }
     }
 
+    public static void parseItemStack(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<ItemStack>, ItemStack> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            String value = arrayObject.getAsJsonPrimitive("value").getAsString();
+            ResourceLocation resourceLocation;
+            try {
+                resourceLocation = new ResourceLocation(value);
+            } catch (Exception e ) {
+                throw new JsonParseException(value + " is not a valid ResourceLocation.");
+            }
+            Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+            if (item == null)
+                throw new JsonParseException(resourceLocation + " is not a valid item.");
+            ItemStack itemStack = item.getDefaultInstance();
+
+            addBasicVisionValue(property, itemStack, arrayObject, jsonObject, key);
+        }
+    }
+
 
     public static void parseBoolean(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<Boolean>, Boolean> property) throws JsonParseException {
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
@@ -260,6 +298,42 @@ public class VisionProcessor {
             Boolean value = arrayObject.getAsJsonPrimitive("value").getAsBoolean();
 
             addBasicVisionValue(property, value, arrayObject, jsonObject, key);
+        }
+    }
+
+    public static void parseSoundType(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<SoundType>, SoundType> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            SoundEvent fallSound = parseSoundInObject(arrayObject, "fall");
+            if (fallSound == null)
+                fallSound = SoundEvents.STONE_FALL;
+            SoundEvent stepSound = parseSoundInObject(arrayObject, "step");
+            if (stepSound == null)
+                stepSound = SoundEvents.STONE_STEP;
+            SoundEvent breakSound = parseSoundInObject(arrayObject, "break");
+            if (breakSound == null)
+                breakSound = SoundEvents.STONE_BREAK;
+            SoundEvent placeSound = parseSoundInObject(arrayObject, "place");
+            if (placeSound == null)
+                placeSound = SoundEvents.STONE_PLACE;
+            SoundEvent hitSound = parseSoundInObject(arrayObject, "hit");
+            if (hitSound == null)
+                hitSound = SoundEvents.STONE_HIT;
+
+            float pitch = arrayObject.has("pitch") ? arrayObject.getAsJsonPrimitive("pitch").getAsFloat() : 1f;
+            if (pitch > 0) {
+                throw new JsonParseException(pitch + " is not an accepted pitch value for " + key + ". Must be within be greater than 0");
+            }
+
+            float level = arrayObject.has("level") ? arrayObject.getAsJsonPrimitive("level").getAsFloat() : 1f;
+            if (level > 0) {
+                throw new JsonParseException(level + " is not an accepted level value for " + key + ". Must be within be greater than 0");
+            }
+
+            SoundType soundType = new SoundType(level, pitch, breakSound, stepSound, placeSound, hitSound, fallSound);
+            addBasicVisionValue(property, soundType, arrayObject, jsonObject, key);
         }
     }
 

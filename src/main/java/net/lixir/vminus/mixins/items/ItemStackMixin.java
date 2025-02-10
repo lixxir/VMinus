@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusConfig;
-import net.lixir.vminus.core.VisionProperties;
 import net.lixir.vminus.core.Visions;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.EnchantmentVisionHelper;
@@ -26,11 +25,8 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -63,9 +59,6 @@ public abstract class ItemStackMixin implements IForgeItemStack {
     @Unique
     private final ItemStack vminus$itemStack = (ItemStack) (Object) this;
 
-    @Unique
-    private ItemVision vminus$itemVision = null;
-
     @Inject(method = "shouldShowInTooltip", at = @At(value = "HEAD"), cancellable = true)
     private static void vminus$shouldShowInTooltip(int p_41627_, ItemStack.TooltipPart p_41628_, CallbackInfoReturnable<Boolean> cir) {
         if (!VMinusConfig.TOOLTIP_REWORK.get())
@@ -90,8 +83,8 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
     @Unique
     public ItemVision vminus$getVision() {
-        if (vminus$itemStack.getItem() instanceof IItemVisionable iItemVisionable) {
-            return iItemVisionable.vminus$getVision();
+        if (vminus$itemStack.getItem() instanceof IItemVisionable iVisionable) {
+            return iVisionable.vminus$getVision();
         }
         return null;
     }
@@ -104,7 +97,7 @@ public abstract class ItemStackMixin implements IForgeItemStack {
     }
 
     @Override
-    public int getBurnTime(@org.jetbrains.annotations.Nullable RecipeType<?> recipeType) {
+    public int getBurnTime(@Nullable RecipeType<?> recipeType) {
         Integer value = vminus$getVision().fuelTime.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
         if (value != null) return value;
         return vminus$itemStack.getItem().getBurnTime(vminus$itemStack, recipeType);
@@ -122,6 +115,8 @@ public abstract class ItemStackMixin implements IForgeItemStack {
     public boolean canEquip(EquipmentSlot armorType, Entity entity) {
         Boolean value = vminus$getVision().canEquip.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
         if (value != null) return value;
+        EquipmentSlot equipValue = vminus$getVision().equipSlot.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
+        if (equipValue != null) return true;
         return vminus$itemStack.getItem().canEquip(vminus$itemStack, armorType, entity);
     }
 
@@ -146,13 +141,15 @@ public abstract class ItemStackMixin implements IForgeItemStack {
             float durabilityRatio = (float) vminus$itemStack.getTag().getInt("reinforcement") / (float) vminus$itemStack.getTag().getInt("max_reinforcement");
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
-        } else if (vminus$itemStack.isDamageableItem()) {
-            float durabilityRatio = (float) DurabilityHelper.getDurability(vminus$itemStack) / (float) DurabilityHelper.getDurability(true, vminus$itemStack);
+        }
+        */
+        if (vminus$itemStack.isDamageableItem()) {
+            float durabilityRatio = (float) vminus$itemStack.getDamageValue() / vminus$itemStack.getMaxDamage();
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
         }
 
-         */
+
     }
 
     @Inject(method = "getBarColor", at = @At("RETURN"), cancellable = true)
@@ -283,6 +280,8 @@ public abstract class ItemStackMixin implements IForgeItemStack {
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
         Boolean value = vminus$getVision().damageable.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
         if (value != null) cir.setReturnValue(value);
+        Integer maxDamageValue = vminus$getVision().maxDamage.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        if (maxDamageValue != null) cir.setReturnValue(maxDamageValue > 0);
     }
 
     @Inject(method = "isEnchantable", at = @At("RETURN"), cancellable = true)

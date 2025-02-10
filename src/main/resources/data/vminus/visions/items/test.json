@@ -1,7 +1,4 @@
 {
-  "item": "bread",
-  "food": {
-    "nutrition": 4,
-    "saturation": 0
-  }
+  "item": "minecraft:end_crystal",
+  "max_stack_size": 16
 }

@@ -38,6 +38,8 @@ public class ItemVisionDeserializer implements JsonDeserializer<ItemVision> {
             VisionProcessor.parseBoolean(jsonObject, vision.enchantable.getName(), vision.enchantable);
         if (jsonObject.has(vision.hasGlint.getName()))
             VisionProcessor.parseBoolean(jsonObject, vision.hasGlint.getName(), vision.hasGlint);
+        if (jsonObject.has(vision.ban.getName()))
+            VisionProcessor.parseBoolean(jsonObject, vision.ban.getName(), vision.ban);
 
         if (jsonObject.has(vision.foodProperties.getName()))
             VisionProcessor.parseVisionFoodProperties(jsonObject, vision.foodProperties.getName(), vision.foodProperties);
@@ -49,6 +51,9 @@ public class ItemVisionDeserializer implements JsonDeserializer<ItemVision> {
             VisionProcessor.parseRarity(jsonObject, vision.rarity.getName(), vision.rarity);
         if (jsonObject.has(vision.attribute.getName()))
             VisionProcessor.parseVisionAttribute(jsonObject, vision.attribute.getName(), vision.attribute);
+        if (jsonObject.has(vision.replace.getName()))
+            VisionProcessor.parseItemStack(jsonObject, vision.replace.getName(), vision.replace);
+
 
         return vision;
     }
