@@ -4,7 +4,7 @@ license="All Rights Reserved"
 
 [[mods]]
 modId="vminus"
-version="3.2.7"
+version="3.3.0"
 displayName="VMinus"
 displayURL="https://curseforge.com/minecraft/mc-mods/v-minus"
 logoFile="logo.png"

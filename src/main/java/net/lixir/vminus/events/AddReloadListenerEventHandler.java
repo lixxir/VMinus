@@ -1,6 +1,8 @@
 package net.lixir.vminus.events;
 
 import net.lixir.vminus.core.resources.managers.BlockVisionManager;
+import net.lixir.vminus.core.resources.managers.CreativeTabManager;
+import net.lixir.vminus.core.resources.managers.EntityVisionManager;
 import net.lixir.vminus.core.resources.managers.ItemVisionManager;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -16,5 +18,7 @@ public class AddReloadListenerEventHandler {
        ICondition.IContext context = event.getConditionContext();
        event.addListener(new ItemVisionManager(context));
        event.addListener(new BlockVisionManager(context));
+       event.addListener(new EntityVisionManager(context));
+       event.addListener(new CreativeTabManager(context));
     }
 }

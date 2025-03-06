@@ -1,8 +1,6 @@
 package net.lixir.vminus.mixins.blocks;
 
-import net.lixir.vminus.traits.Trait;
-import net.lixir.vminus.traits.Traits;
-import net.minecraft.nbt.CompoundTag;
+import net.lixir.vminus.registry.Traits;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;

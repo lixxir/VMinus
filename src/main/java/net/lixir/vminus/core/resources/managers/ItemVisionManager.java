@@ -3,7 +3,7 @@ package net.lixir.vminus.core.resources.managers;
 import net.lixir.vminus.core.VisionType;
 import net.lixir.vminus.core.resources.VisionProcessor;
 import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
 import net.lixir.vminus.core.resources.deserializers.ItemVisionDeserializer;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -29,7 +29,7 @@ public class ItemVisionManager extends VisionManager<ItemVision> {
                     copyVision.merge(vision);
                 }
             }
-            if (item instanceof IItemVisionable itemVisionable) {
+            if (item instanceof IItemVisionAccessor itemVisionable) {
                 itemVisionable.vminus$setVision(copyVision);
             }
         }

@@ -2,15 +2,10 @@ package net.lixir.vminus.core.resources.managers;
 
 import net.lixir.vminus.core.VisionType;
 import net.lixir.vminus.core.resources.VisionProcessor;
-import net.lixir.vminus.core.resources.deserializers.BlockVisionDeserializer;
 import net.lixir.vminus.core.resources.deserializers.EntityVisionDeserializer;
-import net.lixir.vminus.core.visions.BlockVision;
 import net.lixir.vminus.core.visions.EntityVision;
-import net.lixir.vminus.core.visions.Vision;
-import net.lixir.vminus.core.visions.visionable.IBlockVisionable;
-import net.lixir.vminus.core.visions.visionable.IEntityVisionable;
+import net.lixir.vminus.core.visions.accessors.IEntityVisionAccessor;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -34,7 +29,7 @@ public class EntityVisionManager extends VisionManager<EntityVision> {
                     copyVision.merge(vision);
                 }
             }
-            if (entity instanceof IEntityVisionable visionable) {
+            if (entity instanceof IEntityVisionAccessor visionable) {
                 visionable.vminus$setVision(copyVision);
             }
         }

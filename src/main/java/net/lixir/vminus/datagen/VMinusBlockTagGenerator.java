@@ -1,12 +1,12 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
+import net.lixir.vminus.datagen.util.VBlockTagGenerator;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.*;
-import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -15,13 +15,15 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class VMinusBlockTagGenerator extends BlockTagsProvider {
+public class VMinusBlockTagGenerator extends VBlockTagGenerator {
     public VMinusBlockTagGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, VMinus.ID, existingFileHelper);
     }
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
+        super.addTags(pProvider);
+
         var froglights = tag(VMinusTags.Blocks.FROGLIGHTS);
         froglights.add(Blocks.OCHRE_FROGLIGHT);
         froglights.add(Blocks.VERDANT_FROGLIGHT);

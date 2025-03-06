@@ -1,4 +1,4 @@
 {
-  "item": "#vminus:armor/leather",
+  "tag": "vminus:armor/leather",
   "trait": "vminus:insulated=true"
 }

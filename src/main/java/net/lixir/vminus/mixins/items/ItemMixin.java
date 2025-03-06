@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.items;
 
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.VisionFoodProperties;
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
 import net.lixir.vminus.core.visions.ItemVision;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public class ItemMixin implements IItemVisionable {
+public class ItemMixin implements IItemVisionAccessor {
 
     @Unique
     private final Item vminus$item = (Item) (Object) this;
@@ -36,21 +36,21 @@ public class ItemMixin implements IItemVisionable {
 
     @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
     private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value.mergeFoodProperties(cir.getReturnValue()));
     }
 
 
     @Inject(method = "getMaxStackSize", at = @At("RETURN"), cancellable = true)
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().maxStackSize.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        Integer value = vminus$getVision().maxStackSize.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
 
     @Inject(method = "isFireResistant", at = @At("RETURN"), cancellable = true)
     public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().fireResistant.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        Boolean value = vminus$getVision().fireResistant.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -64,25 +64,25 @@ public class ItemMixin implements IItemVisionable {
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().useDuration.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        Integer value = vminus$getVision().useDuration.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(true);
     }
 
     @Inject(method = "getEnchantmentValue", at = @At("RETURN"), cancellable = true)
     private void getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().enchantability.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).build());
+        Integer value = vminus$getVision().enchantability.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getRarity", at = @At("RETURN"), cancellable = true)
     private void getRarity(ItemStack itemStack, CallbackInfoReturnable<Rarity> cir) {
-        Rarity value = vminus$getVision().rarity.getValue(new VisionConditionArguments.Builder().passItem(vminus$item).passItemStack(itemStack).build());
+        Rarity value = vminus$getVision().rarity.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 

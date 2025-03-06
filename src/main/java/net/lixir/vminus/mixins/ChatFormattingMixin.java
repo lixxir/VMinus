@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 @Mixin(ChatFormatting.class)
-@SuppressWarnings({"target", "unchecked"})
+@SuppressWarnings({"targetItemStack"})
 @Unique
 public abstract class ChatFormattingMixin {
     @Shadow

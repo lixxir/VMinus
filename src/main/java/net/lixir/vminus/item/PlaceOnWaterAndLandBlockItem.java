@@ -2,6 +2,7 @@ package net.lixir.vminus.item;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PlaceOnWaterBlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
@@ -9,10 +10,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.FluidState;
 
+import java.util.function.Supplier;
+
 public class PlaceOnWaterAndLandBlockItem extends PlaceOnWaterBlockItem {
-    public PlaceOnWaterAndLandBlockItem(Block p_220226_, Properties p_220227_) {
-        super(p_220226_, p_220227_);
+    private final Supplier<Block> blockSupplier;
+
+    public PlaceOnWaterAndLandBlockItem(Supplier<Block> blockSupplier, Item.Properties properties) {
+        super(null, properties);
+        this.blockSupplier = blockSupplier;
     }
+
+    @Override
+    public Block getBlock() {
+        return blockSupplier.get();
+    }
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();

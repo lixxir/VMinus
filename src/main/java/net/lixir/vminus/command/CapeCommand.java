@@ -49,17 +49,21 @@ public class CapeCommand {
     public static CompletableFuture<Suggestions> getCapeSuggestions(CommandContext<CommandSourceStack> context, SuggestionsBuilder builder) {
         Player entity = null;
 
-
         if (context.getSource().getEntity() instanceof Player) {
             entity = (Player) context.getSource().getEntity();
         }
 
         if (entity != null) {
+            String input = builder.getRemaining().toLowerCase();
             List<Cape> availableCapes = CapeHelper.getAvailableCapes(entity);
+
             for (Cape cape : availableCapes) {
-                builder.suggest(cape.getId());
+                if (cape.getId().toLowerCase().contains(input)) {
+                    builder.suggest(cape.getId());
+                }
             }
         }
+
         builder.suggest("default");
 
         return builder.buildFuture();

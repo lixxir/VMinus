@@ -1,14 +1,16 @@
 package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.core.Visions;
 import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.registry.VMinusAttributes;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -43,6 +45,13 @@ public abstract class LivingEntityMixin {
             }
         }
     }
+
+    @Inject(method = "getJumpBoostPower", at = @At("RETURN"), cancellable = true)
+    public void getJumpBoostPower(CallbackInfoReturnable<Float> cir) {
+        if (vminus$entity.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST.get()))
+            cir.setReturnValue(cir.getReturnValue() + (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST.get()) * 0.15f);
+    }
+
 
     @Inject(method = "canFreeze", at = @At("RETURN"), cancellable = true)
     public void canFreeze(CallbackInfoReturnable<Boolean> cir) {

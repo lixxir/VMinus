@@ -56,7 +56,20 @@ public enum CapeOwner {
     DRELMAO(UUID.fromString("3f06c48a-8141-413a-8cc7-e123da7709a3")),
     ALPHEI(UUID.fromString("a7ce848e-4e4d-4878-9abc-129636cc87a0")),
     SHONESTAIN(UUID.fromString("74a16b25-1652-4cf8-8eb8-4a4a25008e1a")),
-    LEXALIS8(UUID.fromString("f223f221-2362-420f-83f7-694e5756c893"));
+    LEXALIS8(UUID.fromString("f223f221-2362-420f-83f7-694e5756c893")),
+
+    // V3.3.0 and higher
+    FUDGIECATDX(UUID.fromString("2954a1e9-6593-4574-8088-c71793c121a9")),
+    ODDCHILLY(UUID.fromString("a2d81e8c-e363-48dc-af5b-24b0e57a9472")),
+    CAPTAINRAGEJOIN(UUID.fromString("1e5a53a1-cf0f-4138-bcdd-5dfaa217dcae")),
+    DR_PIMPF(UUID.fromString("09f24630-47b0-40a2-b083-99552aa9cbb3")),
+    _8NXTSUKE(UUID.fromString("a078db8a-2dd1-4671-b50b-fee0845c82cf")),
+    HUDSOJR(UUID.fromString("d94fe54f-53a7-45f8-b399-09b7523445e1")),
+    ICY_CRABY(UUID.fromString("cf6cdaba-1b84-42cc-ac78-24b1569abd3f")),
+    VVENIAMIN(UUID.fromString("0f0b884b-0cd2-4acf-b885-d567992eb13d")),
+    ROIXEN(UUID.fromString("c544c4ed-5332-489b-9135-e614e5dd4b32")),
+
+    ;
 
     private final UUID uuid;
 

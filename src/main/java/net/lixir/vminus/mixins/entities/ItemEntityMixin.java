@@ -1,9 +1,8 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.core.VisionProperties;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
 import net.minecraft.world.entity.item.ItemEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,13 +18,13 @@ public class ItemEntityMixin {
 
     @Inject(at = @At("RETURN"), method = "fireImmune()Z", cancellable = true)
     private void fireImmune(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().fireResistant.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemEntity.getItem()).build());
+        Boolean value = vminus$getVision().fireResistant.value(new VisionConditionArguments.Builder().passItemStack(vminus$itemEntity.getItem()).build());
         if (value != null) cir.setReturnValue(value);
     }
 
     @Unique
     public ItemVision vminus$getVision() {
-        if (vminus$itemEntity.getItem().getItem() instanceof IItemVisionable iVisionable) {
+        if (vminus$itemEntity.getItem().getItem() instanceof IItemVisionAccessor iVisionable) {
             return iVisionable.vminus$getVision();
         }
         return null;

@@ -2,18 +2,15 @@ package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import com.google.gson.JsonObject;
 import net.lixir.vminus.VMinusConfig;
-import net.lixir.vminus.core.Visions;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.EnchantmentVisionHelper;
 import net.lixir.vminus.core.util.VisionFoodProperties;
 import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.traits.Trait;
-import net.lixir.vminus.traits.Traits;
-import net.lixir.vminus.util.DurabilityHelper;
+import net.lixir.vminus.world.Trait;
 import net.lixir.vminus.util.EnchantAndCurseHelper;
 import net.lixir.vminus.util.IconHandler;
 import net.minecraft.ChatFormatting;
@@ -83,7 +80,7 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
     @Unique
     public ItemVision vminus$getVision() {
-        if (vminus$itemStack.getItem() instanceof IItemVisionable iVisionable) {
+        if (vminus$itemStack.getItem() instanceof IItemVisionAccessor iVisionable) {
             return iVisionable.vminus$getVision();
         }
         return null;
@@ -98,7 +95,7 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
     @Override
     public int getBurnTime(@Nullable RecipeType<?> recipeType) {
-        Integer value = vminus$getVision().fuelTime.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Integer value = vminus$getVision().fuelTime.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) return value;
         return vminus$itemStack.getItem().getBurnTime(vminus$itemStack, recipeType);
     }
@@ -106,16 +103,16 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
     @Override
     public EquipmentSlot getEquipmentSlot() {
-        EquipmentSlot value = vminus$getVision().equipSlot.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        EquipmentSlot value = vminus$getVision().equipSlot.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) return value;
         return vminus$itemStack.getItem().getEquipmentSlot(vminus$itemStack);
     }
 
     @Override
     public boolean canEquip(EquipmentSlot armorType, Entity entity) {
-        Boolean value = vminus$getVision().canEquip.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
+        Boolean value = vminus$getVision().canEquip.value(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
         if (value != null) return value;
-        EquipmentSlot equipValue = vminus$getVision().equipSlot.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
+        EquipmentSlot equipValue = vminus$getVision().equipSlot.value(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).passEntity(entity).build());
         if (equipValue != null) return true;
         return vminus$itemStack.getItem().canEquip(vminus$itemStack, armorType, entity);
     }
@@ -144,7 +141,7 @@ public abstract class ItemStackMixin implements IForgeItemStack {
         }
         */
         if (vminus$itemStack.isDamageableItem()) {
-            float durabilityRatio = (float) vminus$itemStack.getDamageValue() / vminus$itemStack.getMaxDamage();
+            float durabilityRatio = 1.0F - ((float) vminus$itemStack.getDamageValue() / vminus$itemStack.getMaxDamage());
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
             cir.setReturnValue(Math.min(barWidth, 13));
         }
@@ -203,21 +200,26 @@ public abstract class ItemStackMixin implements IForgeItemStack {
                     int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
                     cir.setReturnValue(transitionColor);
                 } else {
-                    int startColor;
-                    int endColor;
-                    float durabilityRatio = (float) DurabilityHelper.getDurability(vminus$itemStack) / (float) DurabilityHelper.getDurability(true, vminus$itemStack);
-                    if (vminus$itemStack.getTag().getBoolean("death_durability")) {
-                        startColor = 0xFF00FF;
-                        endColor = 0x550055;
-                    } else {
-                        startColor = 0x69fc2a;
-                        endColor = 0xe22626;
-                    }
-                    int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
-                    cir.setReturnValue(transitionColor);
+
                 }
             }
         }
+
+         */
+
+        /*
+        int startColor;
+        int endColor;
+        float durabilityRatio = 1.0F - ((float) vminus$itemStack.getDamageValue() / vminus$itemStack.getMaxDamage());
+        if (vminus$itemStack.getTag().getBoolean("death_durability")) {
+            startColor = 0xFF00FF;
+            endColor = 0x550055;
+        } else {
+            startColor = 0x69fc2a;
+            endColor = 0xe22626;
+        }
+        int transitionColor = vminus$interpolateColor(endColor, startColor, durabilityRatio);
+        cir.setReturnValue(transitionColor);
 
          */
     }
@@ -272,53 +274,53 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
     public void getMaxDamage(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().maxDamage.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Integer value = vminus$getVision().maxDamage.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isDamageableItem", at = @At("RETURN"), cancellable = true)
     public void isDamageableItem(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().damageable.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Boolean value = vminus$getVision().damageable.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(value);
-        Integer maxDamageValue = vminus$getVision().maxDamage.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Integer maxDamageValue = vminus$getVision().maxDamage.value(new VisionConditionArguments(vminus$itemStack));
         if (maxDamageValue != null) cir.setReturnValue(maxDamageValue > 0);
     }
 
     @Inject(method = "isEnchantable", at = @At("RETURN"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().enchantable.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Boolean value = vminus$getVision().enchantable.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(true);
     }
 
     @Inject(method = "getDrinkingSound", at = @At("RETURN"), cancellable = true)
     private void getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null && value.getEatSound() != null)
             cir.setReturnValue(value.getEatSound());
     }
 
     @Inject(method = "hasFoil", at = @At("RETURN"), cancellable = true)
     private void hasFoil(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().hasGlint.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Boolean value = vminus$getVision().hasGlint.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getEatingSound", at = @At("RETURN"), cancellable = true)
     private void getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null && value.getEatSound() != null)
             cir.setReturnValue(value.getEatSound());
     }
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().useDuration.getValue(new VisionConditionArguments.Builder().passItemStack(vminus$itemStack).build());
+        Integer value = vminus$getVision().useDuration.value(new VisionConditionArguments(vminus$itemStack));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -332,12 +334,10 @@ public abstract class ItemStackMixin implements IForgeItemStack {
 
         List<Component> list = cir.getReturnValue() != null ? cir.getReturnValue() : Lists.newArrayList();
 
-        JsonObject itemData = Visions.getData(vminus$itemStack);
-
         CompoundTag tag = vminus$itemStack.getTag();
 
-        int maxDurability = DurabilityHelper.getDurability(true, vminus$itemStack);
-        int durability = DurabilityHelper.getDurability(vminus$itemStack);
+        int maxDurability = vminus$itemStack.getMaxDamage();
+        int durability = vminus$itemStack.getMaxDamage() - vminus$itemStack.getDamageValue();
         int enchantmentLimit = tag != null ? (int) tag.getDouble("enchantment_limit") : 0;
         int enchants = vminus$itemStack.isEnchanted() ? EnchantAndCurseHelper.getTotalEnchantments(vminus$itemStack) : 0;
 

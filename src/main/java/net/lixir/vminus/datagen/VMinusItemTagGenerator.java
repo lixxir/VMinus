@@ -1,18 +1,15 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
+import net.lixir.vminus.datagen.util.VItemTagGenerator;
+import net.lixir.vminus.mixins.items.BoatItemAccessor;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.BannerPatternItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ConcretePowderBlock;
-import net.minecraft.world.level.block.SkullBlock;
-import net.minecraft.world.level.block.WallSkullBlock;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -21,15 +18,23 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class VMinusItemTagGenerator extends ItemTagsProvider {
+public class VMinusItemTagGenerator extends VItemTagGenerator {
     public VMinusItemTagGenerator(PackOutput p_275343_, CompletableFuture<HolderLookup.Provider> p_275729_,
-                               CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
-        super(p_275343_, p_275729_, p_275322_, VMinus.ID, existingFileHelper);
+                                  CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
+        super(p_275343_, p_275729_, p_275322_, existingFileHelper, VMinus.ID);
     }
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
+        super.addTags(pProvider);
         this.tag(VMinusTags.Items.BANNED);
+        this.tag(VMinusTags.Items.UNCOMMON);
+        this.tag(VMinusTags.Items.RARE);
+        this.tag(VMinusTags.Items.EPIC);
+        this.tag(VMinusTags.Items.LEGENDARY);
+        this.tag(VMinusTags.Items.DELICACY);
+        this.tag(VMinusTags.Items.INVERTED);
+        this.tag(VMinusTags.Items.UNOBTAINABLE);
 
         var woodenTools = tag(VMinusTags.Items.WOODEN_TOOLS);
         woodenTools.add(Items.WOODEN_SWORD);
@@ -126,11 +131,23 @@ public class VMinusItemTagGenerator extends ItemTagsProvider {
         diamondEquipment.addTag(VMinusTags.Items.DIAMOND_TOOLS);
 
         var bannerPatterns = tag(VMinusTags.Items.BANNER_PATTERNS);
+        var chestBoats = tag(VMinusTags.Items.CHEST_BOATS);
+        var boats = tag(VMinusTags.Items.BOATS);
+        var shulkerBoxes = tag(VMinusTags.Items.SHULKER_BOXES);
 
         for (Map.Entry<ResourceKey<Item>, Item> entry : ForgeRegistries.ITEMS.getEntries()) {
             Item item = entry.getValue();
             if (item instanceof BannerPatternItem) {
                 bannerPatterns.add(item);
+            } else if (item instanceof BoatItem boatItem) {
+                BoatItemAccessor accessor = (BoatItemAccessor) boatItem;
+                if (accessor.invokeHasChest())
+                    chestBoats.add(item);
+                else
+                    boats.add(item);
+            } else if (item instanceof BlockItem blockItem
+            && blockItem.getBlock() instanceof ShulkerBoxBlock) {
+                shulkerBoxes.add(item);
             }
         }
     }

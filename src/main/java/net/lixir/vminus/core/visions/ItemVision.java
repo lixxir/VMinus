@@ -1,15 +1,21 @@
 package net.lixir.vminus.core.visions;
 
-import net.lixir.vminus.core.VisionProperty;
+import net.lixir.vminus.core.util.VisionItemDecorator;
+import net.lixir.vminus.core.util.VisionTrait;
+import net.lixir.vminus.core.values.VisionProperty;
 import net.lixir.vminus.core.util.VisionAttribute;
 import net.lixir.vminus.core.util.VisionFoodProperties;
 import net.lixir.vminus.core.values.BasicVisionValue;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.UseAnim;
 
 public class ItemVision extends Vision<ItemVision> {
+    private static final ItemVision emptyVision = new ItemVision();
+
     public final VisionProperty<BasicVisionValue<Integer>, Integer> maxStackSize = new VisionProperty<>("max_stack_size");
     public final VisionProperty<BasicVisionValue<Integer>, Integer> enchantability = new VisionProperty<>("enchantability");
     public final VisionProperty<BasicVisionValue<Integer>, Integer> useDuration = new VisionProperty<>("use_duration");
@@ -30,30 +36,32 @@ public class ItemVision extends Vision<ItemVision> {
     public final VisionProperty<BasicVisionValue<EquipmentSlot>, EquipmentSlot> equipSlot = new VisionProperty<>("equip_slot");
     public final VisionProperty<BasicVisionValue<VisionFoodProperties>, VisionFoodProperties> foodProperties = new VisionProperty<>("food");
     public final VisionProperty<BasicVisionValue<VisionAttribute>, VisionAttribute> attribute = new VisionProperty<>("attribute");
+    public final VisionProperty<BasicVisionValue<VisionTrait>, VisionTrait> trait = new VisionProperty<>("trait");
+    public final VisionProperty<BasicVisionValue<VisionItemDecorator>, VisionItemDecorator> decorator = new VisionProperty<>("decorator");
 
 
     @Override
     public void merge(ItemVision vision) {
-        maxStackSize.mergeValues(vision.maxStackSize);
-        enchantability.mergeValues(vision.enchantability);
-        useDuration.mergeValues(vision.useDuration);
-        maxDamage.mergeValues(vision.maxDamage);
-        fuelTime.mergeValues(vision.fuelTime);
+        maxStackSize.merge(vision.maxStackSize);
+        enchantability.merge(vision.enchantability);
+        useDuration.merge(vision.useDuration);
+        maxDamage.merge(vision.maxDamage);
+        fuelTime.merge(vision.fuelTime);
 
-        fireResistant.mergeValues(vision.fireResistant);
-        canEquip.mergeValues(vision.canEquip);
-        damageable.mergeValues(vision.damageable);
-        enchantable.mergeValues(vision.enchantable);
-        hasGlint.mergeValues(vision.hasGlint);
-        ban.mergeValues(vision.ban);
+        fireResistant.merge(vision.fireResistant);
+        canEquip.merge(vision.canEquip);
+        damageable.merge(vision.damageable);
+        enchantable.merge(vision.enchantable);
+        hasGlint.merge(vision.hasGlint);
+        ban.merge(vision.ban);
 
-        replace.mergeValues(vision.replace);
-
-        rarity.mergeValues(vision.rarity);
-        foodProperties.mergeValues(vision.foodProperties);
-        useAnimation.mergeValues(vision.useAnimation);
-        equipSlot.mergeValues(vision.equipSlot);
-        attribute.mergeValues(vision.attribute);
+        replace.merge(vision.replace);
+        rarity.merge(vision.rarity);
+        foodProperties.merge(vision.foodProperties);
+        useAnimation.merge(vision.useAnimation);
+        equipSlot.merge(vision.equipSlot);
+        attribute.merge(vision.attribute);
+        trait.merge(vision.trait);
     }
 
 
@@ -84,5 +92,17 @@ public class ItemVision extends Vision<ItemVision> {
         stringBuilder.append("]");
 
         return stringBuilder.toString();
+    }
+
+    public static ItemVision getVision(Item item) {
+        if (item instanceof IItemVisionAccessor iItemVisionAccessor)
+            return iItemVisionAccessor.vminus$getVision();
+        return emptyVision;
+    }
+
+    public static ItemVision getVision(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof IItemVisionAccessor iItemVisionAccessor)
+            return iItemVisionAccessor.vminus$getVision();
+        return emptyVision;
     }
 }

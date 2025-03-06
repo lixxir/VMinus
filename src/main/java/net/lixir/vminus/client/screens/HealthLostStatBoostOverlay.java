@@ -59,7 +59,7 @@ public class HealthLostStatBoostOverlay {
 
     private static float getAttributeValueFromItem(ItemStack itemStack, EquipmentSlot slot, Attribute attribute) {
         Collection<AttributeModifier> modifiers = itemStack.getAttributeModifiers(slot).get(attribute);
-        if (modifiers != null && !modifiers.isEmpty()) {
+        if (!modifiers.isEmpty()) {
             return (float) modifiers.stream().mapToDouble(AttributeModifier::getAmount).sum();
         }
         return 0.0f;

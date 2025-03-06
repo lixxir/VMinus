@@ -3,7 +3,6 @@ package net.lixir.vminus.core;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.core.util.ItemTabData;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -28,10 +27,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Mod.EventBusSubscriber
 public class Visions {
-    public static final int EMPTY_KEY = -1;
+    /* In the process of being replaced entirely, this code should not be used.
 
-    public static final Map<String, SoundType> BLOCK_SOUND_TYPE_CACHE = new HashMap<>();
-    public static final List<ItemTabData> ITEM_TAB_DATA = new ArrayList<>();
+     */
+    public static final int EMPTY_KEY = -1;
 
 
     private static JsonObject scanVisionJsonKey(JsonObject mainVision, String key, String id, JsonObject mergedData,

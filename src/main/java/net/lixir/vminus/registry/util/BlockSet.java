@@ -1,12 +1,12 @@
 package net.lixir.vminus.registry.util;
 
-import net.lixir.vminus.VMinus;
+import com.mojang.datafixers.util.Pair;
 import net.lixir.vminus.block.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SignItem;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -17,923 +17,632 @@ import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 public class BlockSet {
-    public static final ArrayList<BlockSet> BLOCK_SETS = new ArrayList<>();
-    public static final ArrayList<String> usingMods = new ArrayList<>();
-    private final ArrayList<RegistryObject<Block>> blocks = new ArrayList<>();
+    public static final List<BlockSet> BLOCK_SETS = new ArrayList<>();
+    private final List<BlockItemRegistryPair> blockItemPairs = new ArrayList<>();
 
-
-    private final String baseName;
-    public WoodType woodType = null;
-    private Block alternateBaseBlock = null;
-    // Block RegistryObjects from the BlockSet.
-    private RegistryObject<Block> baseBlock = null;
-    private RegistryObject<Block> stairsBlock = null;
-    private RegistryObject<Block> slabBlock = null;
-    private RegistryObject<Block> wallBlock = null;
-    private RegistryObject<Block> crackedBlock = null;
-    private RegistryObject<Block> fenceBlock = null;
-    private RegistryObject<Block> fenceGateBlock = null;
-    private RegistryObject<Block> doorBlock = null;
-    private RegistryObject<Block> trapDoorBlock = null;
-    private RegistryObject<Block> pressurePlateBlock = null;
-    private RegistryObject<Block> buttonBlock = null;
-    private RegistryObject<Block> standingSignBlock = null;
-    private RegistryObject<Block> wallSignBlock = null;
-    private RegistryObject<Block> hangingSignBlock = null;
-    private RegistryObject<Block> wallHangingSignBlock = null;
-    private RegistryObject<Block> logBlock = null;
-    private RegistryObject<Block> strippedLogBlock = null;
-    private RegistryObject<Block> woodBlock = null;
-    private RegistryObject<Block> strippedWoodBlock = null;
-    private RegistryObject<Block> leavesBlock = null;
-    //
-    private String copyBlock = null;
-    private DyeColor dyeColor = null;
-    private String alternateBaseName = null;
-    private ResourceLocation creativeTabItem = new ResourceLocation("minecraft:bricks");
-    private ResourceLocation afterCreativeTabItem = null;
-    private ResourceLocation signAfterCreativeTabItem = null;
-    private ToolType toolType = ToolType.HAND;
-    private ToolStrength toolStrength = ToolStrength.NONE;
-    private RenderType renderType = RenderType.NORMAL;
-    private float hardness = 1.5f;
-    private float resistance = 6.0f;
-    private int offset = 1;
-    private SoundType soundType = SoundType.STONE;
-    // Inclusions of the BlockSet
-    private boolean includeWall = false;
-    private boolean includeSlab = false;
-    private boolean includeStairs = false;
-    private boolean includeBaseBlock = true;
-    private boolean includeCracked = false;
-    private boolean includeFence = false;
-    private boolean includeFenceGate = false;
-    private boolean includePressurePlate = false;
-    private boolean includeButton = false;
-    private boolean includeTrapdoor = false;
-    private boolean includeDoor = false;
-    private boolean includeLog = false;
-    private boolean includeSign = false;
-    private boolean includeHangingSign = false;
-    private boolean includeChiseled = false;
-    private boolean includeLeaves = false;
-    private boolean leavesColored = false;
-    private boolean isWoodSet = false;
-    private ResourceLocation leavesAfterCreativeTabItem;
     private final String modId;
-
+    private final Block baseBlock;
+    private final RegistryObject<Block> baseBlockObject;
+    private final String renderType;
+    private final BlockSetCreativeOrder creativeOrder;
     private final DeferredRegister<Item> itemRegistry;
     private final DeferredRegister<Block> blockRegistry;
+    private final String baseBlockName;
+    private final String baseBlockPath;
+    private final String baseBlockNamespace;
+    private final BlockBehaviour.Properties properties;
+    private ResourceLocation baseTexture;
 
+    private BlockItemRegistryPair stairs = null;
+    private BlockItemRegistryPair slab = null;
+    private BlockItemRegistryPair wall = null;
+    private BlockItemRegistryPair fence = null;
+    private BlockItemRegistryPair fenceGate = null;
+    private BlockItemRegistryPair pressurePlate = null;
+    private BlockItemRegistryPair button = null;
+    private BlockItemRegistryPair door = null;
+    private BlockItemRegistryPair trapdoor = null;
+    private BlockItemRegistryPair standingSign = null;
+    private BlockItemRegistryPair wallSign = null;
+    private BlockItemRegistryPair hangingSign = null;
+    private BlockItemRegistryPair wallHangingSign = null;
+    private BlockItemRegistryPair log = null;
+    private BlockItemRegistryPair wood = null;
+    private BlockItemRegistryPair strippedLog = null;
+    private BlockItemRegistryPair strippedWood = null;
+    private Pair<TagKey<Block>, TagKey<Item>> logsTag = null;
 
-    public BlockSet(String baseName, String modId, DeferredRegister<Item> itemRegistry, DeferredRegister<Block> blockRegistry) {
-        this.baseName = baseName;
-        this.modId = modId;
-        this.itemRegistry = itemRegistry;
-        this.blockRegistry = blockRegistry;
+    private final ArrayList<TagKey<Block>> blockTags;
+
+    private final WoodType woodType;
+    private final BlockSetType blockSetType;
+
+    private final boolean isWoodSet;
+    private final boolean isStoneSet;
+    private final boolean isNetherWoodSet;
+    private final String blockId;
+
+    private BlockSet(Builder builder) {
+        this.itemRegistry = builder.itemRegistry;
+        this.blockRegistry = builder.blockRegistry;
+        this.modId = builder.modId;
+        this.blockId = builder.blockId;
+        Supplier<? extends Block> supplier = builder.supplier;
+        this.baseBlock = builder.baseBlock;
+        this.properties = builder.properties;
+        this.blockTags = builder.blockTags;
+        this.isStoneSet = builder.isStoneSet;
+        this.isNetherWoodSet = builder.isNetherWoodSet;
+
+        if (supplier != null) {
+            baseBlockObject = blockRegistry.register(blockId, supplier);
+        } else {
+            this.baseBlockObject = builder.baseBlockObj;
+        }
+
+        this.creativeOrder = builder.creativeOrder;
+
+        this.isWoodSet = builder.isWoodSet;
+        this.baseBlockName = getCorrectBaseName();
+        this.baseBlockPath = getCorrectBasePath();
+        if (builder.isWoodSet) {
+            this.blockSetType = BlockSetType.register(new BlockSetType(modId + ":" + baseBlockName));
+            this.woodType = WoodType.register(new WoodType(modId + ":" + baseBlockName, blockSetType));
+        } else {
+            this.woodType = WoodType.OAK;
+            this.blockSetType = BlockSetType.OAK;
+        }
+        if (baseBlock != null) {
+            this.baseBlockNamespace = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.baseBlock)).getNamespace();
+        } else {
+            this.baseBlockNamespace = baseBlockObject.getId().getNamespace();
+        }
+        this.baseTexture = builder.texture;
+        if (baseTexture == null) {
+            if (baseBlock != null) {
+                this.baseTexture = new ResourceLocation(baseBlockNamespace, "block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.baseBlock)).getPath());
+            } else {
+                this.baseTexture = new ResourceLocation(baseBlockNamespace, "block/" + baseBlockObject.getId().getPath());
+            }
+        }
+
+        this.renderType = builder.renderType;
+
+        registerBlockSet(builder);
+        BLOCK_SETS.add(this);
     }
 
-    public static String correctBaseName(String baseName) {
+
+    private TagKey<Block> blockTag(String name) {
+        return BlockTags.create(new ResourceLocation(modId, name));
+    }
+
+    private TagKey<Item> itemTag(String name) {
+        return ItemTags.create(new ResourceLocation(modId, name));
+    }
+
+    public String getBaseBlockName() {
+        return this.baseBlockName;
+    }
+
+    private String getCorrectBasePath() {
+        if (blockId != null && !blockId.isEmpty() && baseBlockObject == null)
+            return blockId;
+        return this.baseBlock != null ? Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(this.baseBlock)).getPath()
+                : this.baseBlockObject.getId().getPath();
+    }
+
+    private String getCorrectBaseName() {
+        String baseName = getCorrectBasePath();
         if (baseName.endsWith("s")) {
-            // accounts for words like 'glass' that have 2 S's
-            if (baseName.length() > 1 && baseName.charAt(baseName.length() - 2) == 's') {
-                return baseName;
-            }
-            return baseName.substring(0, baseName.length() - 1);
+            baseName = baseName.substring(0, baseName.length() - 1);
+        }
+        if (baseName.endsWith("_block")) {
+            baseName = baseName.substring(0, baseName.indexOf("_block"));
+        }
+        if (baseName.endsWith("_plank")) {
+            baseName = baseName.substring(0, baseName.indexOf("_plank"));
         }
         return baseName;
     }
 
-    public static String getAlternateBaseName(String inputString) {
-        if (inputString != null && !inputString.isEmpty()) {
-            String fixedBaseName = inputString;
-            if (fixedBaseName.contains(":")) {
-                fixedBaseName = fixedBaseName.substring(fixedBaseName.indexOf(":") + 1);
+    public List<BlockItemRegistryPair> getBlockItemPairs() {
+        return this.blockItemPairs;
+    }
+
+    private void registerBlockSet(Builder builder) {
+        BlockBehaviour.Properties properties = this.properties != null ? this.properties : BlockBehaviour.Properties.copy(baseBlock);
+
+        if (builder.hasLogs) {
+            if (isNetherWoodSet) {
+                log = registerPair("_stem", () -> new StrippablePillarBlock(BlockBehaviour.Properties.copy(Blocks.CRIMSON_STEM), strippedLog.blockObject()));
+                wood = registerPair("_hyphae", () -> new StrippablePillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_CRIMSON_STEM), strippedWood.blockObject()));
+                strippedLog = registerPair("stripped_", "_stem", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.CRIMSON_HYPHAE)));
+                strippedWood = registerPair("stripped_", "_hyphae", () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_CRIMSON_HYPHAE)));
+                logsTag = new Pair<>(blockTag(baseBlockName + "_stems"), itemTag(baseBlockName + "_stems"));
+            } else {
+                log = registerPair("_log", () -> new StrippableFlammablePillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG), strippedLog.blockObject()));
+                wood = registerPair("_wood", () -> new StrippableFlammablePillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD), strippedWood.blockObject()));
+                strippedLog = registerPair("stripped_", "_log", () -> new FlammableRotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+                strippedWood = registerPair("stripped_", "_wood", () -> new FlammableRotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+                logsTag = new Pair<>(blockTag(baseBlockName + "_logs"), itemTag(baseBlockName + "_logs"));
             }
-            return fixedBaseName;
-        } else {
-            return null;
+
+
+        }
+        // Make sure base block is after some things
+        if (baseBlockObject != null) {
+            RegistryObject<Item> itemRegistryObject = RegistryUtil.itemForBlock(baseBlockObject, itemRegistry);
+            creativeOrder.addItemRegistry(itemRegistryObject);
+            blockItemPairs.add(new BlockItemRegistryPair(baseBlockObject, itemRegistryObject));
+        }
+
+        if (builder.hasStairs) {
+            stairs = registerPair("_stairs", () -> new StairBlock(getBaseBlock()::defaultBlockState, properties));
+        }
+        if (builder.hasSlab) {
+            slab = registerPair("_slab", () -> new SlabBlock(properties));
+        }
+        if (builder.hasWall) {
+            wall = registerPair("_wall", () -> new WallBlock(properties));
+        }
+        if (builder.hasFence) {
+            fence = registerPair("_fence", () -> new FenceBlock(properties));
+        }
+        if (builder.hasFenceGate) {
+            fenceGate = registerPair("_fence_gate", () -> new FenceGateBlock(properties, woodType));
+        }
+        if (builder.hasDoor) {
+            door = registerPair("_door", () -> new DoorBlock(properties, blockSetType));
+        }
+        if (builder.hasTrapdoor) {
+            trapdoor = registerPair("_trapdoor", () -> new TrapDoorBlock(properties, blockSetType));
+        }
+        if (builder.hasPressurePlate) {
+            pressurePlate = registerPair("_pressure_plate", () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, properties, blockSetType));
+        }
+        if (builder.hasButton) {
+            button = registerPair("_button", () -> new ButtonBlock(properties, blockSetType, 15, true));
+        }
+        if (builder.hasSign) {
+            RegistryObject<Block> standingSign = registerBlock("_sign", () -> new ModStandingSignBlock(properties, woodType));
+            RegistryObject<Block> wallSign = registerBlock("_wall_sign", () -> new ModWallSignBlock(properties, woodType));
+            RegistryObject<Item> signItem = itemRegistry.register(baseBlockName + "_sign",
+                    () -> new SignItem(new Item.Properties().stacksTo(16), standingSign.get(), wallSign.get()));
+
+            BlockItemRegistryPair registryPair1 = new BlockItemRegistryPair(standingSign, signItem);
+            BlockItemRegistryPair registryPair2 = new BlockItemRegistryPair(wallSign, signItem);
+
+            this.standingSign = registryPair1;
+            this.wallSign = registryPair2;
+
+            blockItemPairs.add(registryPair1);
+            blockItemPairs.add(registryPair2);
+        }
+        if (builder.hasHangingSign) {
+            RegistryObject<Block> hangingSign = registerBlock("_hanging_sign", () -> new ModHangingSignBlock(properties, woodType));
+            RegistryObject<Block> wallHangingSign = registerBlock("_wall_hanging_sign", () -> new ModWallHangingSignBlock(properties, woodType));
+            RegistryObject<Item> hangingSignItem = itemRegistry.register(baseBlockName + "_hanging_sign",
+                    () -> new HangingSignItem(hangingSign.get(), wallHangingSign.get(), new Item.Properties().stacksTo(16)));
+
+            BlockItemRegistryPair registryPair1 = new BlockItemRegistryPair(hangingSign, hangingSignItem);
+            BlockItemRegistryPair registryPair2 = new BlockItemRegistryPair(wallHangingSign, hangingSignItem);
+
+            this.hangingSign = registryPair1;
+            this.wallHangingSign = registryPair2;
+
+            blockItemPairs.add(registryPair1);
+            blockItemPairs.add(registryPair2);
         }
     }
 
-    public static String getAlternateNamespace(String inputString) {
-        if (inputString != null && !inputString.isEmpty()) {
-            String fixedBaseName = inputString;
-            if (fixedBaseName.contains(":")) {
-                fixedBaseName = fixedBaseName.substring(0, fixedBaseName.indexOf(":"));
-            }
-            return fixedBaseName;
-        } else {
-            return null;
+    public String getModId() {
+        return modId;
+    }
+
+
+    private RegistryObject<Block> registerBlock(String suffix, Supplier<Block> blockSupplier) {
+        return blockRegistry.register(baseBlockName + suffix, blockSupplier);
+    }
+    private BlockItemRegistryPair registerPair(String suffix, Supplier<Block> blockSupplier) {
+        return registerPair("", suffix, blockSupplier);
+    }
+
+    private BlockItemRegistryPair registerPair(String prefix, String suffix, Supplier<Block> blockSupplier) {
+        RegistryObject<Block> block = blockRegistry.register(prefix + baseBlockName + suffix, blockSupplier);
+        RegistryObject<Item> item = itemRegistry.register(prefix + baseBlockName + suffix, () -> new BlockItem(block.get(), new Item.Properties()));
+
+        if (creativeOrder != null && item != null) {
+            creativeOrder.addItemRegistry(item);
         }
+        BlockItemRegistryPair registryPair = new BlockItemRegistryPair(block, item);
+        blockItemPairs.add(registryPair);
+        return registryPair;
     }
 
-    public static String renderTypeToString(BlockSet.RenderType renderType) {
-        String strRenderType = "solid";
-        switch (renderType) {
-            case GLASS -> strRenderType = "cutout_mipped";
-            case NORMAL -> strRenderType = "solid";
-            case STAINED_GLASS -> strRenderType = "translucent";
-        }
-        return strRenderType;
-    }
-
-    public BlockSet strength(float hardness, float resistance) {
-        this.hardness = hardness;
-        this.resistance = resistance;
-        return this;
-    }
-
-    public BlockSet sound(SoundType soundType) {
-        this.soundType = soundType;
-        return this;
-    }
-
-    public BlockSet withWalls() {
-        this.includeWall = true;
-        return this;
-    }
-
-    public BlockSet inTabItem(ResourceLocation resourceLocation) {
-        this.creativeTabItem = resourceLocation;
-        return this;
-    }
-
-    public BlockSet inTabItem(TabType tabType) {
-        ResourceLocation resourceLocation = null;
-        switch (tabType) {
-            case COLORED -> resourceLocation = new ResourceLocation("minecraft", "cyan_wool");
-            case BUILDING -> resourceLocation = new ResourceLocation("minecraft", "bricks");
-            case NATURAL -> resourceLocation = new ResourceLocation("minecraft", "grass_block");
-            case FUNCTIONAL -> resourceLocation = new ResourceLocation("minecraft", "oak_sign");
-        }
-        if (resourceLocation != null)
-            this.creativeTabItem = resourceLocation;
-        return this;
-    }
-
-    public BlockSet setCopyBlock(String copyBlock) {
-        this.copyBlock = copyBlock;
-        return this;
-    }
-
-    public BlockSet withSlabs() {
-        this.includeSlab = true;
-        return this;
-    }
-
-    public BlockSet withStairs() {
-        this.includeStairs = true;
-        return this;
-    }
-
-    public BlockSet withStairsSlabWall() {
-        this.includeStairs = true;
-        this.includeWall = true;
-        this.includeSlab = true;
-        return this;
-    }
-
-    public BlockSet withStairsSlabWallNoBase() {
-        this.includeStairs = true;
-        this.includeWall = true;
-        this.includeSlab = true;
-        this.includeBaseBlock = false;
-        return this;
-    }
-
-    public BlockSet withStairsSlab() {
-        this.includeStairs = true;
-        this.includeSlab = true;
-        return this;
-    }
-
-    public BlockSet withStairsSlabNoBase() {
-        this.includeStairs = true;
-        this.includeSlab = true;
-        this.includeBaseBlock = false;
-        return this;
-    }
-
-    public BlockSet withoutBase() {
-        this.includeBaseBlock = false;
-        return this;
-    }
-
-    public BlockSet withCracked() {
-        this.includeCracked = true;
-        return this;
-    }
-
-    public BlockSet withFence() {
-        this.includeFence = true;
-        return this;
-    }
-
-    public BlockSet withFenceGate() {
-        this.includeFenceGate = true;
-        return this;
-    }
-
-    public BlockSet withPressurePlate() {
-        this.includePressurePlate = true;
-        return this;
-    }
-
-    public BlockSet withButton() {
-        this.includeButton = true;
-        return this;
-    }
-
-    public BlockSet withDoor() {
-        this.includeDoor = true;
-        return this;
-    }
-
-    public BlockSet withTrapDoor() {
-        this.includeTrapdoor = true;
-        return this;
-    }
-
-    public BlockSet withSign() {
-        this.includeSign = true;
-        return this;
-    }
-
-    public BlockSet setWoodSet() {
-        this.isWoodSet = true;
-        return this;
-    }
-
-    public BlockSet withHangingSign() {
-        this.includeHangingSign = true;
-        return this;
-    }
-
-    public BlockSet leavesNotColored() {
-        this.leavesColored = false;
-        return this;
-    }
-
-    public BlockSet woodSet() {
-        this.includeBaseBlock = true;
-        this.includeStairs = true;
-        this.includeSlab = true;
-        this.includeFence = true;
-        this.includeFenceGate = true;
-        this.includeDoor = true;
-        this.includeTrapdoor = true;
-        this.includePressurePlate = true;
-        this.includeButton = true;
-        this.includeSign = true;
-        this.includeHangingSign = true;
-        this.isWoodSet = true;
-        this.includeLog = true;
-        this.copyBlock = "minecraft:oak_planks";
-        this.toolType = ToolType.AXE;
-        this.includeLeaves = true;
-        this.leavesColored = true;
-        this.alternateBaseName = this.modId + ":" + baseName + "_planks";
-        this.creativeTabItem = new ResourceLocation("minecraft", "bricks");
-        return this;
-    }
-
-    public boolean isWoodSet() {
-        return this.isWoodSet;
-    }
-
-    public boolean hasWall() {
-        return this.includeWall;
-    }
-
-    public boolean hasFence() {
-        return this.includeFence;
-    }
-
-    public boolean hasFenceGate() {
-        return this.includeFenceGate;
-    }
-
-    public boolean hasPressurePlate() {
-        return this.includePressurePlate;
-    }
-
-    public boolean hasButton() {
-        return this.includeButton;
-    }
-
-    public boolean hasDoor() {
-        return this.includeDoor;
-    }
-
-    public boolean hasTrapdoor() {
-        return this.includeTrapdoor;
-    }
-
-    public boolean areLeavesColored() {
-        return this.leavesColored;
-    }
-
-    public boolean hasSign() {
-        return this.includeSign;
-    }
-
-    public boolean hasLog() {
-        return this.includeLog;
-    }
-
-    public boolean hasLeaves() {
-        return this.includeLeaves;
-    }
-
-    public boolean hasHangingSign() {
-        return this.includeHangingSign;
-    }
-
-    public boolean hasChiseled() {
-        return this.includeChiseled;
-    }
-
-    public boolean hasSlab() {
-        return this.includeSlab;
-    }
-
-    public boolean hasStairs() {
-        return this.includeStairs;
-    }
-
-    public boolean hasCracked() {
-        return this.includeCracked;
-    }
-
-    public boolean hasBase() {
-        return this.includeBaseBlock;
-    }
-
-    public ArrayList<RegistryObject<Block>> getBlocks() {
-        return this.blocks;
-    }
-
-    public int getOffset() {
-        return this.offset;
-    }
-
-    public BlockSet setOffset(int offset) {
-        this.offset = offset;
-        return this;
-    }
-
-    public BlockSet setDye(DyeColor dyeColor) {
-        this.dyeColor = dyeColor;
-        return this;
+    public BlockSetCreativeOrder getCreativeOrder() {
+        return creativeOrder;
     }
 
     public Block getBaseBlock() {
-        if (hasBase()) {
-            return this.baseBlock.get();
-        } else if (alternateBaseName != null && !alternateBaseName.isEmpty()) {
-            return this.alternateBaseBlock;
-        }
-        return null;
+        return this.baseBlockObject != null ? this.baseBlockObject.get() : this.baseBlock;
     }
 
-    public Block getStairsBlock() {
-        if (hasStairs()) {
-            return this.stairsBlock.get();
-        }
-        return null;
+    public RegistryObject<Block> getBaseBlockRegistryObject() {
+        return baseBlockObject;
+    }
+
+    public BlockItemRegistryPair getWall() {
+        return wall;
+    }
+
+    public BlockItemRegistryPair getSlab() {
+        return slab;
+    }
+
+    public BlockItemRegistryPair getStairs() {
+        return stairs;
+    }
+
+    public String getRenderType() {
+        return renderType;
+    }
+
+    public String getBaseBlockNamespace() {
+        return baseBlockNamespace;
     }
 
     public WoodType getWoodType() {
-        return this.woodType;
+        return woodType;
     }
 
-    public Block getSlabBlock() {
-        if (hasSlab()) {
-            return this.slabBlock.get();
-        }
-        return null;
+    public boolean isWoodSet() {
+        return isWoodSet;
     }
 
-    public Block getFenceBlock() {
-        if (hasFence()) {
-            return this.fenceBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getFence() {
+        return fence;
     }
 
-    public Block getFenceGateBlock() {
-        if (hasFenceGate()) {
-            return this.fenceGateBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getFenceGate() {
+        return fenceGate;
     }
 
-    public Block getPressurePlateBlock() {
-        if (hasPressurePlate()) {
-            return this.pressurePlateBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getPressurePlate() {
+        return pressurePlate;
     }
 
-    public Block getButtonBlock() {
-        if (hasButton()) {
-            return this.buttonBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getButton() {
+        return button;
     }
 
-    public Block getWallBlock() {
-        if (hasWall()) {
-            return this.wallBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getDoor() {
+        return door;
     }
 
-    public Block getDoorBlock() {
-        if (hasDoor()) {
-            return this.doorBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getTrapdoor() {
+        return trapdoor;
     }
 
-    public Block getTrapdoorBlock() {
-        if (hasTrapdoor()) {
-            return this.trapDoorBlock.get();
-        }
-        return null;
+    public ResourceLocation getBaseTexture() {
+        return baseTexture;
     }
 
-    public Block getCrackedBlock() {
-        if (hasCracked()) {
-            return this.crackedBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getSign() {
+        return standingSign;
     }
 
-    public Block getStandingSignBlock() {
-        if (hasSign()) {
-            return this.standingSignBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getWallSign() {
+        return wallSign;
     }
 
-    public Block getWallSignBlock() {
-        if (hasSign()) {
-            return this.wallSignBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getHangingSign() {
+        return hangingSign;
     }
 
-    public Block getHangingSignBlock() {
-        if (hasHangingSign()) {
-            return this.hangingSignBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getWallHangingSign() {
+        return wallHangingSign;
     }
 
-    public Block getWallHangingSignBlock() {
-        if (hasHangingSign()) {
-            return this.wallHangingSignBlock.get();
-        }
-        return null;
+    public String getBaseBlockPath() {
+        return baseBlockPath;
     }
 
-    public Block getLogBlock() {
-        if (hasLog()) {
-            return this.logBlock.get();
-        }
-        return null;
+    public ArrayList<TagKey<Block>> getBlockTags() {
+        return blockTags;
     }
 
-    public Block getLeavesBlock() {
-        if (hasLeaves()) {
-            return this.leavesBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getLog() {
+        return log;
     }
 
-    public Block getStrippedLogBlock() {
-        if (hasLog()) {
-            return this.strippedLogBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getWood() {
+        return wood;
     }
 
-    public Block getWoodBlock() {
-        if (hasLog()) {
-            return this.woodBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getStrippedLog() {
+        return strippedLog;
     }
 
-    public Block getStrippedWoodBlock() {
-        if (hasLog()) {
-            return this.strippedWoodBlock.get();
-        }
-        return null;
+    public BlockItemRegistryPair getStrippedWood() {
+        return strippedWood;
     }
 
-    public ResourceLocation getTabItem() {
-        return this.creativeTabItem;
+    public Pair<TagKey<Block>, TagKey<Item>> getLogsTag() {
+        return logsTag;
     }
 
-    public String getBaseName() {
-        return this.baseName;
+    public boolean isStoneSet() {
+        return isStoneSet;
     }
 
-    public String getAlternateBaseName() {
-        if (alternateBaseName != null && !alternateBaseName.isEmpty()) {
-            String fixedBaseName = alternateBaseName;
-            if (fixedBaseName.contains(":")) {
-                fixedBaseName = fixedBaseName.substring(fixedBaseName.indexOf(":"), fixedBaseName.length() - 1);
-            }
-            return fixedBaseName;
-        } else {
-            return null;
-        }
+    public boolean isNetherWoodSet() {
+        return isNetherWoodSet;
     }
 
-    public BlockSet setAlternateBaseName(String alternateBaseName) {
-        this.alternateBaseName = alternateBaseName;
-        return this;
-    }
+    public static class Builder {
+        private String baseBlockNamespaceId = null;
+        private RegistryObject<Block> baseBlockObj;
+        private Block baseBlock = null;
+        private final DeferredRegister<Block> blockRegistry;
+        private final DeferredRegister<Item> itemRegistry;
+        private final String modId;
 
-    public String getAlternateBaseNameRaw() {
-        return this.alternateBaseName;
-    }
+        private BlockSetCreativeOrder creativeOrder = null;
+        private String renderType = "solid";
+        private boolean hasStairs = false;
+        private boolean hasLogs = false;
+        private boolean hasSlab = false;
+        private boolean hasWall = false;
+        private boolean hasFence = false;
+        private boolean hasFenceGate = false;
+        private boolean hasPressurePlate = false;
+        private boolean hasButton = false;
+        private boolean hasTrapdoor = false;
+        private boolean hasDoor = false;
+        private boolean hasSign = false;
+        private boolean hasHangingSign = false;
+        private boolean isWoodSet = false;
+        private boolean isStoneSet = false;
+        private ResourceLocation texture = null;
+        private Supplier<? extends Block> supplier = null;
+        private BlockBehaviour.Properties properties = null;
+        private String blockId = "";
+        private final ArrayList<TagKey<Block>> blockTags = new ArrayList<>();
+        private boolean isNetherWoodSet = false;
 
-    public ResourceLocation getSignAfterCreativeTabItem() {
-        return this.signAfterCreativeTabItem;
-    }
-
-    public ResourceLocation getAfterCreativeTabItem() {
-        return this.afterCreativeTabItem;
-    }
-
-    public ToolType getTooltype() {
-        return this.toolType;
-    }
-
-    public BlockSet withToolType(ToolType toolType) {
-        this.toolType = toolType;
-        return this;
-    }
-
-    public ToolStrength getToolStrength() {
-        return this.toolStrength;
-    }
-
-    public RenderType getRenderType() {
-        return this.renderType;
-    }
-
-    public BlockSet setRenderType(RenderType renderType) {
-        this.renderType = renderType;
-        return this;
-    }
-
-    public BlockSet withToolStrength(ToolStrength toolStrength) {
-        this.toolStrength = toolStrength;
-        return this;
-    }
-
-    public BlockSet afterCreativeItem(ResourceLocation resourceLocation) {
-        this.afterCreativeTabItem = resourceLocation;
-        return this;
-    }
-
-    public BlockSet signAfterCreativeItem(ResourceLocation resourceLocation) {
-        this.signAfterCreativeTabItem = resourceLocation;
-        return this;
-    }
-
-    public BlockSet leavesAfterCreativeItem(ResourceLocation resourceLocation) {
-        this.leavesAfterCreativeTabItem = resourceLocation;
-        return this;
-    }
-
-    public String getAlternateNamespace() {
-        if (alternateBaseName != null && !alternateBaseName.isEmpty()) {
-            String fixedBaseName = alternateBaseName;
-            if (fixedBaseName.contains(":")) {
-                fixedBaseName = fixedBaseName.substring(0, fixedBaseName.indexOf(":"));
-            }
-            return fixedBaseName;
-        } else {
-            return null;
-        }
-    }
-
-    public Block getCorrectBlock(RegistryObject<Block> baseBlock, Block block) {
-        if (baseBlock != null) {
-            baseBlock.get();
-            return baseBlock.get();
-        } else {
-            return (block);
-        }
-    }
-
-    public String getModId(){
-        return this.modId;
-    }
-
-    public Block getCopyBlock(RegistryObject<Block> baseBlock, Block block) {
-        Block correctedBlock = null;
-        if (copyBlock != null && !copyBlock.isEmpty()) {
-            ResourceLocation resourceLocation = new ResourceLocation(copyBlock);
-            correctedBlock = ForgeRegistries.BLOCKS.getValue(resourceLocation);
-        } else if (baseBlock != null) {
-            correctedBlock = baseBlock.get();
-        } else if (block != null) {
-            correctedBlock = block;
-        }
-        return correctedBlock;
-    }
-
-    public Block getBlockWithRendering(BlockType blockType, BlockBehaviour.Properties properties) {
-        return getBlockWithRendering(blockType, properties, null);
-    }
-
-    public Block getBlockWithRendering(BlockType blockType, BlockBehaviour.Properties properties, @Nullable Block block) {
-        Block returnBlock = null;
-        if (renderType == RenderType.GLASS) {
-            switch (blockType) {
-                case BASE -> returnBlock = new GlassBlock(properties);
-                case STAIRS ->
-                        returnBlock = new GlassStairsBlock(() -> getCopyBlock(baseBlock, block).defaultBlockState(), properties);
-                case SLAB -> returnBlock = new GlassSlabBlock(properties);
-            }
-        } else if (renderType == RenderType.STAINED_GLASS) {
-            switch (blockType) {
-                case BASE -> returnBlock = new StainedGlassBlock(this.dyeColor, properties);
-                case STAIRS -> returnBlock = new StainedGlassStairsBlock(this.dyeColor, properties);
-                case SLAB -> returnBlock = new StainedGlassSlabBlock(this.dyeColor, properties);
-            }
-        } else {
-            switch (blockType) {
-                case BASE -> returnBlock = new Block(properties);
-                case STAIRS ->
-                        returnBlock = new StairBlock(() -> getCopyBlock(baseBlock, block).defaultBlockState(), properties);
-                case SLAB -> returnBlock = new SlabBlock(properties);
-                case WALL -> returnBlock = new WallBlock(properties);
-                case FENCE -> returnBlock = new FenceBlock(properties);
-                case FENCE_GATE -> returnBlock = new FenceGateBlock(properties, this.woodType);
-                case PRESSURE_PLATE ->
-                        returnBlock = new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, properties, BlockSetType.OAK);
-                case BUTTON -> returnBlock = new ButtonBlock(properties, BlockSetType.OAK, 15, true);
-                case DOOR -> returnBlock = new DoorBlock(properties, BlockSetType.OAK);
-                case TRAPDOOR -> returnBlock = new TrapDoorBlock(properties, BlockSetType.OAK);
-                case LOG -> returnBlock = new ModFlammableRotatedPillarBlock(properties);
-            }
-        }
-        return returnBlock;
-    }
-
-    public BlockSet build() {
-        VMinus.LOGGER.debug("Building BlockSet for mod: {}", modId);
-        Block block;
-        RegistryObject<Block> baseBlock;
-
-
-        if (isWoodSet) {
-            VMinus.LOGGER.debug("Registering WoodType: {}", modId + ":" + baseName);
-            this.woodType = WoodType.register(new WoodType(modId + ":" + baseName, BlockSetType.OAK));
+        public Builder(String modId, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
+            this.baseBlock = null;
+            this.baseBlockObj = null;
+            this.blockRegistry = blockRegistry;
+            this.itemRegistry = itemRegistry;
+            this.modId = modId;
         }
 
-        if (includeBaseBlock) {
-            VMinus.LOGGER.debug("Including base block for: {}", (isWoodSet ? baseName + "_planks" : baseName));
-            block = null;
-            if (this.copyBlock != null && !this.copyBlock.isEmpty()) {
-                VMinus.LOGGER.debug("Copying block from: {}", this.copyBlock);
-                Block copyBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(this.copyBlock));
-                baseBlock = blockRegistry.register((isWoodSet ? baseName + "_planks" : baseName),
-                        () -> new Block(BlockBehaviour.Properties.copy(copyBlock)));
-            } else {
-                baseBlock = blockRegistry.register((isWoodSet ? baseName + "_planks" : baseName),
-                        () -> new Block(BlockBehaviour.Properties.of().strength(hardness, resistance).sound(soundType)));
-            }
-            itemRegistry.register((isWoodSet ? baseName + "_planks" : baseName), () -> new BlockItem(baseBlock.get(), new Item.Properties()));
-            blocks.add(baseBlock);
+        public Builder(String modId, String baseBlockNamespaceId, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
+            this.baseBlockNamespaceId = baseBlockNamespaceId;
+            this.baseBlock = null;
+            this.baseBlockObj = null;
+            this.blockRegistry = blockRegistry;
+            this.itemRegistry = itemRegistry;
+            this.modId = modId;
+        }
+
+        public Builder(String modId, Block baseBlock, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
             this.baseBlock = baseBlock;
-        } else {
-            baseBlock = null;
-            if (alternateBaseName != null && !alternateBaseName.isEmpty()) {
-                VMinus.LOGGER.debug("Using alternate base block name: {}", alternateBaseName);
-                ResourceLocation resourceLocation = new ResourceLocation(alternateBaseName.split(":")[0], alternateBaseName.split(":")[1]);
-                block = ForgeRegistries.BLOCKS.getValue(resourceLocation);
-                this.alternateBaseBlock = block;
-            } else {
-                block = null;
-            }
+            this.baseBlockObj = null;
+            this.blockRegistry = blockRegistry;
+            this.itemRegistry = itemRegistry;
+            this.modId = modId;
         }
 
-        if (baseBlock != null || block != null) {
-            String fixedBaseBlockId = correctBaseName(baseName);
-            Block copyBlock = getCopyBlock(baseBlock, block);
-
-            if (includeCracked) {
-                VMinus.LOGGER.debug("Including cracked block for: {}", baseName);
-                this.crackedBlock = blockRegistry.register("cracked_" + baseName,
-                        () -> getBlockWithRendering(BlockType.BASE, BlockBehaviour.Properties.copy(copyBlock)));
-                itemRegistry.register("cracked_" + baseName, () -> new BlockItem(crackedBlock.get(), new Item.Properties()));
-                blocks.add(crackedBlock);
-            }
-
-            if (includeStairs) {
-                VMinus.LOGGER.debug("Including stairs block for: {}", fixedBaseBlockId);
-                this.stairsBlock = blockRegistry.register(fixedBaseBlockId + "_stairs",
-                        () -> getBlockWithRendering(BlockType.STAIRS, BlockBehaviour.Properties.copy(copyBlock), block));
-                itemRegistry.register(fixedBaseBlockId + "_stairs", () -> new BlockItem(stairsBlock.get(), new Item.Properties()));
-                blocks.add(stairsBlock);
-            }
-
-            if (includeSlab) {
-                VMinus.LOGGER.debug("Including slab block for: {}", fixedBaseBlockId);
-                this.slabBlock = blockRegistry.register(fixedBaseBlockId + "_slab",
-                        () -> getBlockWithRendering(BlockType.SLAB, BlockBehaviour.Properties.copy(copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_slab", () -> new BlockItem(slabBlock.get(), new Item.Properties()));
-                blocks.add(slabBlock);
-            }
-
-            if (includeWall) {
-                VMinus.LOGGER.debug("Including wall block for: {}", fixedBaseBlockId);
-                this.wallBlock = blockRegistry.register(fixedBaseBlockId + "_wall",
-                        () -> getBlockWithRendering(BlockType.WALL, BlockBehaviour.Properties.copy(copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_wall", () -> new BlockItem(wallBlock.get(), new Item.Properties()));
-                blocks.add(wallBlock);
-            }
-
-            if (includeFence) {
-                VMinus.LOGGER.debug("Including fence block for: {}", fixedBaseBlockId);
-                this.fenceBlock = blockRegistry.register(fixedBaseBlockId + "_fence",
-                        () -> getBlockWithRendering(BlockType.FENCE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_FENCE : copyBlock)));
-
-                itemRegistry.register(fixedBaseBlockId + "_fence", () -> new BlockItem(fenceBlock.get(), new Item.Properties()));
-                blocks.add(fenceBlock);
-            }
-
-            if (includeFenceGate) {
-                VMinus.LOGGER.debug("Including fence gate block for: {}", fixedBaseBlockId);
-                this.fenceGateBlock = blockRegistry.register(fixedBaseBlockId + "_fence_gate",
-                        () -> getBlockWithRendering(BlockType.FENCE_GATE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_FENCE_GATE : copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_fence_gate", () -> new BlockItem(fenceGateBlock.get(), new Item.Properties()));
-                blocks.add(fenceGateBlock);
-            }
-
-            if (includePressurePlate) {
-                VMinus.LOGGER.debug("Including pressure plate block for: {}", fixedBaseBlockId);
-                this.pressurePlateBlock = blockRegistry.register(fixedBaseBlockId + "_pressure_plate",
-                        () -> getBlockWithRendering(BlockType.PRESSURE_PLATE, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_PRESSURE_PLATE : copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_pressure_plate", () -> new BlockItem(pressurePlateBlock.get(), new Item.Properties()));
-                blocks.add(pressurePlateBlock);
-            }
-
-            if (includeButton) {
-                VMinus.LOGGER.debug("Including button block for: {}", fixedBaseBlockId);
-                this.buttonBlock = blockRegistry.register(fixedBaseBlockId + "_button",
-                        () -> getBlockWithRendering(BlockType.BUTTON, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_BUTTON : copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_button", () -> new BlockItem(buttonBlock.get(), new Item.Properties()));
-                blocks.add(buttonBlock);
-            }
-
-            if (includeDoor) {
-                VMinus.LOGGER.debug("Including door block for: {}", fixedBaseBlockId);
-                this.doorBlock = blockRegistry.register(fixedBaseBlockId + "_door",
-                        () -> getBlockWithRendering(BlockType.DOOR, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_DOOR : copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_door", () -> new BlockItem(doorBlock.get(), new Item.Properties()));
-                blocks.add(doorBlock);
-            }
-
-            if (includeTrapdoor) {
-                VMinus.LOGGER.debug("Including trapdoor block for: {}", fixedBaseBlockId);
-                this.trapDoorBlock = blockRegistry.register(fixedBaseBlockId + "_trapdoor",
-                        () -> getBlockWithRendering(BlockType.TRAPDOOR, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_TRAPDOOR : copyBlock)));
-                itemRegistry.register(fixedBaseBlockId + "_trapdoor", () -> new BlockItem(trapDoorBlock.get(), new Item.Properties()));
-                blocks.add(trapDoorBlock);
-            }
-
-            if (isWoodSet) {
-                if (includeSign) {
-                    VMinus.LOGGER.debug("Including sign blocks for: {}", fixedBaseBlockId);
-                    this.standingSignBlock = blockRegistry.register(fixedBaseBlockId + "_sign",
-                            () -> new ModStandingSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_SIGN : copyBlock), this.woodType));
-                    this.wallSignBlock = blockRegistry.register(fixedBaseBlockId + "_wall_sign",
-                            () -> new ModWallSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_WALL_SIGN : copyBlock), this.woodType));
-
-                    itemRegistry.register(fixedBaseBlockId + "_sign",
-                            () -> new SignItem(new Item.Properties().stacksTo(16), standingSignBlock.get(), wallSignBlock.get()));
-
-                    blocks.add(standingSignBlock);
-                    blocks.add(wallSignBlock);
-                }
-
-                if (includeHangingSign) {
-                    VMinus.LOGGER.debug("Including hanging sign blocks for: {}", fixedBaseBlockId);
-                    this.hangingSignBlock = blockRegistry.register(fixedBaseBlockId + "_hanging_sign",
-                            () -> new ModHangingSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_HANGING_SIGN : copyBlock), this.woodType));
-                    this.wallHangingSignBlock = blockRegistry.register(fixedBaseBlockId + "_hanging_wall_sign",
-                            () -> new ModWallHangingSignBlock(BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_WALL_HANGING_SIGN : copyBlock), this.woodType));
-
-                    itemRegistry.register(fixedBaseBlockId + "_hanging_sign",
-                            () -> new SignItem(new Item.Properties().stacksTo(16), hangingSignBlock.get(), wallHangingSignBlock.get()));
-
-                    blocks.add(hangingSignBlock);
-                    blocks.add(wallHangingSignBlock);
-                }
-
-                if (includeLeaves) {
-                    VMinus.LOGGER.debug("Including leaves block for: {}", fixedBaseBlockId);
-                    this.leavesBlock = blockRegistry.register(fixedBaseBlockId + "_leaves",
-                            () -> new ModLeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
-                    itemRegistry.register(fixedBaseBlockId + "_leaves", () -> new BlockItem(leavesBlock.get(), new Item.Properties()));
-
-                    blocks.add(leavesBlock);
-                }
-
-                if (includeLog) {
-                    VMinus.LOGGER.debug("Including log blocks for: {}", fixedBaseBlockId);
-                    // Names
-                    final String logId = fixedBaseBlockId + "_log";
-                    final String strippedLogId = "stripped_" + logId;
-                    final String woodId = fixedBaseBlockId + "_wood";
-                    final String strippedWoodId = "stripped_" + woodId;
-
-                    this.logBlock = blockRegistry.register(logId,
-                            () -> getBlockWithRendering(BlockType.LOG, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_LOG : copyBlock)));
-                    this.strippedLogBlock = blockRegistry.register(strippedLogId,
-                            () -> getBlockWithRendering(BlockType.LOG, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.STRIPPED_OAK_LOG : copyBlock)));
-                    this.woodBlock = blockRegistry.register(woodId,
-                            () -> getBlockWithRendering(BlockType.LOG, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.OAK_WOOD : copyBlock)));
-                    this.strippedWoodBlock = blockRegistry.register(strippedWoodId,
-                            () -> getBlockWithRendering(BlockType.LOG, BlockBehaviour.Properties.copy(isWoodSet ? Blocks.STRIPPED_OAK_WOOD : copyBlock)));
-
-                    itemRegistry.register(logId, () -> new BlockItem(logBlock.get(), new Item.Properties()));
-                    itemRegistry.register(strippedLogId, () -> new BlockItem(strippedLogBlock.get(), new Item.Properties()));
-                    itemRegistry.register(woodId, () -> new BlockItem(woodBlock.get(), new Item.Properties()));
-                    itemRegistry.register(strippedWoodId, () -> new BlockItem(strippedWoodBlock.get(), new Item.Properties()));
-
-                    blocks.add(logBlock);
-                    blocks.add(strippedLogBlock);
-                    blocks.add(woodBlock);
-                    blocks.add(strippedWoodBlock);
-                }
-            }
+        public Builder(String modId, RegistryObject<Block> baseBlockObj, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
+            this.baseBlockObj = baseBlockObj;
+            this.blockRegistry = blockRegistry;
+            this.itemRegistry = itemRegistry;
+            this.modId = modId;
         }
 
-        usingMods.add(this.modId);
-        BLOCK_SETS.add(this);
-        VMinus.LOGGER.debug("Finished building BlockSet for mod: {}", modId);
-        return this;
-    }
+        public Builder(String modId, String blockId, BlockBehaviour.Properties properties, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
+            this.blockId = blockId;
+            this.supplier = () -> new Block(properties);
+            this.properties = properties;
+            this.baseBlockObj = null;
+            this.blockRegistry = blockRegistry;
+            this.itemRegistry = itemRegistry;
+            this.modId = modId;
+        }
 
-    public enum ToolType {
-        PICKAXE,
-        AXE,
-        SHOVEL,
-        HAND,
-        HOE
-    }
+        public Builder stairs() {
+            this.hasStairs = true;
+            return this;
+        }
 
-    public enum ToolStrength {
-        NONE,
-        WOODEN,
-        STONE,
-        IRON,
-        DIAMOND,
-        NETHERITE
-    }
+        public Builder door() {
+            this.hasDoor = true;
+            return this;
+        }
 
-    public enum TabType {
-        BUILDING,
-        NATURAL,
-        COLORED,
-        FUNCTIONAL
-    }
+        public Builder sign() {
+            this.hasSign = true;
+            return this;
+        }
 
-    public enum RenderType {
-        NORMAL,
-        GLASS,
-        STAINED_GLASS
-    }
+        public Builder name(String name) {
+            this.blockId = name;
+            return this;
+        }
 
-    public enum BlockType {
-        BASE,
-        STAIRS,
-        SLAB,
-        WALL,
-        FENCE,
-        FENCE_GATE,
-        PRESSURE_PLATE,
-        DOOR,
-        TRAPDOOR,
-        SIGN,
-        HANGING_SIGN,
-        BUTTON,
-        LOG
-    }
+        public Builder logs() {
+            this.hasLogs = true;
+            return this;
+        }
 
+        public Builder hangingSign() {
+            this.hasHangingSign = true;
+            return this;
+        }
+
+        public Builder stoneSet() {
+            this.hasStairs = true;
+            this.hasSlab = true;
+            this.hasWall = true;
+            this.hasPressurePlate = true;
+            this.hasButton = true;
+            this.isStoneSet = true;
+            return this;
+        }
+
+        public Builder netherWoodSet() {
+            this.hasStairs = true;
+            this.hasSlab = true;
+            this.hasFence = true;
+            this.hasFenceGate = true;
+            this.hasPressurePlate = true;
+            this.hasButton = true;
+            this.hasDoor = true;
+            this.hasTrapdoor = true;
+            this.hasSign = true;
+            this.hasLogs = true;
+            this.hasHangingSign = true;
+            this.isNetherWoodSet = true;
+            this.isWoodSet = true;
+            return this;
+        }
+
+        public Builder woodSet() {
+            this.hasStairs = true;
+            this.hasSlab = true;
+            this.hasFence = true;
+            this.hasFenceGate = true;
+            this.hasPressurePlate = true;
+            this.hasButton = true;
+            this.hasDoor = true;
+            this.hasTrapdoor = true;
+            this.hasSign = true;
+            this.hasLogs = true;
+            this.hasHangingSign = true;
+            this.isWoodSet = true;
+            return this;
+        }
+
+        public Builder fence() {
+            this.hasFence = true;
+            return this;
+        }
+
+        public Builder fenceGate() {
+            this.hasFenceGate = true;
+            return this;
+        }
+
+        public Builder button() {
+            this.hasButton = true;
+            return this;
+        }
+
+        public Builder pressurePlate() {
+            this.hasPressurePlate = true;
+            return this;
+        }
+
+        public Builder trapdoor() {
+            this.hasTrapdoor = true;
+            return this;
+        }
+
+        public Builder slab() {
+            this.hasSlab = true;
+            return this;
+        }
+
+        public Builder wall() {
+            this.hasWall = true;
+            return this;
+        }
+
+        public Builder tag(TagKey<Block> blockTag) {
+            blockTags.add(blockTag);
+            return this;
+        }
+
+        public Builder renderType(String renderType) {
+            this.renderType = renderType;
+            return this;
+        }
+
+        public Builder creativeTab(Item targetItem, CreativeModeTab tab) {
+            return creativeTab(targetItem, tab, false);
+        }
+
+        public Builder creativeTab(BlockSetCreativeOrder blockSetCreativeOrder) {
+            this.creativeOrder = blockSetCreativeOrder;
+            return this;
+        }
+
+        public Builder creativeTab(CreativeModeTab tab) {
+            if (baseBlock != null)
+                return creativeTab(baseBlock.asItem(), tab, false);
+            return this;
+        }
+
+        public Builder creativeTab(CreativeModeTab tab, Boolean before) {
+            if (baseBlock != null)
+                return creativeTab(baseBlock.asItem(), tab, before);
+            return this;
+        }
+
+        public Builder creativeTab(Item targetItem, CreativeModeTab tab, Boolean before) {
+            this.creativeOrder = new BlockSetCreativeOrder(tab, targetItem, before);
+            return this;
+        }
+
+        public Builder texture(ResourceLocation resourceLocation) {
+            this.texture = resourceLocation;
+            return this;
+        }
+
+        public Block getBaseBlock() {
+            return this.baseBlock;
+        }
+
+        public @Nullable String getBlockId() {
+            return this.blockId;
+        }
+
+        public Builder baseBlock(Block block) {
+            this.baseBlock = block;
+            return this;
+        }
+
+        public Builder registryBlock(String blockId, BlockBehaviour.Properties properties) {
+            this.blockId = blockId;
+            this.supplier = () -> new Block(properties);
+            return this;
+        }
+
+        public Builder properties(BlockBehaviour.Properties properties) {
+            this.properties = properties;
+            this.supplier = () -> new Block(properties);
+            return this;
+        }
+
+        public Builder baseBlock(RegistryObject<Block> block) {
+            this.baseBlockObj = block;
+            return this;
+        }
+
+        public BlockSet build() {
+            return new BlockSet(this);
+        }
+
+        public @Nullable String getBaseBlockNamespaceId() {
+            return baseBlockNamespaceId;
+        }
+    }
 }

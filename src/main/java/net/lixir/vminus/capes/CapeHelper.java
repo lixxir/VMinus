@@ -44,7 +44,15 @@ public class CapeHelper {
             CapeOwner.CAMRIOD_CORE,
             CapeOwner.NUCLEARDIAMOND,
             CapeOwner.SHARKYTHENARWHAL,
-            CapeOwner.SHONESTAIN
+            CapeOwner.SHONESTAIN,
+            CapeOwner._8NXTSUKE,
+            CapeOwner.FUDGIECATDX,
+            CapeOwner.ODDCHILLY,
+            CapeOwner.CAPTAINRAGEJOIN,
+            CapeOwner.DR_PIMPF,
+            CapeOwner.HUDSOJR,
+            CapeOwner.ICY_CRABY,
+            CapeOwner.VVENIAMIN
     );
 
     private static final List<CapeOwner> BOOSTERS = Arrays.asList(
@@ -65,7 +73,8 @@ public class CapeHelper {
             CapeOwner.EFFORT_A,
             CapeOwner.UURETCH,
             CapeOwner.VECTORV,
-            CapeOwner.BONES418
+            CapeOwner.BONES418,
+            CapeOwner.ROIXEN
     );
 
     private static final List<CapeOwner> DEVELOPERS = Arrays.asList(
@@ -81,7 +90,8 @@ public class CapeHelper {
             CapeOwner.JIMBLES_JOESTAR,
             CapeOwner.STALLMAN1111,
             CapeOwner.VECTORV,
-            CapeOwner.PONDEROSA
+            CapeOwner.PONDEROSA,
+            CapeOwner.SLIME_SLABS
     );
 
     private static final List<CapeOwner> PHOTON_BUILDER = Arrays.asList(
@@ -93,9 +103,6 @@ public class CapeHelper {
             CapeOwner.LEXALIS8,
             CapeOwner.LUCENTIC
     );
-
-
-
 
     public static ResourceLocation getCapeTexture(Player player) {
         String capeId = player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null)
@@ -123,8 +130,6 @@ public class CapeHelper {
         if (entity instanceof Player player) {
             UUID playerUUID = player.getGameProfile().getId();
             String playerName = player.getGameProfile().getName();
-
-
 
             switch (capeId) {
                 case "beeper" -> {

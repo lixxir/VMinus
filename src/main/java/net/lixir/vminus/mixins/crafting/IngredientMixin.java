@@ -1,9 +1,8 @@
 package net.lixir.vminus.mixins.crafting;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.VisionUtil;
+import net.lixir.vminus.core.visions.ItemVision;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.spongepowered.asm.mixin.Mixin;
@@ -47,13 +46,12 @@ public abstract class IngredientMixin {
         boolean changed = false;
         for (Ingredient.Value value : accessor.getValues()) {
             for (ItemStack stack : value.getItems()) {
-                JsonObject visionData = Visions.getData(stack);
-                ItemStack itemStack = VisionProperties.getReplacementStack(stack);
-
-                if (itemStack != null) {
+                ItemStack replacementStack = ItemVision.getVision(stack).replace.value(new VisionConditionArguments(stack));
+                Boolean banned = ItemVision.getVision(stack).ban.value(new VisionConditionArguments(stack));
+                if (replacementStack != null) {
                     changed = true;
-                    replacedItems.add(itemStack);
-                } else if (!VisionProperties.isBanned(stack, visionData)) {
+                    replacedItems.add(replacementStack);
+                } else if ((banned == null || !banned)) {
                     changed = true;
                     replacedItems.add(stack);
                 }

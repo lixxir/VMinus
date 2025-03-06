@@ -1,7 +1,7 @@
 package net.lixir.vminus.events;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.util.AttributeHelper;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.util.ISpeedGetter;

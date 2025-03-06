@@ -1,6 +1,6 @@
 package net.lixir.vminus.core.visions;
 
-import net.lixir.vminus.core.VisionProperty;
+import net.lixir.vminus.core.values.VisionProperty;
 import net.lixir.vminus.core.values.BasicVisionValue;
 
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public abstract class Vision<T> implements IMergableVision<T> {
     }
 
     protected <t> void appendProperty(StringBuilder stringBuilder, VisionProperty<BasicVisionValue<t>, t> property) {
-        if (property.getValue() != null) {
-            stringBuilder.append("(" + property.getName() + ": " + property.getValue() + "),");
+        if (property.value() != null) {
+            stringBuilder.append("(" + property.name() + ": " + property.value() + "),");
         }
     }
 }

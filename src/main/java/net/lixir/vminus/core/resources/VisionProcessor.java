@@ -3,19 +3,21 @@ package net.lixir.vminus.core.resources;
 import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.core.VisionProperties;
-import net.lixir.vminus.core.VisionProperty;
 import net.lixir.vminus.core.VisionType;
 import net.lixir.vminus.core.conditions.VisionConditions;
-import net.lixir.vminus.core.util.VisionAttribute;
-import net.lixir.vminus.core.util.VisionFoodProperties;
+import net.lixir.vminus.core.util.*;
 import net.lixir.vminus.core.values.BasicVisionValue;
+import net.lixir.vminus.core.values.VisionProperty;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusRarities;
+import net.lixir.vminus.world.Trait;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
@@ -28,7 +30,6 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,8 +42,6 @@ public class VisionProcessor {
         JsonObject jsonFileObject = jsonFile.getAsJsonObject();
         String listType = visionType.getListName();
         String singleName = visionType.getSingleName();
-
-        VMinus.LOGGER.debug("Testing process: {} ", jsonFile);
 
         // Adds single keys to the key list
         keyToArray(jsonFileObject, singleName, listType);
@@ -118,9 +117,6 @@ public class VisionProcessor {
                 throw new JsonParseException("Invalid list key: '" + listKey + "'. Allowed characters: [a-z, 0-9, :, !, #, *, /, _]");
             }
         }
-
-        VMinus.LOGGER.info("Processed JSON: {}", processedJsonObject);
-
         return processedJsonObject;
     }
 
@@ -209,7 +205,7 @@ public class VisionProcessor {
                 value = 0;
             }
             Boolean replace = arrayObject.has("replace") && arrayObject.get("replace").isJsonPrimitive() && arrayObject.getAsJsonPrimitive("replace").getAsBoolean();
-            Boolean remove = arrayObject.has("remove")  && arrayObject.get("remove").isJsonPrimitive() && arrayObject.getAsJsonPrimitive("remove").getAsBoolean();
+            Boolean remove = arrayObject.has("remove") && arrayObject.get("remove").isJsonPrimitive() && arrayObject.getAsJsonPrimitive("remove").getAsBoolean();
 
             String uuidString = arrayObject.has("uuid") ? arrayObject.getAsJsonPrimitive("uuid").getAsString() : null;
             UUID uuid;
@@ -218,7 +214,7 @@ public class VisionProcessor {
             } else {
                 try {
                     uuid = UUID.fromString(uuidString);
-                }catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     throw new JsonParseException(uuidString + " is not a valid UUID.");
                 }
             }
@@ -262,30 +258,78 @@ public class VisionProcessor {
             }
 
             AttributeModifier attributeModifier = new AttributeModifier(uuid, name, value, operation);
-            VisionAttribute visionAttribute = new VisionAttribute(remove,replace, attributeModifier, attribute, equipmentSlot, id);
+            VisionAttribute visionAttribute = new VisionAttribute(remove, replace, attributeModifier, attribute, equipmentSlot, id);
 
             addBasicVisionValue(property, visionAttribute, arrayObject, jsonObject, key);
         }
     }
 
+
+    public static void parseItemStackWithTagKey(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<VisionItemStackWithTagKey>, VisionItemStackWithTagKey> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+            if (!arrayObject.has("value"))
+                continue;
+            String value = arrayObject.getAsJsonPrimitive("value").getAsString();
+            if (value.startsWith("#")) {
+                ResourceLocation tagLocation = new ResourceLocation(value.substring(1));
+                TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tagLocation);
+                VisionItemStackWithTagKey visionItemStackWithTagKey = new VisionItemStackWithTagKey(null, tagKey);
+                addBasicVisionValue(property, visionItemStackWithTagKey, arrayObject, jsonObject, key);
+            } else {
+                ResourceLocation resourceLocation = parseResourceLocation(key, arrayObject);
+                Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
+                if (item == null)
+                    throw new JsonParseException(resourceLocation + " is not a valid item.");
+                ItemStack itemStack = item.getDefaultInstance();
+                VisionItemStackWithTagKey visionItemStackWithTagKey = new VisionItemStackWithTagKey(itemStack, null);
+                addBasicVisionValue(property, visionItemStackWithTagKey, arrayObject, jsonObject, key);
+            }
+
+
+        }
+    }
+
+
     public static void parseItemStack(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<ItemStack>, ItemStack> property) throws JsonParseException {
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
-
-            String value = arrayObject.getAsJsonPrimitive("value").getAsString();
-            ResourceLocation resourceLocation;
-            try {
-                resourceLocation = new ResourceLocation(value);
-            } catch (Exception e ) {
-                throw new JsonParseException(value + " is not a valid ResourceLocation.");
-            }
+            ResourceLocation resourceLocation = parseResourceLocation(key, arrayObject);
             Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
             if (item == null)
                 throw new JsonParseException(resourceLocation + " is not a valid item.");
             ItemStack itemStack = item.getDefaultInstance();
 
             addBasicVisionValue(property, itemStack, arrayObject, jsonObject, key);
+        }
+    }
+
+    public static void parseItemDecorator(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<VisionItemDecorator>, VisionItemDecorator> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            Float value = Mth.clamp(arrayObject.getAsJsonPrimitive("order").getAsFloat(), 0f, 200f);
+            ResourceLocation resourceLocation = parseResourceLocation("id", key, arrayObject);
+            VisionItemDecorator visionItemDecorator = new VisionItemDecorator(resourceLocation, value);
+
+            addBasicVisionValue(property, visionItemDecorator, arrayObject, jsonObject, key);
+        }
+    }
+
+    public static void parseTrait(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<VisionTrait>, VisionTrait> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            Boolean value = arrayObject.getAsJsonPrimitive("value").getAsBoolean();
+            ResourceLocation resourceLocation = parseResourceLocation("id", key, arrayObject);
+            Trait trait = Traits.fromId(resourceLocation);
+            VisionTrait visionTrait = new VisionTrait(trait, value);
+
+            addBasicVisionValue(property, visionTrait, arrayObject, jsonObject, key);
         }
     }
 
@@ -298,6 +342,71 @@ public class VisionProcessor {
             Boolean value = arrayObject.getAsJsonPrimitive("value").getAsBoolean();
 
             addBasicVisionValue(property, value, arrayObject, jsonObject, key);
+        }
+    }
+
+    public static void parseCreativeOrder(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<VisionCreativeOrder>, VisionCreativeOrder> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
+            ResourceLocation targetItemResourceLocation = parseResourceLocation("target", key, arrayObject);
+            Item targetItem = ForgeRegistries.ITEMS.getValue(targetItemResourceLocation);
+            if (targetItem == null)
+                throw new JsonParseException(targetItemResourceLocation + " is not a valid target item for " + key + ".");
+            ItemStack targetItemStack = targetItem.getDefaultInstance();
+
+            ResourceLocation itemResourceLocation = parseResourceLocation("item", key, arrayObject);
+            Item item = ForgeRegistries.ITEMS.getValue(itemResourceLocation);
+            if (item == null)
+                throw new JsonParseException(itemResourceLocation + " is not a valid item for " + key + ".");
+            ItemStack itemStack = item.getDefaultInstance();
+
+            Boolean before = arrayObject.has("before") && arrayObject.get("before").isJsonPrimitive() && arrayObject.getAsJsonPrimitive("before").getAsBoolean();
+
+            VisionCreativeOrder visionCreativeOrder = new VisionCreativeOrder(itemStack, targetItemStack, before);
+            addBasicVisionValue(property, visionCreativeOrder, arrayObject, jsonObject, key);
+        }
+    }
+    private static ResourceLocation parseResourceLocation(String key, JsonObject jsonObject) throws JsonParseException  {
+        return parseResourceLocation("value", key, jsonObject);
+    }
+    private static ResourceLocation parseResourceLocation(String valueName, String key, JsonObject jsonObject) throws JsonParseException  {
+        String id;
+        try {
+            id = jsonObject.getAsJsonPrimitive(valueName).getAsString();
+        } catch (Exception e) {
+            throw new JsonParseException(key + " does not have " + valueName + ".");
+        }
+        ResourceLocation resourceLocation;
+        try {
+            resourceLocation = new ResourceLocation(id);
+        }catch (Exception e) {
+            throw new JsonParseException(id + " is not a valid resource location for " + key + ".");
+        }
+        return resourceLocation;
+    }
+
+    public static void parseBaseAttribute(JsonObject jsonObject, String key, VisionProperty<BasicVisionValue<VisionBaseAttribute>, VisionBaseAttribute> property) throws JsonParseException {
+        JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        for (JsonElement jsonArrayElement : jsonArray) {
+            JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+            double value;
+            try {
+                value = arrayObject.getAsJsonPrimitive("value").getAsDouble();
+            } catch (Exception e) {
+                throw new JsonParseException(key + " does not have a value.");
+            }
+            ResourceLocation resourceLocation = parseResourceLocation("id", key, arrayObject);
+            Attribute attribute;
+            try {
+                attribute = ForgeRegistries.ATTRIBUTES.getValue(resourceLocation);
+            } catch (Exception e) {
+                throw new JsonParseException(key + " does not have an id.");
+            }
+            VisionBaseAttribute visionBaseAttribute = new VisionBaseAttribute(value, attribute);
+
+            addBasicVisionValue(property, visionBaseAttribute, arrayObject, jsonObject, key);
         }
     }
 
@@ -504,7 +613,7 @@ public class VisionProcessor {
     private static <T> void addBasicVisionValue(VisionProperty<BasicVisionValue<T>, T> property, T value, JsonObject arrayObject, JsonObject jsonObject, String key) {
         BasicVisionValue<T> basicVisionValue = new BasicVisionValue<>(value, VisionConditions.resolveConditions(arrayObject));
         basicVisionValue.setPriority(getPriority(jsonObject, key));
-        property.addValue(basicVisionValue);
+        property.add(basicVisionValue);
     }
 
     public static int getPriority(JsonObject jsonObject, String key) throws JsonParseException {

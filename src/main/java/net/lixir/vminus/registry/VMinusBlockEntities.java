@@ -1,7 +1,3 @@
-
-/*
- *    MCreator note: This file will be REGENERATED on each build.
- */
 package net.lixir.vminus.registry;
 
 import net.lixir.vminus.VMinus;
@@ -15,7 +11,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 public class VMinusBlockEntities {
@@ -23,9 +18,8 @@ public class VMinusBlockEntities {
 	public static final RegistryObject<BlockEntityType<ModSignBlockEntity>> MOD_SIGN =
 			BLOCK_ENTITIES.register("mod_sign", () -> {
 				List<Block> signBlocks = BlockSet.BLOCK_SETS.stream()
-						.filter(set -> set.hasSign())
-						.flatMap(set -> Stream.of(set.getStandingSignBlock(), set.getWallSignBlock()))
-						.filter(Objects::nonNull)
+						.filter(set -> set.getSign() != null && set.getWallSign() != null)
+						.flatMap(set -> Stream.of(set.getSign().block(), set.getWallSign().block()))
 						.toList();
 
 				return BlockEntityType.Builder.of(ModSignBlockEntity::new, signBlocks.toArray(new Block[0])).build(null);
@@ -33,10 +27,10 @@ public class VMinusBlockEntities {
 
 
 	public static final RegistryObject<BlockEntityType<ModHangingSignBlockEntity>> MOD_HANGING_SIGN =
-			BLOCK_ENTITIES.register("hanging_mod_sign", () -> {
+			BLOCK_ENTITIES.register("mod_hanging_sign", () -> {
 				List<Block> hangingSignBlocks = BlockSet.BLOCK_SETS.stream()
-						.flatMap(set -> Stream.of(set.getHangingSignBlock(), set.getWallHangingSignBlock()))
-						.filter(Objects::nonNull)
+						.filter(set -> set.getHangingSign() != null && set.getWallHangingSign() != null)
+						.flatMap(set -> Stream.of(set.getHangingSign().block(), set.getWallHangingSign().block()))
 						.toList();
 				return BlockEntityType.Builder.of(ModHangingSignBlockEntity::new, hangingSignBlocks.toArray(new Block[0])).build(null);
 			});

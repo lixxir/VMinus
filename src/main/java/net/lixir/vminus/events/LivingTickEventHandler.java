@@ -1,12 +1,15 @@
 package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.lixir.vminus.util.AttributeHelper;
 import net.lixir.vminus.util.ISpeedGetter;
 import net.lixir.vminus.core.Visions;
 import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.world.Trait;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -66,6 +69,14 @@ public class LivingTickEventHandler {
 
             handleSprintMomentum(entity, nbt);
         }
+        for (ItemStack armorStack : entity.getArmorSlots()) {
+            for (Trait trait : Traits.getTraits(armorStack)) {
+                if (trait.armorTick(armorStack, entity, world))
+                    if (event.isCancelable())
+                        event.setCanceled(true);
+            }
+        }
+
     }
 
     private static void handleSprintMomentum(LivingEntity entity, CompoundTag nbt) {

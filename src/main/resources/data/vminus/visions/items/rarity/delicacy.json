@@ -1,6 +1,4 @@
 {
-  "items": [
-    "#vminus:rarity/delicacy"
-  ],
+  "tag": "vminus:rarity/delicacy",
   "rarity": "delicacy"
 }

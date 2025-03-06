@@ -1,6 +1,5 @@
 package net.lixir.vminus;
 
-import com.google.gson.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod;
 

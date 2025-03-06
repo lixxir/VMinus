@@ -1,6 +1,6 @@
 package net.lixir.vminus.core.visions;
 
-import net.lixir.vminus.core.VisionProperty;
+import net.lixir.vminus.core.values.VisionProperty;
 import net.lixir.vminus.core.values.BasicVisionValue;
 import net.minecraft.world.level.block.SoundType;
 
@@ -21,15 +21,15 @@ public class BlockVision extends Vision<BlockVision> {
 
     @Override
     public void merge(BlockVision vision) {
-        lightLevel.mergeValues(vision.lightLevel);
-        speedFactor.mergeValues(vision.speedFactor);
-        jumpFactor.mergeValues(vision.jumpFactor);
-        friction.mergeValues(vision.friction);
-        explosionResistance.mergeValues(vision.explosionResistance);
-        sound.mergeValues(vision.sound);
-        destroySpeed.mergeValues(vision.destroySpeed);
-        emissive.mergeValues(vision.emissive);
-        occludes.mergeValues(vision.occludes);
-        redstoneConductor.mergeValues(vision.redstoneConductor);
+        lightLevel.merge(vision.lightLevel);
+        speedFactor.merge(vision.speedFactor);
+        jumpFactor.merge(vision.jumpFactor);
+        friction.merge(vision.friction);
+        explosionResistance.merge(vision.explosionResistance);
+        sound.merge(vision.sound);
+        destroySpeed.merge(vision.destroySpeed);
+        emissive.merge(vision.emissive);
+        occludes.merge(vision.occludes);
+        redstoneConductor.merge(vision.redstoneConductor);
     }
 }

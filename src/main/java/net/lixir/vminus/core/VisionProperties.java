@@ -19,6 +19,9 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 public class VisionProperties {
+    /* In the process of being replaced entirely, this code should not be used.
+
+     */
 
     private final static int NO_INDEX = -1;
 
@@ -465,8 +468,8 @@ public class VisionProperties {
         public final static String CARRY_NBT = "carry_nbt";
 
         public final static String CREATIVE_ORDER = "creative_order";
-        public final static String TARGET = "target";
-        public final static String TAB = "tab";
+        public final static String TARGET = "targetItemStack";
+        public final static String TAB = "creativeModeTab";
         public final static String BEFORE = "before";
         public final static String HIDDEN_TAB = "hidden_tab";
 

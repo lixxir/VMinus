@@ -1,6 +1,4 @@
 {
-  "items": [
-    "#vminus:rarity/inverted"
-  ],
+  "tag": "vminus:rarity/inverted",
   "rarity": "inverted"
 }

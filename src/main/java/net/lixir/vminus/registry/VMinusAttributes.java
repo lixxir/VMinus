@@ -1,6 +1,3 @@
-/*
- *    MCreator note: This file will be REGENERATED on each build.
- */
 package net.lixir.vminus.registry;
 
 import net.lixir.vminus.VMinus;
@@ -38,6 +35,7 @@ public class VMinusAttributes {
     public static final RegistryObject<Attribute> HEALTH_LOST_STAT_BOOST = ATTRIBUTES.register("health_lost_stat_boost", () -> (new RangedAttribute("attribute." + VMinus.ID + ".health_lost_stat_boost", 0, -100, 100)).setSyncable(true));
     public static final RegistryObject<Attribute> MOMENTUM = ATTRIBUTES.register("momentum", () -> (new RangedAttribute("attribute." + VMinus.ID + ".momentum", 0, 0, 100)).setSyncable(true));
     public static final RegistryObject<Attribute> TRANSLUCENCE = ATTRIBUTES.register("translucence", () -> (new RangedAttribute("attribute." + VMinus.ID + ".translucence", 0, 0, 100)).setSyncable(true));
+    public static final RegistryObject<Attribute> JUMP_BOOST = ATTRIBUTES.register("jump_boost", () -> (new RangedAttribute("attribute." + VMinus.ID + ".jump_boost", 0, -100, 100)).setSyncable(true));
 
     @SubscribeEvent
     public static void addAttributes(EntityAttributeModificationEvent event) {
@@ -52,5 +50,6 @@ public class VMinusAttributes {
         event.add(EntityType.PLAYER, MOB_DETECTION_RANGE.get());
         event.add(EntityType.PLAYER, MOMENTUM.get());
         event.add(EntityType.PLAYER, TRANSLUCENCE.get());
+        event.add(EntityType.PLAYER, JUMP_BOOST.get());
     }
 }

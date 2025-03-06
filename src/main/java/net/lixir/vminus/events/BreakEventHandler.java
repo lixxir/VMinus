@@ -1,8 +1,8 @@
 package net.lixir.vminus.events;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.traits.Trait;
-import net.lixir.vminus.traits.Traits;
+import net.lixir.vminus.world.Trait;
+import net.lixir.vminus.registry.Traits;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +25,6 @@ public class BreakEventHandler {
         Block block = blockState.getBlock();
 
         for (Trait trait : Traits.getTraits(mainHand)) {
-            VMinus.LOGGER.info("break event trait: " + trait);
             if (trait.onMine(mainHand, player, level, blockState, blockPos, block))
                if (event.isCancelable())
                    event.setCanceled(true);

@@ -3,7 +3,6 @@ package net.lixir.vminus.core.resources.managers;
 import com.google.gson.*;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.core.resources.VisionProcessor;
-import net.lixir.vminus.events.LevelLoadedEventHandler;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -60,7 +59,6 @@ public abstract class VisionManager<T> extends SimpleJsonResourceReloadListener 
         }
 
         applyVisions(visions);
-        LevelLoadedEventHandler.debounce = false;
     }
 
     protected abstract void applyVisions(List<T> visions);

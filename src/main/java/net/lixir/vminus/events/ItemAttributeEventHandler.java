@@ -3,9 +3,12 @@ package net.lixir.vminus.events;
 import com.google.common.collect.Multimap;
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.util.VisionAttribute;
+import net.lixir.vminus.core.util.VisionTrait;
 import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.visionable.IItemVisionable;
+import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.world.Trait;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -33,10 +36,10 @@ public class ItemAttributeEventHandler {
         Item item = itemStack.getItem();
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
-        if (item instanceof IItemVisionable iVisionable) {
+        if (item instanceof IItemVisionAccessor iVisionable) {
             ItemVision itemVision = iVisionable.vminus$getVision();
-            List<VisionAttribute> visionAttributes = itemVision.attribute.getValues(new VisionConditionArguments.Builder().passItemStack(itemStack).build());
-
+            List<VisionAttribute> visionAttributes = itemVision.attribute.values(new VisionConditionArguments(itemStack));
+            List<VisionTrait> visionTraits = itemVision.trait.values(new VisionConditionArguments(itemStack));
 
             for (VisionAttribute visionAttribute : visionAttributes) {
                 boolean replace = visionAttribute.replace();
@@ -63,40 +66,22 @@ public class ItemAttributeEventHandler {
                         equipmentSlot = EquipmentSlot.MAINHAND;
                     }
                 }
-                if (eventSlot == equipmentSlot)
+                if (eventSlot == equipmentSlot) {
+                    if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED.get()))
+                        miningFlag = true;
                     event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
-            }
-        }
-
-
-        /*
-            index = 0;
-            while (true) {
-                String traitId = VisionProperties.getString(visionData, VisionProperties.Names.TRAIT, itemStack, index);
-                if (traitId == null)
-                    break;
-                index++;
-                if (!traitId.contains("="))
-                    continue;
-                String validId = traitId.substring(0, traitId.indexOf('='));
-                boolean value;
-                if (traitId.endsWith("true")) {
-                    value = true;
-                } else  if (traitId.endsWith("false")) {
-                    value = false;
-                } else {
-                    continue;
                 }
+            }
 
-                Trait trait = Traits.TRAIT_REGISTRY.get().getValue(new ResourceLocation(validId));
-                if (trait == null)
-                    continue;
+            for (VisionTrait visionTrait : visionTraits) {
+                Trait trait = visionTrait.trait();
+                boolean value = visionTrait.value();
                 if (!Traits.hasTrait(itemStack, trait))
                     Traits.setTrait(itemStack, trait, value);
             }
 
+        }
 
-         */
         if (eventSlot == EquipmentSlot.MAINHAND) {
 
             handleMiningAttributes(event, itemStack, miningFlag);

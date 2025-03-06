@@ -1,6 +1,7 @@
 package net.lixir.vminus.core.conditions;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -10,12 +11,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import javax.annotation.Nullable;
 
 public class VisionConditionArguments {
-    private final Item item;
-    private final ItemStack itemStack;
-    private final Entity entity;
-    private final Block block;
-    private final BlockBehaviour.BlockStateBase blockStateBase;
-    private final BlockState blockState;
+    private Item item = null;
+    private ItemStack itemStack = null;
+    private Entity entity = null;
+    private Block block = null;
+    private BlockBehaviour.BlockStateBase blockStateBase = null;
+    private BlockState blockState = null;
+    private EntityType<?> entityType = null;
 
     private VisionConditionArguments(Builder builder) {
         this.item = builder.item;
@@ -26,17 +28,33 @@ public class VisionConditionArguments {
         this.blockState = builder.blockState;
     }
 
-    public @Nullable Item getItem() {
-        return item;
+    public VisionConditionArguments(ItemStack itemStack) {
+        this.item = itemStack.getItem();
+        this.itemStack = itemStack;
     }
 
-    public @Nullable ItemStack getItemStack() {
-        return itemStack;
+    public VisionConditionArguments(Item item) {
+        this.item = item;
     }
 
-    public @Nullable Entity getEntity() {
-        return entity;
+    public VisionConditionArguments(EntityType<?> entityType) {
+        this.entityType = entityType;
     }
+
+    public VisionConditionArguments(Entity entity) {
+        this.entity = entity;
+        this.entityType = entity.getType();
+    }
+
+    public VisionConditionArguments(Block block) {
+        this.block = block;
+    }
+    public VisionConditionArguments(BlockBehaviour.BlockStateBase blockStateBase) {
+        this.blockStateBase = blockStateBase;
+    }
+
+
+
 
     public boolean hasItem() {
         return item != null;
@@ -50,17 +68,34 @@ public class VisionConditionArguments {
         return entity != null;
     }
 
+    public @Nullable Item getItem() {
+        return item;
+    }
+
+    public @Nullable ItemStack getItemStack() {
+        return itemStack;
+    }
+
+    public @Nullable EntityType<?> getEntityType() {
+        return entityType;
+    }
+
+    public @Nullable Entity getEntity() {
+        return entity;
+    }
+
     public @Nullable Block getBlock() {
         return block;
     }
 
-    public BlockState getBlockState() {
+    public @Nullable BlockState getBlockState() {
         return blockState;
     }
 
-    public BlockBehaviour.BlockStateBase getBlockStateBase() {
+    public @Nullable BlockBehaviour.BlockStateBase getBlockStateBase() {
         return blockStateBase;
     }
+
 
     public static class Builder {
         private Item item = null;

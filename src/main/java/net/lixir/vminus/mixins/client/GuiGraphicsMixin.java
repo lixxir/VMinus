@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.lixir.vminus.core.Visions;
 import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.core.util.VisionItemDecorator;
+import net.lixir.vminus.core.visions.ItemVision;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 @Mixin(GuiGraphics.class)
 public abstract class GuiGraphicsMixin {
@@ -40,7 +43,7 @@ public abstract class GuiGraphicsMixin {
             return false;
         }
 
-        AbstractContainerMenu menu = player.inventoryMenu;
+        AbstractContainerMenu menu = player.containerMenu;
         if (!menu.getCarried().isEmpty()) {
             return !itemstack.equals(menu.getCarried());
         }
@@ -52,30 +55,19 @@ public abstract class GuiGraphicsMixin {
     @Unique
     private void vminus$renderCustomTexture(ItemStack itemstack, int x, int y) {
         GuiGraphicsAccessor accessor = (GuiGraphicsAccessor) vminus$guiGraphics;
-        JsonObject visionData = Visions.getData(itemstack);
-        accessor.getPoseStack().pushPose();
-        ResourceLocation customTexture = vminus$getCustomTextureForItem(itemstack);
-        if (customTexture != null) {
-            RenderSystem.setShaderTexture(0, customTexture);
-            if (VisionProperties.getBoolean(visionData, "front", itemstack)) {
-                accessor.getPoseStack().translate(0.0F, 0.0F, 200.0F);
-            } else {
-                accessor.getPoseStack().translate(0.0F, 0.0F, 0.0F);
-            }
+        ItemVision itemVision = ItemVision.getVision(itemstack);
+        if (itemVision == null)
+            return;
+        if (itemstack.getTag() != null && itemstack.getTag().getBoolean("tab_item"))
+            return;
+        List<VisionItemDecorator> visionItemDecoratorList = itemVision.decorator.values();
+        for (VisionItemDecorator visionItemDecorator : visionItemDecoratorList) {
+            ResourceLocation texture = visionItemDecorator.texture();
+            RenderSystem.setShaderTexture(0, texture);
+            accessor.getPoseStack().translate(0.0F, 0.0F, visionItemDecorator.order());
             GuiGraphics guiGraphics = (GuiGraphics) (Object) this;
-            guiGraphics.blit(customTexture, x, y, 0, 0, 16, 16, 16, 16);
+            guiGraphics.blit(texture, x, y, 0, 0, 16, 16, 16, 16);
+            accessor.getPoseStack().popPose();
         }
-        accessor.getPoseStack().popPose();
-    }
-
-    @Unique
-    private ResourceLocation vminus$getCustomTextureForItem(ItemStack itemstack) {
-        JsonObject visionData = Visions.getData(itemstack);
-        String decoString = VisionProperties.getString(visionData, "decorator", itemstack);
-        if (itemstack.getTag() == null || !itemstack.getTag().getBoolean("tab_item")) {
-            if (decoString != null && !decoString.isEmpty())
-                return new ResourceLocation(decoString);
-        }
-        return null;
     }
 }

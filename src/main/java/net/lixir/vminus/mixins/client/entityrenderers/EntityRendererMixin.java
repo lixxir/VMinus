@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.client.entityrenderers;
 
+import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.traits.Traits;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;

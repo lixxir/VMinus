@@ -2,17 +2,13 @@ package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.core.conditions.VisionConditionArguments;
 import net.lixir.vminus.core.visions.EntityVision;
-import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.visionable.IEntityVisionable;
+import net.lixir.vminus.core.visions.accessors.IEntityVisionAccessor;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.util.ISpeedGetter;
-import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,9 +17,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements ISpeedGetter, IEntityVisionable {
+public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor {
     @Unique
     private final Entity vminus$entity = (Entity) (Object) this;
+
     @Unique
     private double vminus$speed = 0.0;
 
@@ -46,17 +43,13 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionable {
     @Unique
     private EntityVision vminus$entityVision = new EntityVision();
 
-    @Shadow
-    public abstract EntityType<?> getType();
-
-    @Shadow public abstract void tick();
 
     @Inject(method = "isSilent", at = @At("RETURN"), cancellable = true)
     private void isSilent(CallbackInfoReturnable<Boolean> cir) {
         float translucency = vminus$entity.getPersistentData().getFloat(VMinusAttributes.TRANSLUCENCE_KEY)*2f;
         if (translucency >= 1f)
             cir.setReturnValue(true);
-        Boolean value = vminus$getVision().silent.getValue(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
+        Boolean value = vminus$getVision().silent.value(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -65,7 +58,7 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionable {
         float translucency = vminus$entity.getPersistentData().getFloat(VMinusAttributes.TRANSLUCENCE_KEY)*1.5f;
         if (translucency >= 1f)
             cir.setReturnValue(true);
-        Boolean value = vminus$getVision().dampensVibrations.getValue(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
+        Boolean value = vminus$getVision().dampensVibrations.value(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -125,6 +118,9 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionable {
 
     @Override
     public EntityVision vminus$getVision() {
+        if (vminus$entity.getType() instanceof IEntityVisionAccessor entityVisionable) {
+            return entityVisionable.vminus$getVision();
+        }
         return this.vminus$entityVision;
     }
 }

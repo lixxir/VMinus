@@ -27,11 +27,6 @@ import java.util.function.Supplier;
 public class VminusModVariables {
     public static final Capability<PlayerVariables> PLAYER_VARIABLES_CAPABILITY = CapabilityManager.get(new CapabilityToken<PlayerVariables>() {
     });
-    public static com.google.gson.JsonObject main_item_vision = new com.google.gson.JsonObject();
-    public static com.google.gson.JsonObject main_block_vision = new com.google.gson.JsonObject();
-    public static com.google.gson.JsonObject main_entity_vision = new com.google.gson.JsonObject();
-    public static com.google.gson.JsonObject main_enchantment_vision = new com.google.gson.JsonObject();
-    public static com.google.gson.JsonObject main_effect_vision = new com.google.gson.JsonObject();
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {

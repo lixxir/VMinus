@@ -1,6 +1,7 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.core.VisionProperties;
+import net.lixir.vminus.core.conditions.VisionConditionArguments;
+import net.lixir.vminus.core.visions.ItemVision;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
@@ -13,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ShapelessRecipeMixin {
     @Inject(method = "getResultItem", at = @At("RETURN"), cancellable = true)
     public void vminus$getResultItem(RegistryAccess p_267111_, CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack itemStack = VisionProperties.getReplacementStack(cir.getReturnValue());
-        if (itemStack != null)
-            cir.setReturnValue(itemStack);
+        ItemStack itemStack = ItemVision.getVision(cir.getReturnValue()).replace.value(new VisionConditionArguments(cir.getReturnValue()));
+        if (itemStack != null) cir.setReturnValue(itemStack);
     }
 }

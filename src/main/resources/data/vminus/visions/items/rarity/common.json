@@ -1,6 +1,4 @@
 {
-  "items": [
-    "#vminus:rarity/common"
-  ],
+  "tag": "vminus:rarity/common",
   "rarity": "common"
 }

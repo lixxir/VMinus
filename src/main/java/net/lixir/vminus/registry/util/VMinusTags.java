@@ -4,7 +4,6 @@ import net.lixir.vminus.VMinus;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -65,6 +64,11 @@ public class VMinusTags {
         public static final TagKey<Item> DELICACY = tag("rarity/delicacy");
 
         public static final TagKey<Item> BANNER_PATTERNS = tag("banner_patterns");
+        public static final TagKey<Item> CONCRETE_POWDER = tag("concrete_powder");
+        public static final TagKey<Item> CHEST_BOATS = tag("chest_boats");
+        public static final TagKey<Item> BOATS = tag("boats");
+        public static final TagKey<Item> SHULKER_BOXES = tag("shulker_boxes");
+
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinus.ID, name));
