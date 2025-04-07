@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.blocks;
 
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.visions.BlockVision;
-import net.lixir.vminus.core.visions.accessors.IBlockVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.BlockVision;
+import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,11 +18,11 @@ public class BlockRealMixin implements IBlockVisionAccessor {
     private final Block vminus$block = (Block) (Object) this;
 
     @Unique
-    private BlockVision vminus$blockVision = new BlockVision();
+    private BlockVision vminus$blockVision = null;
 
     @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
     private void getSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().speedFactor.value(new VisionConditionArguments(vminus$block));
+        Float value = vminus$getVision().speed_boost.value(new VisionConditionArguments(vminus$block));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -34,13 +34,13 @@ public class BlockRealMixin implements IBlockVisionAccessor {
 
     @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
     private void getJumpFactor(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().jumpFactor.value(new VisionConditionArguments(vminus$block));
+        Float value = vminus$getVision().jump_boost.value(new VisionConditionArguments(vminus$block));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
     private void getExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().explosionResistance.value(new VisionConditionArguments(vminus$block));
+        Float value = vminus$getVision().blast_resistance.value(new VisionConditionArguments(vminus$block));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -52,11 +52,16 @@ public class BlockRealMixin implements IBlockVisionAccessor {
 
     @Override
     public BlockVision vminus$getVision() {
+        if (vminus$blockVision == null)
+            return BlockVision.EMPTY;
         return vminus$blockVision;
     }
 
     @Override
     public void vminus$setVision(BlockVision vision) {
-        this.vminus$blockVision = vision;
+        if (vminus$blockVision == null)
+            this.vminus$blockVision = vision;
+        else
+            this.vminus$blockVision.merge(vision);
     }
 }

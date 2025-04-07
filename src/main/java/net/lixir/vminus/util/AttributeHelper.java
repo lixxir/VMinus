@@ -30,12 +30,6 @@ public class AttributeHelper {
         return Math.max(damage, 0);
     }
 
-    public static float calculateHealthBoostFromItem(ItemStack itemStack, LivingEntity entity) {
-        float healthBoost = 0.0f;
-        float healthDifference = entity.getMaxHealth() - entity.getHealth();
-        healthBoost += healthDifference * getAttributeFromItem(itemStack, VMinusAttributes.HEALTH_LOST_STAT_BOOST.get());
-        return healthBoost;
-    }
 
     public static float getAttributesFromArmor(Entity entity, Attribute attribute) {
         if (!(entity instanceof LivingEntity livingEntity)) {

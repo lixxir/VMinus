@@ -2,20 +2,22 @@ package net.lixir.vminus.mixins.entities;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.Traits;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
 import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.util.SizeAttributeUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,6 +30,8 @@ import java.util.Random;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
+    @Shadow protected abstract int increaseAirSupply(int p_21307_);
+
     @Unique
     private final LivingEntity vminus$entity = (LivingEntity) (Object) this;
 
@@ -48,8 +52,46 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "getJumpBoostPower", at = @At("RETURN"), cancellable = true)
     public void getJumpBoostPower(CallbackInfoReturnable<Float> cir) {
+        float increase = 0;
         if (vminus$entity.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST.get()))
-            cir.setReturnValue(cir.getReturnValue() + (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST.get()) * 0.15f);
+            increase += (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST.get()) * 0.15f;
+        if (increase != 0)
+            cir.setReturnValue((cir.getReturnValue() * increase) * SizeAttributeUtil.getHeight(vminus$entity) * 0.2f);
+    }
+
+    @Inject(method = "getEyeHeight", at = @At("RETURN"), cancellable = true)
+    public void getEyeHeight(CallbackInfoReturnable<Float> callbackInfo) {
+        if (vminus$entity == null)
+            return;
+        if (vminus$entity.tickCount > 0) {
+            float height = SizeAttributeUtil.getHeight(vminus$entity);
+            if (height != 1) {
+                callbackInfo.setReturnValue(callbackInfo.getReturnValue() * height);
+            }
+        }
+    }
+
+    @Inject(method = "getDimensions", at = @At(value = "RETURN"), cancellable = true)
+    public void getDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
+        float defaultHeight = cir.getReturnValue().height;
+        float defaultWidth = cir.getReturnValue().width;
+        float width = defaultWidth * SizeAttributeUtil.getWidth(vminus$entity);
+        float height = defaultHeight * SizeAttributeUtil.getHeight(vminus$entity);
+        if (width != defaultWidth && height != defaultHeight)
+            cir.setReturnValue(EntityDimensions.scalable(width, height));
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "TAIL"))
+    public void baseTick(CallbackInfo ci) {
+        if (vminus$entity == null)
+            return;
+        vminus$entity.refreshDimensions();
+    }
+
+    @Inject(method = "createLivingAttributes", at = @At("RETURN"))
+    private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
+        cir.getReturnValue().add(VMinusAttributes.WIDTH.get());
+        cir.getReturnValue().add(VMinusAttributes.HEIGHT.get());
     }
 
 
@@ -69,6 +111,7 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "tickEffects", at = @At("HEAD"), cancellable = true)
     private void tickEffects(CallbackInfo ci) {
+        /*
         LivingEntityAccessor accessor = (LivingEntityAccessor) vminus$entity;
         Iterator<MobEffect> iterator = accessor.getActiveEffects().keySet().iterator();
         try {
@@ -130,26 +173,39 @@ public abstract class LivingEntityMixin {
 
     @Inject(method = "isSensitiveToWater", at = @At("RETURN"), cancellable = true)
     private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
+        /*
         if (VisionProperties.searchElement(VisionProperties.Names.WATER_SENSITIVE, vminus$entity) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.WATER_SENSITIVE, vminus$entity, cir.getReturnValue()));
+
+         */
+
     }
 
     @Inject(method = "canBreatheUnderwater", at = @At("RETURN"), cancellable = true)
     private void canBreatheUnderwater(CallbackInfoReturnable<Boolean> cir) {
+          /*
         if (VisionProperties.searchElement(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity, cir.getReturnValue()));
+
+           */
     }
 
     @Inject(method = "getSoundVolume", at = @At("RETURN"), cancellable = true)
     private void getSoundVolume(CallbackInfoReturnable<Float> cir) {
+          /*
         if (VisionProperties.searchElement(VisionProperties.Names.VOLUME, vminus$entity) != null)
             cir.setReturnValue(Math.max(0f, VisionProperties.getNumber(VisionProperties.Names.VOLUME, vminus$entity, cir.getReturnValue()).floatValue()));
+
+           */
     }
 
     @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
     private void getExperienceReward(CallbackInfoReturnable<Integer> cir) {
+          /*
         if (VisionProperties.searchElement(VisionProperties.Names.XP, vminus$entity) != null)
             cir.setReturnValue(Math.max(0, VisionProperties.getNumber(VisionProperties.Names.XP, vminus$entity, cir.getReturnValue()).intValue()));
+
+           */
     }
 
 

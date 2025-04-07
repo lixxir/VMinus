@@ -4,14 +4,13 @@ import net.lixir.vminus.block.ModHangingSignBlock;
 import net.lixir.vminus.block.ModStandingSignBlock;
 import net.lixir.vminus.block.ModWallHangingSignBlock;
 import net.lixir.vminus.block.ModWallSignBlock;
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.block.BlockSetup;
-import net.lixir.vminus.util.setup.block.BlockSetupModel;
+import net.lixir.vminus.datagen.util.simple.BlockItemDatagen;
+import net.lixir.vminus.datagen.util.simple.DatagenObject;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
 import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
@@ -31,66 +30,50 @@ public class VBlockStateProvider extends BlockStateProvider {
         this.modId = modId;
     }
 
+    public String getModId() {
+        return modId;
+    }
+
     @Override
     protected void registerStatesAndModels() {
         BlockSet.BLOCK_SETS.stream()
                 .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(this::blockSetStates);
+                .forEach(this::blockSets);
+        simpleDatagen();
+    }
 
-        for (BlockSetup blockSetup : SetupRegistries.BLOCKS.getValues(modId)) {
-            BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
-            RegistryObject<Block> blockRegistryObject = blockItemPair.blockObject();
-            RegistryObject<Item> itemRegistryObject = blockItemPair.itemObject();
-            Block block = blockItemPair.block();
-            Item item = blockItemPair.item();
-            Block baseBlock = blockSetup.getBaseBlock();
-            BlockSetupModel datagenSetupModel = blockSetup.getSetupModel();
-            if (block != null && blockRegistryObject != null && datagenSetupModel != null && !datagenSetupModel.equals(BlockSetupModel.NONE)) {
-                switch (datagenSetupModel) {
-                    case SIMPLE -> simpleBlockWithItem(block, models().cubeAll(blockRegistryObject.getId().getPath(), modLoc("block/" + blockRegistryObject.getId().getPath())));
-                    case LEAVES -> {
-                        registerLeaves(block);
-                        itemModels().withExistingParent(blockRegistryObject.getId().getPath(), modId + ":block/" + blockRegistryObject.getId().getPath());
-                    }
-                    case WALL -> {
-                        ResourceLocation texture = blockTexture(baseBlock);
-                        wallBlock((WallBlock) block, texture);
-                        itemModels().wallInventory(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath(), texture);
-                    }
-                    case CROSS -> {
-                        cross(block);
-                        itemModels().getBuilder(blockRegistryObject.getId().getPath())
-                                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
-                                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
-                    }
-                    case VARIED_CROSS -> {
-                        variedCross(block);
-                        itemModels().getBuilder(blockRegistryObject.getId().getPath())
-                                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
-                                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
-                    }
-                    case TINTED_CROSS -> {
-                        tintedCross(block);
-                        itemModels().getBuilder(blockRegistryObject.getId().getPath())
-                                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
-                                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
-                    }
-                    case FLAT_LAYER -> {
-                        flatLayer(block);
-                        itemModels().getBuilder(blockRegistryObject.getId().getPath())
-                                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
-                                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
-                    }
-                    case CUBE_COLUMN -> {
-                        cubeColumn(block);
-                        itemModels().withExistingParent(blockRegistryObject.getId().getPath(), modId + ":block/" + blockRegistryObject.getId().getPath());
-                    }
+    private void simpleDatagen() {
+        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
+            if (!simpleDatagen.hasModel())
+                continue;
+            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
+                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
+                RegistryObject<Block> blockRegistryObject = blockItemPair.blockObject();
+                Block block = blockItemPair.block();
+                switch (simpleDatagen.getType()) {
+                    case ORE -> allSidedCubeWithItem(block, blockRegistryObject);
+                    case FLOWER, PLANT -> crossWithItem(block, blockRegistryObject);
                 }
             }
         }
     }
 
-    private void blockSetStates(BlockSet blockSet) {
+    protected void stainedGlassPane(RegistryObject<Block> blockRegistryObject) {
+        Block block = blockRegistryObject.get();
+        String path = blockRegistryObject.getId().getPath();
+        String namespace = blockRegistryObject.getId().getNamespace();
+        String glassPath = path.substring(0, path.indexOf("_pane"));
+    }
+
+    protected void allSidedCubeWithItem(RegistryObject<Block> registryObject) {
+        allSidedCubeWithItem(registryObject.get(), registryObject);
+    }
+
+    protected void allSidedCubeWithItem(Block block, RegistryObject<Block> registryObject) {
+        simpleBlockWithItem(block, models().cubeAll(registryObject.getId().getPath(), modLoc("block/" + registryObject.getId().getPath())));
+    }
+
+    private void blockSets(BlockSet blockSet) {
         String baseName = blockSet.getBaseBlockName();
         Block block = blockSet.getBaseBlock();
         if (blockSet.getBaseBlockRegistryObject() != null)
@@ -147,25 +130,20 @@ public class VBlockStateProvider extends BlockStateProvider {
                         "all", blockTexture(block)));
     }
 
-    public void flatLayer(Block block) {
-        String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
+    protected void woolCarpetBlock(Block block) {
+        ResourceLocation resourceLocation = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block));
+        String blockPath = resourceLocation.getPath();
+        String colorName = resourceLocation.getPath().substring(0, blockPath.indexOf("_carpet"));
         simpleBlock(block, models().withExistingParent(
                         blockPath,
-                        new ResourceLocation("vminus", "block/flat_layer"))
-                .texture("0", blockTexture(block)));
+                        new ResourceLocation("minecraft", "block/carpet"))
+                .texture("wool", new ResourceLocation(resourceLocation.getNamespace(), "block/" +  colorName + "_wool")));
+        itemModels().withExistingParent(colorName + "_carpet", modId + ":block/" + colorName + "_carpet");
     }
 
-    public void tintedCross(Block block) {
+    protected void variedCross(Block block) {
         String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
-        simpleBlock(block, models().withExistingParent(
-                        blockPath,
-                        new ResourceLocation("minecraft", "block/tinted_cross"))
-                .texture("cross", blockTexture(block)));
-    }
 
-
-    public void variedCross(Block block) {
-        String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
         simpleBlock(block, models().withExistingParent(
                 blockPath,
                 new ResourceLocation("vminus", "block/varied_cross"))
@@ -186,6 +164,15 @@ public class VBlockStateProvider extends BlockStateProvider {
         simpleBlock(block, models().cross(blockTexture(block).getPath(),
                 blockTexture(block)).renderType("cutout"));
     }
+
+    public void crossWithItem(Block block, RegistryObject<Block> blockRegistryObject) {
+        simpleBlock(block, models().cross(blockTexture(block).getPath(),
+                blockTexture(block)).renderType("cutout"));
+        itemModels().getBuilder(blockRegistryObject.getId().getPath())
+                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
+                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
+    }
+
 
     public void blockItem(Block block) {
         simpleBlockItem(block, new ModelFile.UncheckedModelFile(modId +

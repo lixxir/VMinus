@@ -1,12 +1,10 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.SetupTag;
-import net.lixir.vminus.util.setup.block.BlockSetup;
+import net.lixir.vminus.datagen.util.simple.BlockItemDatagen;
+import net.lixir.vminus.datagen.util.simple.DatagenObject;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
 import net.lixir.vminus.registry.util.BlockSet;
-import net.lixir.vminus.util.setup.item.ItemSetup;
-import net.lixir.vminus.util.setup.item.ItemSetupModel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -15,6 +13,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
@@ -31,53 +30,28 @@ public class VItemTagGenerator extends ItemTagsProvider {
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         BlockSet.BLOCK_SETS.stream()
                 .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(this::registerBlockSetTags);
+                .forEach(this::blockSets);
+        simpleDatagen();
+    }
 
-        var walls = tag(ItemTags.WALLS);
-        var stairs = tag(ItemTags.STAIRS);
-        var slabs = tag(ItemTags.SLABS);
-        var leaves = tag(ItemTags.LEAVES);
-
-        var swords = tag(ItemTags.SWORDS);
-        var pickaxes = tag(ItemTags.PICKAXES);
-        var axes = tag(ItemTags.AXES);
-        var shovels = tag(ItemTags.SHOVELS);
-        var hoes = tag(ItemTags.HOES);
-
-        for (BlockSetup blockSetup : SetupRegistries.BLOCKS.getValues(modId)) {
-            BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
-            Block block = blockItemPair.block();
-            Item item = blockItemPair.item();
-            Block baseBlock = blockSetup.getBaseBlock();
-
-            SetupTag setupTag = blockSetup.getDatagenTag();
-            if (setupTag != null && !setupTag.equals(SetupTag.NONE)) {
-                switch (setupTag) {
-                    case WALL -> walls.add(item);
-                    case STAIRS -> stairs.add(item);
-                    case SLAB -> slabs.add(item);
-                    case LEAVES -> leaves.add(item);
-                }
-
-            }
-        }
-        for (ItemSetup itemSetup : SetupRegistries.ITEMS.getValues(modId)) {
-            RegistryObject<Item> itemRegistryObject = itemSetup.getItemRegistryObject();
-            Item item = itemRegistryObject.get();
-            SetupTag setupTag = itemSetup.getSetupTag();
-            if (itemRegistryObject != null && item != null && setupTag != null && !setupTag.equals(SetupTag.NONE)) {
-                switch (setupTag) {
-                    case SWORD -> swords.add(item);
-                    case PICKAXE -> pickaxes.add(item);
-                    case AXE -> axes.add(item);
-                    case SHOVEL -> shovels.add(item);
-                    case HOE -> hoes.add(item);
+    private void simpleDatagen() {
+        var ores = tag(Tags.Items.ORES);
+        var smallFlowers = tag(ItemTags.SMALL_FLOWERS);
+        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
+            if (!simpleDatagen.hasTag())
+                continue;
+            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
+                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
+                Item item = blockItemPair.item();
+                switch (simpleDatagen.getType()) {
+                    case ORE -> ores.add(item);
+                    case FLOWER -> smallFlowers.add(item);
                 }
             }
         }
     }
 
-    private void registerBlockSetTags(BlockSet blockSet) {
+    private void blockSets(BlockSet blockSet) {
         var planks = tag(ItemTags.PLANKS);
         var logs = tag(ItemTags.LOGS);
         var stairs = tag(ItemTags.STAIRS);

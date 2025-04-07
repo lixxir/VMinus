@@ -6,6 +6,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -31,11 +32,13 @@ public class DyedBlockSet {
             BlockSet.Builder builder = builderFunction.apply(color);
             if (builder != null) {
                 String namespace = builder.getBaseBlockNamespaceId();
-
                 String blockId = builder.getBlockId();
                 Block block;
                 if (blockId != null && namespace != null) {
-                    block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(namespace, blockId));
+                    Block originalBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(namespace, blockId));
+                    if (originalBlock != null && !originalBlock.equals(Blocks.AIR))
+                        originalBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(builder.getModId(), blockId));
+                    block = originalBlock;
                 } else {
                     block = null;
                 }
@@ -55,10 +58,10 @@ public class DyedBlockSet {
                         }
                     }
                 }
+                BlockSet blockSet = builder.build();
 
 
-
-                blockSets.put(color, builder.build());
+                blockSets.put(color, blockSet);
             }
         }
     }

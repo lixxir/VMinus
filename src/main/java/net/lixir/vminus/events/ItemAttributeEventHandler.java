@@ -1,11 +1,11 @@
 package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.util.VisionAttribute;
-import net.lixir.vminus.core.util.VisionTrait;
-import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.util.VisionAttribute;
+import net.lixir.vminus.visions.util.VisionTrait;
+import net.lixir.vminus.visions.ItemVision;
+import net.lixir.vminus.visions.accessors.IItemVisionAccessor;
 import net.lixir.vminus.registry.Traits;
 import net.lixir.vminus.registry.VMinusAttributes;
 import net.lixir.vminus.world.Trait;

@@ -1,11 +1,11 @@
 package net.lixir.vminus.mixins.creative;
 
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.util.VisionCreativeOrder;
-import net.lixir.vminus.core.util.VisionItemStackWithTagKey;
-import net.lixir.vminus.core.visions.CreativeTabVision;
-import net.lixir.vminus.core.visions.ItemVision;
-import net.lixir.vminus.core.visions.accessors.ICreativeTabVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.util.VisionCreativeOrder;
+import net.lixir.vminus.visions.util.VisionItemReplacement;
+import net.lixir.vminus.visions.CreativeTabVision;
+import net.lixir.vminus.visions.ItemVision;
+import net.lixir.vminus.visions.accessors.ICreativeTabVisionAccessor;
 import net.lixir.vminus.registry.util.BlockSet;
 import net.lixir.vminus.registry.util.BlockSetCreativeOrder;
 import net.minecraft.tags.TagKey;
@@ -51,87 +51,46 @@ public class CreativeModeTabMixin implements ICreativeTabVisionAccessor {
     private void vminus$buildContents(CreativeModeTab.ItemDisplayParameters displayContext, CallbackInfo ci) {
         CreativeTabModeAccessor accessor = (CreativeTabModeAccessor) vminus$creativeModeTab;
         List<Item> itemsToRemove = new ArrayList<>(vminus$getVision().remove.values().stream()
-                .filter((VisionItemStackWithTagKey t) -> t.itemStack() != null)
-                .map((VisionItemStackWithTagKey t) -> t.itemStack().getItem())
+                .filter((VisionItemReplacement t) -> t.itemStack() != null)
+                .map((VisionItemReplacement t) -> t.itemStack().getItem())
                 .toList());
 
         List<TagKey<Item>> itemTagsToRemove = new ArrayList<>(vminus$getVision().remove.values().stream()
-                .map(VisionItemStackWithTagKey::tag)
+                .map(VisionItemReplacement::tag)
                 .filter(Objects::nonNull)
                 .toList());
 
 
-        for (ItemStack itemStack : accessor.getDisplayItems()) {
-            if (itemStack == null)
-                continue;
-            Item item = itemStack.getItem();
-            Boolean banned = ItemVision.getVision(itemStack).ban.value(new VisionConditionArguments(itemStack));
+        vminus$processHiddenItems(accessor.getDisplayItems(), itemsToRemove, itemTagsToRemove);
+        vminus$processHiddenItems(accessor.getSearchItems(), itemsToRemove, itemTagsToRemove);
 
-            boolean isTaggedForRemoval = itemTagsToRemove.stream().anyMatch(tagKey -> {
-                var tagCollection = ForgeRegistries.ITEMS.tags();
-                if (tagCollection == null) return false;
-                tagCollection.getTag(tagKey);
-                return tagCollection.getTag(tagKey).contains(item);
-            });
-
-            if ((banned != null && banned) || itemsToRemove.contains(item) || isTaggedForRemoval) {
-                itemsToRemove.add(item);
-            }
-        }
-
-        for (ItemStack itemStack : accessor.getSearchItems()) {
-            if (itemStack == null)
-                continue;
-            Item item = itemStack.getItem();
-            Boolean banned = ItemVision.getVision(itemStack).ban.value(new VisionConditionArguments(itemStack));
-
-            boolean isTaggedForRemoval = itemTagsToRemove.stream().anyMatch(tagKey -> {
-                var tagCollection = ForgeRegistries.ITEMS.tags();
-                if (tagCollection == null) return false;
-                tagCollection.getTag(tagKey);
-                return tagCollection.getTag(tagKey).contains(item);
-            });
-
-            if ((banned != null && banned) || itemsToRemove.contains(item) || isTaggedForRemoval) {
-                itemsToRemove.add(item);
-            }
-        }
-
-        accessor.getDisplayItems().removeIf(itemStack -> {
-            var tagCollection = ForgeRegistries.ITEMS.tags();
-            return itemsToRemove.contains(itemStack.getItem()) ||
-                    (tagCollection != null && itemTagsToRemove.stream().anyMatch(tagKey ->
-                    {
-                        tagCollection.getTag(tagKey);
-                        return tagCollection.getTag(tagKey).contains(itemStack.getItem());
-                    }));
-        });
-
-        accessor.getSearchItems().removeIf(itemStack -> {
-            var tagCollection = ForgeRegistries.ITEMS.tags();
-            return itemsToRemove.contains(itemStack.getItem()) ||
-                    (tagCollection != null && itemTagsToRemove.stream().anyMatch(tagKey ->
-                    {
-                        tagCollection.getTag(tagKey);
-                        return tagCollection.getTag(tagKey).contains(itemStack.getItem());
-                    }));
-        });
 
         List<VisionCreativeOrder> orders = new ArrayList<>(vminus$getVision().order.values());
         List<ItemStack> itemList = new ArrayList<>(accessor.getDisplayItems());
-        orders.sort(Comparator.comparingInt(order -> vminus$findItemIndex(itemList, order.getTargetItemStack().getItem())));
+
+        orders.sort(Comparator.comparingInt(order -> {
+            ItemStack targetStack = order.getTargetItemStack();
+            return targetStack != null ? vminus$findItemIndex(itemList, targetStack.getItem()) : Integer.MAX_VALUE;
+        }));
 
 
         for (VisionCreativeOrder order : orders) {
-            ItemStack targetItemStack = order.getTargetItemStack();
-            if (targetItemStack == null)
-                continue;
-            Item targetItem = targetItemStack.getItem();
             ItemStack itemStack = order.getItemStack();
             if (itemStack == null)
                 continue;
+
             Item item = itemStack.getItem();
-            vminus$addItemsToTab(targetItem, item, order.isBefore());
+            ItemStack targetItemStack = order.getTargetItemStack();
+
+            if (targetItemStack != null) {
+                Item targetItem = targetItemStack.getItem();
+                vminus$addItemsToTab(targetItem, item, order.isBefore());
+            } else {
+                if (!accessor.getDisplayItems().contains(itemStack))
+                    accessor.getDisplayItems().add(itemStack);
+                if (!accessor.getSearchItems().contains(itemStack))
+                    accessor.getSearchItems().add(itemStack);
+            }
         }
 
         boolean updated;
@@ -170,16 +129,48 @@ public class CreativeModeTabMixin implements ICreativeTabVisionAccessor {
                 }
             }
         }
-
+        vminus$creativeModeTab.rebuildSearchTree();
     }
+
+    @Unique
+    private void vminus$processHiddenItems(Collection<ItemStack> itemStacks, List<Item> itemsToRemove, List<TagKey<Item>> itemTagsToRemove) {
+        var tagCollection = ForgeRegistries.ITEMS.tags();
+
+
+        for (ItemStack itemStack : itemStacks) {
+            if (itemStack == null)
+                continue;
+
+            Item item = itemStack.getItem();
+            ItemVision itemVision = ItemVision.of(itemStack);
+
+            Boolean banned = itemVision.ban.value(new VisionConditionArguments(itemStack));
+            VisionItemReplacement visionItemReplacement = itemVision.replace.value(new VisionConditionArguments(itemStack));
+            boolean isTaggedForRemoval = itemTagsToRemove.stream().anyMatch(tagKey ->
+                    tagCollection != null && tagCollection.getTag(tagKey).contains(item));
+
+            if ((banned != null && banned) ||
+                    (visionItemReplacement != null &&
+                            (visionItemReplacement.itemStack() != null || visionItemReplacement.tag() != null)) ||
+                    itemsToRemove.contains(item) || isTaggedForRemoval) {
+                itemsToRemove.add(item);
+            }
+        }
+        itemStacks.removeIf(itemStack -> itemsToRemove.contains(itemStack.getItem()) ||
+                (tagCollection != null && itemTagsToRemove.stream().anyMatch(tagKey ->
+                        tagCollection.getTag(tagKey).contains(itemStack.getItem())))
+        );
+    }
+
+
 
 
     @Unique
     private void vminus$addItemsToTab(@Nullable Item targetItem, Item item, boolean before) {
-        Boolean banned = ItemVision.getVision(item).ban.value(new VisionConditionArguments(item));
+        Boolean banned = ItemVision.of(item).ban.value(new VisionConditionArguments(item));
         if (banned != null && banned)
             return;
-        Boolean targetBanned = ItemVision.getVision(targetItem).ban.value(new VisionConditionArguments(targetItem));
+        Boolean targetBanned = ItemVision.of(targetItem).ban.value(new VisionConditionArguments(targetItem));
         if (targetBanned != null && targetBanned)
             return;
 

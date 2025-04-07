@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.visions.EntityVision;
-import net.lixir.vminus.core.visions.accessors.IEntityVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.EntityVision;
+import net.lixir.vminus.visions.accessors.IEntityVisionAccessor;
 import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

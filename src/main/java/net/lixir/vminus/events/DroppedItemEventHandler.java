@@ -2,8 +2,6 @@ package net.lixir.vminus.events;
 
 import com.google.gson.JsonObject;
 import net.lixir.vminus.registry.VMinusSounds;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -23,6 +21,7 @@ import java.util.Objects;
 public class DroppedItemEventHandler {
     @SubscribeEvent
     public static void vminus$ItemTossEvent(ItemTossEvent event) {
+        /*
         Entity entity = event.getEntity();
         if (entity == null)
             return;
@@ -48,5 +47,7 @@ public class DroppedItemEventHandler {
                     SoundSource.PLAYERS, (float) 0.4,
                     (float) (1 + Mth.nextDouble(RandomSource.create(), -0.1, 0.1)));
         }
+
+         */
     }
 }

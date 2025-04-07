@@ -1,6 +1,6 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.core.VisionType;
+import net.lixir.vminus.visions.VisionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

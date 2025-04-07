@@ -1,17 +1,16 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.SetupTag;
-import net.lixir.vminus.util.setup.SetupToolType;
-import net.lixir.vminus.util.setup.block.BlockSetup;
+import net.lixir.vminus.datagen.util.simple.BlockItemDatagen;
+import net.lixir.vminus.datagen.util.simple.DatagenObject;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
 import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
@@ -29,48 +28,42 @@ public class VBlockTagGenerator extends BlockTagsProvider {
         // Blocksets
         BlockSet.BLOCK_SETS.stream()
                 .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(this::registerBlockSetTags);
+                .forEach(this::blockSets);
 
         var walls = tag(BlockTags.WALLS);
         var stairs = tag(BlockTags.STAIRS);
         var slabs = tag(BlockTags.SLABS);
         var leaves = tag(BlockTags.LEAVES);
+        var flowers = tag(BlockTags.FLOWERS);
+        var smallFlowers = tag(BlockTags.SMALL_FLOWERS);
         var swordEfficient = tag(BlockTags.SWORD_EFFICIENT);
         var pickaxeMineable = tag(BlockTags.MINEABLE_WITH_PICKAXE);
         var axeMineable = tag(BlockTags.MINEABLE_WITH_AXE);
         var shovelMineable = tag(BlockTags.MINEABLE_WITH_SHOVEL);
         var hoeMineable = tag(BlockTags.MINEABLE_WITH_HOE);
+        simpleDatagen();
+    }
 
-        for (BlockSetup blockSetup : SetupRegistries.BLOCKS.getValues(modId)) {
-            BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
-            Block block = blockItemPair.block();
-            Item item = blockItemPair.item();
-            Block baseBlock = blockSetup.getBaseBlock();
-
-            SetupTag setupTag = blockSetup.getDatagenTag();
-            if (setupTag != null && !setupTag.equals(SetupTag.NONE)) {
-                switch (setupTag) {
-                    case WALL -> walls.add(block);
-                    case STAIRS -> stairs.add(block);
-                    case SLAB -> slabs.add(block);
-                    case LEAVES -> leaves.add(block);
-                }
-            }
-
-            SetupToolType setupToolType = blockSetup.getDatagenToolType();
-            if (setupToolType != null) {
-                switch (setupToolType) {
-                    case SWORD -> swordEfficient.add(block);
-                    case PICKAXE -> pickaxeMineable.add(block);
-                    case AXE -> axeMineable.add(block);
-                    case SHOVEL -> shovelMineable.add(block);
-                    case HOE -> hoeMineable.add(block);
+    private void simpleDatagen() {
+        var ores = tag(Tags.Blocks.ORES);
+        var smallFlowers = tag(BlockTags.SMALL_FLOWERS);
+        var replaceable = tag(BlockTags.REPLACEABLE);
+        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
+            if (!simpleDatagen.hasTag())
+                continue;
+            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
+                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
+                Block block = blockItemPair.block();
+                switch (simpleDatagen.getType()) {
+                    case ORE -> ores.add(block);
+                    case FLOWER -> smallFlowers.add(block);
+                    case PLANT -> replaceable.add(block);
                 }
             }
         }
     }
 
-    private void registerBlockSetTags(BlockSet blockSet) {
+    private void blockSets(BlockSet blockSet) {
         var planks = tag(BlockTags.PLANKS);
         var logs = tag(BlockTags.LOGS);
         var stairs = tag(BlockTags.STAIRS);
@@ -132,6 +125,7 @@ public class VBlockTagGenerator extends BlockTagsProvider {
             if (blockSet.getTrapdoor() != null)
                 trapdoors.add(blockSet.getTrapdoor().block());
         }
+
         if (blockSet.getWall() != null)
             walls.add(blockSet.getWall().block());
         if (blockSet.getFenceGate() != null)

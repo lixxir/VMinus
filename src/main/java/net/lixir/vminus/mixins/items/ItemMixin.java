@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.util.VisionFoodProperties;
-import net.lixir.vminus.core.visions.accessors.IItemVisionAccessor;
-import net.lixir.vminus.core.visions.ItemVision;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.util.VisionFoodProperties;
+import net.lixir.vminus.visions.accessors.IItemVisionAccessor;
+import net.lixir.vminus.visions.ItemVision;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ public class ItemMixin implements IItemVisionAccessor {
     private final Item vminus$item = (Item) (Object) this;
 
     @Unique
-    private ItemVision vminus$itemVision = new ItemVision();
+    private ItemVision vminus$itemVision = null;
 
     /*
     @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)
@@ -36,21 +36,21 @@ public class ItemMixin implements IItemVisionAccessor {
 
     @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
     private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$item));
+        VisionFoodProperties value = vminus$getVision().food_properties.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value.mergeFoodProperties(cir.getReturnValue()));
     }
 
 
     @Inject(method = "getMaxStackSize", at = @At("RETURN"), cancellable = true)
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().maxStackSize.value(new VisionConditionArguments(vminus$item));
+        Integer value = vminus$getVision().max_stack_size.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
 
     @Inject(method = "isFireResistant", at = @At("RETURN"), cancellable = true)
     public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().fireResistant.value(new VisionConditionArguments(vminus$item));
+        Boolean value = vminus$getVision().fire_resistant.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -64,13 +64,13 @@ public class ItemMixin implements IItemVisionAccessor {
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().useDuration.value(new VisionConditionArguments(vminus$item));
+        Integer value = vminus$getVision().use_duration.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
     private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        VisionFoodProperties value = vminus$getVision().foodProperties.value(new VisionConditionArguments(vminus$item));
+        VisionFoodProperties value = vminus$getVision().food_properties.value(new VisionConditionArguments(vminus$item));
         if (value != null) cir.setReturnValue(true);
     }
 
@@ -88,11 +88,16 @@ public class ItemMixin implements IItemVisionAccessor {
 
     @Override
     public void vminus$setVision(ItemVision itemVision) {
-        this.vminus$itemVision = itemVision;
+        if (this.vminus$itemVision == null)
+            this.vminus$itemVision = itemVision;
+        else
+            this.vminus$itemVision.merge(itemVision);
     }
 
     @Override
     public ItemVision vminus$getVision() {
+        if (vminus$itemVision == null)
+            return ItemVision.EMPTY;
         return this.vminus$itemVision;
     }
 }

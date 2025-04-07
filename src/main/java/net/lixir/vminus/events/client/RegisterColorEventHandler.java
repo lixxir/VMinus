@@ -1,9 +1,10 @@
 package net.lixir.vminus.events.client;
 
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.SetupTint;
-import net.lixir.vminus.util.setup.block.BlockSetup;
+import net.lixir.vminus.datagen.util.simple.DatagenObject;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
+import net.lixir.vminus.datagen.util.simple.TintedBlockItemDatagen;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
+import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.FoliageColor;
@@ -20,20 +21,18 @@ import java.util.List;
 public class RegisterColorEventHandler {
     @SubscribeEvent
     public static void itemColorLoad(RegisterColorHandlersEvent.Item event) {
-        for (List<BlockSetup> blockSetupList : SetupRegistries.BLOCKS.getValues().values()) {
-            for (BlockSetup blockSetup : blockSetupList) {
-                BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
+        for (List<DatagenObject> value : DatagenRegistry.getValues().values()) {
+            if (value instanceof TintedBlockItemDatagen tintedBlockItemDatagen) {
+                BlockItemRegistryPair blockItemPair = tintedBlockItemDatagen.getBlockItemRegistryPair();
                 Item item = blockItemPair.item();
-                SetupTint setupTint = blockSetup.getDatagenTint();
-                if (item != null && setupTint != null && !setupTint.equals(SetupTint.NONE)) {
-                    switch (setupTint) {
-                        case FOLIAGE -> event.register((stack, tintIndex) ->
-                                tintIndex == 0 ? FoliageColor.getDefaultColor() : -1, item
-                        );
-                        case GRASS -> event.register((stack, tintIndex) ->
-                                tintIndex == 0 ? GrassColor.getDefaultColor() : -1, item
-                        );
-                    }
+                TintedBlockItemDatagen.TintType tintType = tintedBlockItemDatagen.getTintType();
+                switch (tintType) {
+                    case FOLIAGE -> event.register((stack, tintIndex) ->
+                            tintIndex == 0 ? FoliageColor.getDefaultColor() : -1, item
+                    );
+                    case GRASS -> event.register((stack, tintIndex) ->
+                            tintIndex == 0 ? GrassColor.getDefaultColor() : -1, item
+                    );
                 }
             }
         }
@@ -41,26 +40,24 @@ public class RegisterColorEventHandler {
 
     @SubscribeEvent
     public static void blockColorLoad(RegisterColorHandlersEvent.Block event) {
-        for (List<BlockSetup> blockSetupList : SetupRegistries.BLOCKS.getValues().values()) {
-            for (BlockSetup blockSetup : blockSetupList) {
-                BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
+        for (List<DatagenObject> value : DatagenRegistry.getValues().values()) {
+            if (value instanceof TintedBlockItemDatagen tintedBlockItemDatagen) {
+                BlockItemRegistryPair blockItemPair = tintedBlockItemDatagen.getBlockItemRegistryPair();
                 Block block = blockItemPair.block();
-                SetupTint setupTint = blockSetup.getDatagenTint();
-                if (block != null && setupTint != null && !setupTint.equals(SetupTint.NONE)) {
-                    switch (setupTint) {
-                        case FOLIAGE -> event.getBlockColors().register(
-                                (bs, world, pos, index) -> world != null && pos != null
-                                        ? BiomeColors.getAverageFoliageColor(world, pos)
-                                        : FoliageColor.getDefaultColor(),
-                                block
-                        );
-                        case GRASS -> event.getBlockColors().register(
-                                (bs, world, pos, index) -> world != null && pos != null
-                                        ? BiomeColors.getAverageGrassColor(world, pos)
-                                        : GrassColor.getDefaultColor(),
-                                block
-                        );
-                    }
+                TintedBlockItemDatagen.TintType tintType = tintedBlockItemDatagen.getTintType();
+                switch (tintType) {
+                    case FOLIAGE -> event.getBlockColors().register(
+                            (bs, world, pos, index) -> world != null && pos != null
+                                    ? BiomeColors.getAverageFoliageColor(world, pos)
+                                    : FoliageColor.getDefaultColor(),
+                            block
+                    );
+                    case GRASS -> event.getBlockColors().register(
+                            (bs, world, pos, index) -> world != null && pos != null
+                                    ? BiomeColors.getAverageGrassColor(world, pos)
+                                    : GrassColor.getDefaultColor(),
+                            block
+                    );
                 }
             }
         }

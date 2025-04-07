@@ -1,4 +1,7 @@
 {
   "tag": "vminus:armor/leather",
-  "trait": "vminus:insulated=true"
+  "trait": {
+    "id": "vminus:insulated",
+    "value": true
+  }
 }

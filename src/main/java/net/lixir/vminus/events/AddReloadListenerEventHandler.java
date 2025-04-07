@@ -1,9 +1,9 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.core.resources.managers.BlockVisionManager;
-import net.lixir.vminus.core.resources.managers.CreativeTabManager;
-import net.lixir.vminus.core.resources.managers.EntityVisionManager;
-import net.lixir.vminus.core.resources.managers.ItemVisionManager;
+import net.lixir.vminus.visions.resources.managers.BlockVisionManager;
+import net.lixir.vminus.visions.resources.managers.CreativeTabManager;
+import net.lixir.vminus.visions.resources.managers.EntityVisionManager;
+import net.lixir.vminus.visions.resources.managers.ItemVisionManager;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;

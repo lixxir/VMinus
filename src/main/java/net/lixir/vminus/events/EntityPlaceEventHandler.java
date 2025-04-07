@@ -3,7 +3,6 @@ package net.lixir.vminus.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.lixir.vminus.core.Visions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.LevelAccessor;
@@ -19,6 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 public class EntityPlaceEventHandler {
     @SubscribeEvent
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
+        /*
         LevelAccessor world = event.getLevel();
         Entity entity = event.getEntity();
         if (entity == null) return;
@@ -60,5 +60,7 @@ public class EntityPlaceEventHandler {
                 }
             }
         }
+
+         */
     }
 }

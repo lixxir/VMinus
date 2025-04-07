@@ -1,8 +1,6 @@
 package net.lixir.vminus.mixins.client;
 
 import com.google.gson.JsonObject;
-import net.lixir.vminus.core.Visions;
-import net.lixir.vminus.core.VisionProperties;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -31,6 +29,7 @@ public abstract class ClientPacketListenerMixin {
         ClientPacketListenerAccessor accessor = (ClientPacketListenerAccessor) vminus$clientPacketListener;
         Entity entity = vminus$clientPacketListener.getLevel().getEntity(packet.getItemId());
 
+        /*
         if (entity instanceof ItemEntity itemEntity) {
             ItemStack itemStack = itemEntity.getItem();
             JsonObject visionData = Visions.getData(itemStack);
@@ -41,7 +40,10 @@ public abstract class ClientPacketListenerMixin {
                         Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation)),
                         SoundSource.PLAYERS, 0.2F,
                         (accessor.getRandom().nextFloat() - accessor.getRandom().nextFloat()) * 1.4F + 2.0F, false);
-        }
-            }
+                        }
+         }
+
+         */
+
     }
 }

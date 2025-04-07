@@ -17,8 +17,23 @@ public class VMinusTags {
         public static final TagKey<Block> FROGLIGHTS = tag("froglights");
         public static final TagKey<Block> MOB_HEADS = tag("mob_heads");
         public static final TagKey<Block> CONCRETE_POWDER = tag("concrete_powder");
-        public static final TagKey<Block> BRUSHABLE_BLOCKS = tag("brushable_blocks");
-
+        public static final TagKey<Block> BRUSHABLE = tag("brushable");
+        public static final TagKey<Block> CAN_SUSTAIN_PLANTS = tag("can_sustain_plants");
+        public static final TagKey<Block> CAN_SUSTAIN_CACTUS = tag("can_sustain_cactus");
+        public static final TagKey<Block> CAN_SUSTAIN_DEAD_BUSH = tag("can_sustain_dead_bush");
+        public static final TagKey<Block> DYEABLE = tag("dyeable");
+        public static final TagKey<Block> DYED = tag("dyed");
+        public static final TagKey<Block> DYED_WOOL = tag("dyed/wool");
+        public static final TagKey<Block> DYED_TERRACOTTA = tag("dyed/terracotta");
+        public static final TagKey<Block> DYED_CONCRETE = tag("dyed/concrete");
+        public static final TagKey<Block> DYED_BEDS = tag("dyed/beds");
+        public static final TagKey<Block> DYED_BANNERS = tag("dyed/banners");
+        public static final TagKey<Block> DYED_CANDLES = tag("dyed/candles");
+        public static final TagKey<Block> DYED_GLAZED_TERRACOTTA = tag("dyed/glazed_terracotta");
+        public static final TagKey<Block> DYED_CARPETS = tag("dyed/carpets");
+        public static final TagKey<Block> DYED_CONCRETE_POWDER = tag("dyed/concrete_powder");
+        public static final TagKey<Block> DYED_STAINED_GLASS = tag("dyed/stained_glass");
+        public static final TagKey<Block> DYED_STAINED_GLASS_PANE = tag("dyed/stained_glass_pane");
 
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(VMinus.ID, name));
@@ -26,7 +41,8 @@ public class VMinusTags {
     }
 
     public static class Entities {
-        public static final TagKey<EntityType<?>> IGNORES_TRANSLUCENCE = create(new ResourceLocation(VMinus.ID, "ignores_translucence"));
+        // public static final TagKey<EntityType<?>> IGNORES_TRANSLUCENCE = create(new ResourceLocation(VMinus.ID, "ignores_translucence"));
+        public static final TagKey<EntityType<?>> ZOMBIES = create(new ResourceLocation(VMinus.ID, "zombies"));
 
         private static TagKey<EntityType<?>> create(ResourceLocation p_203849_) {
             return TagKey.create(Registries.ENTITY_TYPE, p_203849_);

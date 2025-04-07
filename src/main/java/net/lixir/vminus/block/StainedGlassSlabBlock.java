@@ -11,50 +11,40 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 
-public final class StainedGlassSlabBlock extends SlabBlock
-        implements BeaconBeamBlock
-{
+public final class StainedGlassSlabBlock extends SlabBlock implements BeaconBeamBlock {
     private final DyeColor color;
 
-    public StainedGlassSlabBlock(DyeColor color,
-                                 Properties settings)
-    {
+    public StainedGlassSlabBlock(DyeColor color, Properties settings) {
         super(settings);
         this.color = color;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean skipRendering(BlockState state, BlockState stateFrom,
-                                 Direction direction)
-    {
+    public boolean skipRendering(@NotNull BlockState state, BlockState stateFrom, @NotNull Direction direction) {
         Block blockFrom = stateFrom.getBlock();
 
-        if(blockFrom instanceof StainedGlassBlock
-                && ((StainedGlassBlock)blockFrom).getColor() == color)
+        if(blockFrom instanceof StainedGlassBlock && ((StainedGlassBlock)blockFrom).getColor() == color)
             return true;
 
         if(blockFrom == this)
             if(isInvisibleToGlassSlab(state, stateFrom, direction))
                 return true;
 
-        if(blockFrom instanceof StainedGlassStairsBlock
-                && ((StainedGlassStairsBlock)blockFrom).getColor() == color)
+        if(blockFrom instanceof StainedGlassStairsBlock && ((StainedGlassStairsBlock)blockFrom).getColor() == color)
             if(isInvisibleToGlassStairs(state, stateFrom, direction))
                 return true;
 
         return super.skipRendering(state, stateFrom, direction);
     }
 
-    private boolean isInvisibleToGlassSlab(BlockState state,
-                                           BlockState stateFrom, Direction direction)
-    {
+    private boolean isInvisibleToGlassSlab(BlockState state, BlockState stateFrom, Direction direction) {
         SlabType type = state.getValue(SlabBlock.TYPE);
         SlabType typeFrom = stateFrom.getValue(SlabBlock.TYPE);
 
-        switch(direction)
-        {
+        switch(direction) {
             case UP:
                 if(typeFrom != SlabType.TOP && type != SlabType.BOTTOM)
                     return true;
@@ -77,63 +67,50 @@ public final class StainedGlassSlabBlock extends SlabBlock
         return false;
     }
 
-    private boolean isInvisibleToGlassStairs(BlockState state,
-                                             BlockState stateFrom, Direction direction)
-    {
+    private boolean isInvisibleToGlassStairs(BlockState state, BlockState stateFrom, Direction direction) {
         SlabType type = state.getValue(SlabBlock.TYPE);
         Half halfFrom = stateFrom.getValue(StairBlock.HALF);
         Direction facingFrom = stateFrom.getValue(StairBlock.FACING);
 
-        // up
         if(direction == Direction.UP)
             if(halfFrom == Half.BOTTOM)
                 return true;
 
-        // down
         if(direction == Direction.DOWN)
             if(halfFrom == Half.TOP)
                 return true;
 
-        // other stairs rear
         if(facingFrom == direction.getOpposite())
             return true;
 
-        // sides
         if(direction.get2DDataValue() != -1)
         {
             if(type == SlabType.BOTTOM && halfFrom == Half.BOTTOM)
                 return true;
 
-            if(type == SlabType.TOP && halfFrom == Half.TOP)
-                return true;
+            return type == SlabType.TOP && halfFrom == Half.TOP;
         }
 
         return false;
     }
 
     @Override
-    public VoxelShape getVisualShape(BlockState state, BlockGetter world,
-                                     BlockPos pos, CollisionContext context)
-    {
+    public @NotNull VoxelShape getVisualShape(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos, @NotNull CollisionContext context) {
         return Shapes.empty();
     }
 
     @Override
-    public float getShadeBrightness(BlockState state, BlockGetter world,
-                                    BlockPos pos)
-    {
+    public float getShadeBrightness(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
         return 1.0F;
     }
 
     @Override
-    public boolean propagatesSkylightDown(BlockState state, BlockGetter world,
-                                          BlockPos pos)
-    {
+    public boolean propagatesSkylightDown(@NotNull BlockState state, @NotNull BlockGetter world, @NotNull BlockPos pos) {
         return true;
     }
 
     @Override
-    public DyeColor getColor()
+    public @NotNull DyeColor getColor()
     {
         return color;
     }

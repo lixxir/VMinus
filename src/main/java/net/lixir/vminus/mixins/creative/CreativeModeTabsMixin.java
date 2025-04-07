@@ -1,8 +1,6 @@
 package net.lixir.vminus.mixins.creative;
 
-import net.lixir.vminus.core.visions.CreativeTabVision;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.lixir.vminus.visions.CreativeTabVision;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +20,7 @@ public class CreativeModeTabsMixin {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.getVision(tab).hide.value();
+            Boolean hide = CreativeTabVision.of(tab).hide.value();
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
@@ -35,7 +33,7 @@ public class CreativeModeTabsMixin {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.getVision(tab).hide.value();
+            Boolean hide = CreativeTabVision.of(tab).hide.value();
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
@@ -48,7 +46,7 @@ public class CreativeModeTabsMixin {
         List<CreativeModeTab> originalTabs = cir.getReturnValue().toList();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.getVision(tab).hide.value();
+            Boolean hide = CreativeTabVision.of(tab).hide.value();
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);

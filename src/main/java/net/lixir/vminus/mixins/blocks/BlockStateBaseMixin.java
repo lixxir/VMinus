@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.blocks;
 
-import net.lixir.vminus.core.conditions.VisionConditionArguments;
-import net.lixir.vminus.core.visions.BlockVision;
-import net.lixir.vminus.core.visions.accessors.IBlockVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.BlockVision;
+import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -20,7 +20,7 @@ public abstract class BlockStateBaseMixin  implements IBlockVisionAccessor {
 
     @Inject(method = "getLightEmission", at = @At("RETURN"), cancellable = true)
     private void getLightEmission(CallbackInfoReturnable<Integer> cir) {
-        Integer value = vminus$getVision().lightLevel.value(new VisionConditionArguments(vminus$blockBaseState));
+        Integer value = vminus$getVision().light_level.value(new VisionConditionArguments(vminus$blockBaseState));
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -32,19 +32,19 @@ public abstract class BlockStateBaseMixin  implements IBlockVisionAccessor {
 
     @Inject(method = "canOcclude", at = @At("RETURN"), cancellable = true)
     private void canOcclude(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().occludes.value(new VisionConditionArguments(vminus$blockBaseState));
+        Boolean value = vminus$getVision().occlude.value(new VisionConditionArguments(vminus$blockBaseState));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "isRedstoneConductor", at = @At("RETURN"), cancellable = true)
     private void isRedstoneConductor(CallbackInfoReturnable<Boolean> cir) {
-        Boolean value = vminus$getVision().redstoneConductor.value(new VisionConditionArguments(vminus$blockBaseState));
+        Boolean value = vminus$getVision().redstone_conductor.value(new VisionConditionArguments(vminus$blockBaseState));
         if (value != null) cir.setReturnValue(value);
     }
 
     @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     private void getDestroySpeed(BlockGetter p_60801_, BlockPos p_60802_, CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().destroySpeed.value(new VisionConditionArguments(vminus$blockBaseState));
+        Float value = vminus$getVision().break_speed.value(new VisionConditionArguments(vminus$blockBaseState));
         if (value != null) cir.setReturnValue(value);
     }
 

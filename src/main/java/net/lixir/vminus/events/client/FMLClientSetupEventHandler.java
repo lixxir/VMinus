@@ -1,7 +1,8 @@
 package net.lixir.vminus.events.client;
 
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.block.BlockSetup;
+import net.lixir.vminus.datagen.util.simple.BlockItemDatagen;
+import net.lixir.vminus.datagen.util.simple.DatagenObject;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -17,13 +18,13 @@ import java.util.List;
 public class FMLClientSetupEventHandler {
     @SubscribeEvent
     public static void vminus$FMLClientSetupEvent(FMLClientSetupEvent event) {
-        for (List<BlockSetup> blockSetupList : SetupRegistries.BLOCKS.getValues().values()) {
-            for (BlockSetup blockSetup : blockSetupList) {
-                BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
+        for (List<DatagenObject> value : DatagenRegistry.getValues().values()) {
+            if (value instanceof BlockItemDatagen blockItemDatagen) {
+                BlockItemRegistryPair blockItemPair = blockItemDatagen.getBlockItemRegistryPair();
                 Block block = blockItemPair.block();
-                RenderType renderType = blockSetup.getRenderType();
-                if (renderType != null) {
-                    ItemBlockRenderTypes.setRenderLayer(block, renderType);
+                DatagenObject.Type type = blockItemDatagen.getType();
+                switch (type) {
+                    case FLOWER, LARGE_FLOWER, PLANT, LARGE_PLANT ->   ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutout());
                 }
             }
         }

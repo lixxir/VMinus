@@ -1,4 +1,7 @@
 {
   "tag": "vminus:armor/golden",
-  "trait": "vminus:piglin_charm=true"
+  "trait": {
+    "id": "vminus:piglin_charm",
+    "value": true
+  }
 }

@@ -4,7 +4,7 @@ import java.util.UUID;
 
 public enum CapeOwner {
 
-    LIXIR(UUID.fromString("16749ceb-714d-40c2-a228-d48a0079cdc0")),
+    LIXIR(UUID.fromString("9b186dc0-30e9-4ba0-b068-acaf83d975aa")),
     SWEETY(UUID.fromString("b582223b-ff29-4277-ab55-0d3e9586163c")),
     SLIME_SLABS(UUID.fromString("54701376-b19a-4fc1-b107-74626b0d1bfb")),
     ELATIUM_NETWORK(UUID.fromString("ff24d9e0-4e8e-44a9-ad90-f33810556532")),

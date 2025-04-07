@@ -1,9 +1,6 @@
 package net.lixir.vminus.mixins.client;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.core.visions.CreativeTabVision;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.lixir.vminus.visions.CreativeTabVision;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +19,7 @@ public abstract class CreativeTabsScreenPageMixin {
 
         List<CreativeModeTab> filteredTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.getVision(tab).hide.value();
+            Boolean hide = CreativeTabVision.of(tab).hide.value();
             if (hide != null && hide)
                 continue;
             filteredTabs.add(tab);

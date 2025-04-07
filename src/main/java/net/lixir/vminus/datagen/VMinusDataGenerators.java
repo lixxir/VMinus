@@ -4,6 +4,10 @@ import net.lixir.vminus.VMinus;
 import net.lixir.vminus.datagen.util.loottable.VLootTableProvider;
 import net.lixir.vminus.datagen.util.VBlockStateProvider;
 import net.lixir.vminus.datagen.util.VRecipeProvider;
+import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
+import net.lixir.vminus.datagen.util.simple.OreDatagen;
+import net.lixir.vminus.registry.VMinusBlocks;
+import net.lixir.vminus.registry.VMinusItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -22,6 +26,7 @@ public class VMinusDataGenerators {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
+
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         CompletableFuture<TagsProvider.TagLookup<Block>> blockTagLookup = generator.addProvider(

@@ -23,15 +23,11 @@ public class LivingHurtEventHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLivingHurt(LivingHurtEvent event) {
         Entity entity = event.getEntity();
-        if (!(entity instanceof LivingEntity _entity)) {
+        if (!(entity instanceof LivingEntity livingEntity))
             return;
-        }
-        CompoundTag nbt = entity.getPersistentData();
-        nbt.putDouble(VMinusAttributes.MOMENTUM_NBT_KEY, 0);
 
         DamageSource damageSource = event.getSource();
-        final float amount = event.getAmount();
-        float damage = amount;
+        float damage = event.getAmount();
 
         List<ProtectionConfig> protectionTypes = List.of(
                 new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/fire")),
@@ -41,29 +37,10 @@ public class LivingHurtEventHandler {
         );
 
         for (ProtectionConfig protectionConfig : protectionTypes) {
-            damage = AttributeHelper.applyProtection(damage, _entity, damageSource, protectionConfig.attribute(), protectionConfig.damageTag());
+            damage = AttributeHelper.applyProtection(damage, livingEntity, damageSource, protectionConfig.attribute(), protectionConfig.damageTag());
         }
 
-        float healthBoost = 0.0f;
-
-
-
-        if (damageSource.getEntity() != null) {
-            Entity sourceEntity = damageSource.getEntity();
-            CompoundTag sourceNbt = entity.getPersistentData();
-            if (sourceNbt.contains(VMinusAttributes.MOMENTUM_NBT_KEY))
-                sourceNbt.putDouble(VMinusAttributes.MOMENTUM_NBT_KEY, sourceNbt.getDouble(VMinusAttributes.MOMENTUM_NBT_KEY)*0.5);
-            if (sourceEntity instanceof ISpeedGetter speedGetter && sourceEntity instanceof LivingEntity attacker) {
-                        if (Traits.hasTrait(attacker.getMainHandItem(), Traits.SURGE.get())) {
-                            double speed = Math.max(0, Math.sqrt(speedGetter.vminus$getSpeed()));
-                            float speedMultiplier = 1.0f + (float) ((speed / 0.15) * 0.75);
-                            damage *= Math.min(speedMultiplier, 5f);
-                        }
-                }
-            }
-
-
-        event.setAmount(damage + (amount * healthBoost));
+        event.setAmount(damage);
     }
 
 

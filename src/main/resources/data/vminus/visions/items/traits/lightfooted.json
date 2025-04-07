@@ -1,4 +1,7 @@
 {
   "item": "minecraft:leather_boots",
-  "trait": "vminus:lightfooted=true"
+  "trait": {
+    "id": "vminus:lightfooted",
+    "value": true
+  }
 }

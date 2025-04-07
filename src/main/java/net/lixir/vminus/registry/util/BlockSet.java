@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class BlockSet {
     public static final List<BlockSet> BLOCK_SETS = new ArrayList<>();
@@ -116,7 +117,6 @@ public class BlockSet {
         registerBlockSet(builder);
         BLOCK_SETS.add(this);
     }
-
 
     private TagKey<Block> blockTag(String name) {
         return BlockTags.create(new ResourceLocation(modId, name));
@@ -415,6 +415,10 @@ public class BlockSet {
         private String blockId = "";
         private final ArrayList<TagKey<Block>> blockTags = new ArrayList<>();
         private boolean isNetherWoodSet = false;
+
+        public String getModId() {
+            return modId;
+        }
 
         public Builder(String modId, DeferredRegister<Block> blockRegistry, DeferredRegister<Item> itemRegistry) {
             this.baseBlock = null;

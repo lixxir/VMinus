@@ -1,8 +1,7 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.network.mobvariants.MobVariantSyncPacket;
-import net.lixir.vminus.network.mobvariants.MobVariantSyncPacketHandler;
+import net.lixir.vminus.network.mobvariants.RequestVariantTexturePacket;
+import net.lixir.vminus.network.mobvariants.SyncVariantTexturePacket;
 import net.lixir.vminus.registry.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +12,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkEvent;
@@ -56,13 +56,26 @@ public class VMinus {
         Traits.TRAITS.register(bus);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
-        registerNetworkMessages();
 
         VMinusBlockSets.initialize();
-        SetupRegistries.initialize();
+
+        registerPackets();
     }
 
-
+    public static void registerPackets() {
+        VMinus.addNetworkMessage(
+                RequestVariantTexturePacket.class,
+                RequestVariantTexturePacket::encode,
+                RequestVariantTexturePacket::decode,
+                RequestVariantTexturePacket::handle
+        );
+        VMinus.addNetworkMessage(
+                SyncVariantTexturePacket.class,
+                SyncVariantTexturePacket::encode,
+                SyncVariantTexturePacket::decode,
+                SyncVariantTexturePacket::handle
+        );
+    }
 
     public static <T> void addNetworkMessage(Class<T> messageType,
                                              BiConsumer<T, FriendlyByteBuf> encoder,
@@ -75,15 +88,6 @@ public class VMinus {
     public static void queueServerWork(int tick, Runnable action) {
         if (Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER)
             workQueue.add(new AbstractMap.SimpleEntry<>(action, tick));
-    }
-
-    private void registerNetworkMessages() {
-        addNetworkMessage(
-                MobVariantSyncPacket.class,
-                MobVariantSyncPacket::encode,
-                MobVariantSyncPacket::decode,
-                MobVariantSyncPacketHandler::handle
-        );
     }
 
     @SubscribeEvent

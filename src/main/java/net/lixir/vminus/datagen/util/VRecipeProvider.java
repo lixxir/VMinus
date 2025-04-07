@@ -1,12 +1,11 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.util.setup.SetupRecipe;
-import net.lixir.vminus.util.setup.SetupRegistries;
-import net.lixir.vminus.util.setup.block.BlockSetup;
+import net.lixir.vminus.datagen.util.simple.*;
 import net.lixir.vminus.registry.util.BlockItemRegistryPair;
 import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -14,13 +13,16 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class VRecipeProvider extends RecipeProvider implements IConditionBuilder {
     final private String modId;
+    protected Consumer<FinishedRecipe> pWriter = null;
 
     public VRecipeProvider(PackOutput pOutput, String modId) {
         super(pOutput);
@@ -29,115 +31,135 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
 
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
+        this.pWriter = pWriter;
         BlockSet.BLOCK_SETS.stream()
                 .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(blockSet -> registerBlockSetRecipes(pWriter, blockSet));
-
-        for (BlockSetup blockSetup : SetupRegistries.BLOCKS.getValues(modId)) {
-            BlockItemRegistryPair blockItemPair = blockSetup.getBlockItemPair();
-            Block block = blockItemPair.block();
-            Block baseBlock = blockSetup.getBaseBlock();
-            SetupRecipe blockSetupRecipe = blockSetup.getSetupRecipe();
-            if (baseBlock != null && !blockSetupRecipe.equals(SetupRecipe.NONE)) {
-                switch (blockSetupRecipe) {
-                    case WALL -> wallRecipe(pWriter, baseBlock, block);
-                }
-            }
-
-        }
-
-
+                .forEach(this::blockSets);
+        simpleDatagen();
     }
 
-    private void registerBlockSetRecipes(@NotNull Consumer<FinishedRecipe> pWriter, BlockSet blockSet) {
+    private void simpleDatagen() {
+        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
+            if (!simpleDatagen.hasRecipes())
+                continue;
+            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
+                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
+                Block block = blockItemPair.block();
+                Item item = blockItemPair.item();
+                switch (simpleDatagen.getType()) {
+                    case ORE -> {
+                        OreDatagen oreDatagen = (OreDatagen) blockItemSimpleDatagen;
+                        RegistryObject<Item> oreDropRegistryObject = oreDatagen.getOreDrop();
+                        Item oreDrop = oreDropRegistryObject.get();
+                        List<ItemLike> inputs = List.of(item);
+                        String oreDropPath = oreDropRegistryObject.getId().getPath();
+                        oreSmelting(pWriter, inputs, RecipeCategory.MISC, oreDrop, 0.7f, 200, oreDropPath);
+                        oreBlasting(pWriter, inputs, RecipeCategory.MISC, oreDrop, 0.7f, 100, oreDropPath);
+                    }
+                    case FLOWER -> {
+                        FlowerDatagen flowerDatagen = (FlowerDatagen) blockItemSimpleDatagen;
+                        Item dyeItem = flowerDatagen.getDyeItem();
+                        dyeRecipe(block, dyeItem, 1);
+                    }
+                    case LARGE_FLOWER -> {
+                        FlowerDatagen flowerDatagen = (FlowerDatagen) blockItemSimpleDatagen;
+                        Item dyeItem = flowerDatagen.getDyeItem();
+                        dyeRecipe(block, dyeItem, 2);
+                    }
+                }
+            }
+        }
+    }
+
+    private void blockSets(BlockSet blockSet) {
         ItemLike baseBlock = blockSet.getBaseBlock();
         if (baseBlock == null)
             return;
         if (blockSet.getStairs() != null) {
             ItemLike slabBlock = blockSet.getStairs().item();
-            stairsRecipe(pWriter, baseBlock, slabBlock);
+            stairsRecipe(baseBlock, slabBlock);
         }
         if (blockSet.getSlab() != null) {
             ItemLike stairsBlock = blockSet.getSlab().item();
-            slabRecipe(pWriter, baseBlock, stairsBlock);
+            slabRecipe(baseBlock, stairsBlock);
         }
         if (blockSet.getWall() != null) {
             ItemLike wallBlock = blockSet.getWall().item();
-            wallRecipe(pWriter, baseBlock, wallBlock);
+            wallRecipe(baseBlock, wallBlock);
         }
         if (blockSet.getFence() != null) {
             ItemLike fenceBlock = blockSet.getFence().item();
-            fenceRecipe(pWriter, baseBlock, fenceBlock);
+            fenceRecipe(baseBlock, fenceBlock);
         }
         if (blockSet.getDoor() != null) {
             ItemLike doorBlock = blockSet.getDoor().item();
-            doorRecipe(pWriter, baseBlock, doorBlock);
+            doorRecipe(baseBlock, doorBlock);
         }
         if (blockSet.getTrapdoor() != null) {
             ItemLike trapdoorBlock = blockSet.getTrapdoor().item();
-            doorRecipe(pWriter, baseBlock, trapdoorBlock);
+            doorRecipe(baseBlock, trapdoorBlock);
         }
         if (blockSet.getPressurePlate() != null) {
             ItemLike pressurePlate = blockSet.getPressurePlate().item();
             ItemLike slab = blockSet.getSlab().item();
-            pressurePlateRecipe(pWriter, baseBlock, slab, pressurePlate);
+            pressurePlateRecipe(baseBlock, slab, pressurePlate);
         }
         if (blockSet.getButton() != null) {
             ItemLike buttonBlock = blockSet.getButton().item();
-            buttonRecipe(pWriter, baseBlock, buttonBlock);
+            buttonRecipe(baseBlock, buttonBlock);
         }
         if (blockSet.getSign() != null) {
             ItemLike signItem = blockSet.getSign().item();
-            signRecipe(pWriter, baseBlock, signItem);
+            signRecipe(baseBlock, signItem);
         }
         if (blockSet.getHangingSign() != null) {
             ItemLike hangingSignItem = blockSet.getHangingSign().item();
-            hangingSignRecipe(pWriter, baseBlock, blockSet.getStrippedLog().block(), hangingSignItem);
+            hangingSignRecipe(baseBlock, blockSet.getStrippedLog().block(), hangingSignItem);
         }
         if (blockSet.getLog() != null) {
             planksFromLog(pWriter, baseBlock, blockSet.getLogsTag().getSecond(), 4);
         }
     }
 
-    protected void chestplateRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void chestplateRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, output, 1)
                 .pattern("B B")
                 .pattern("BBB")
                 .pattern("BBB")
                 .define('B', material)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void leggingsRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void leggingsRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, output, 1)
                 .pattern("BBB")
                 .pattern("B B")
                 .pattern("B B")
                 .define('B', material)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void bootsRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void bootsRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, output, 1)
                 .pattern("B B")
                 .pattern("B B")
                 .define('B', material)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void helmetRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void helmetRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, output, 1)
                 .pattern("BBB")
                 .pattern("B B")
                 .define('B', material)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void pickaxeRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void pickaxeRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, output, 1)
                 .pattern("BBB")
                 .pattern(" S ")
@@ -145,11 +167,11 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                 .define('B', material)
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
 
-    protected void axeRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void axeRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, output, 1)
                 .pattern("BB")
                 .pattern("BS")
@@ -157,10 +179,10 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                 .define('B', material)
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void shovelRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void shovelRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, output, 1)
                 .pattern("B")
                 .pattern("S")
@@ -168,10 +190,10 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                 .define('B', material)
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void swordRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void swordRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, output, 1)
                 .pattern("B")
                 .pattern("B")
@@ -179,11 +201,11 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                 .define('B', material)
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
 
-    protected void hoeRecipe(Consumer<FinishedRecipe> writer, Item material, Item output) {
+    protected void hoeRecipe(Item material, Item output) {
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, output, 1)
                 .pattern("BB")
                 .pattern(" S")
@@ -191,34 +213,42 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                 .define('B', material)
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(material), has(material))
-                .save(writer);
+                .save(pWriter);
     }
 
-    protected void slabRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike slabBlock) {
+    protected void slabRecipe(ItemLike baseBlock, ItemLike slabBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, slabBlock, 4)
                     .pattern("BB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, slabBlock, 6)
                     .pattern("BBB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void buttonRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike buttonBlock) {
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, buttonBlock, 1)
-                    .requires(baseBlock, 1)
-                    .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+    protected void dyeRecipe(ItemLike baseBlock, ItemLike dyeItem, int output) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, dyeItem, output)
+                .requires(baseBlock, 1)
+                .unlockedBy(getHasName(baseBlock), has(baseBlock))
+                .save(pWriter);
 
     }
 
-    protected void signRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike signItem) {
+    protected void buttonRecipe(ItemLike baseBlock, ItemLike buttonBlock) {
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, buttonBlock, 1)
+                    .requires(baseBlock, 1)
+                    .unlockedBy(getHasName(baseBlock), has(baseBlock))
+                    .save(pWriter);
+
+    }
+
+    protected void signRecipe(ItemLike baseBlock, ItemLike signItem) {
         if (ModList.get().isLoaded("detour") ) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, signItem, 1)
                     .pattern("B")
@@ -226,7 +256,7 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('S', Items.STICK)
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, signItem, 3)
                     .pattern("BBB")
@@ -235,11 +265,11 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('S', Items.STICK)
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void hangingSignRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, @Nullable ItemLike strippedLogBlock, ItemLike signItem) {
+    protected void hangingSignRecipe(ItemLike baseBlock, @Nullable ItemLike strippedLogBlock, ItemLike signItem) {
         if (ModList.get().isLoaded("detour") ) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, signItem, 1)
                     .pattern("C")
@@ -247,7 +277,7 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('C', Items.CHAIN)
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else if (strippedLogBlock != null){
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, signItem, 6)
                     .pattern("C C")
@@ -256,43 +286,43 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('C', Items.CHAIN)
                     .define('B', strippedLogBlock)
                     .unlockedBy(getHasName(strippedLogBlock), has(strippedLogBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void pressurePlateRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, @Nullable ItemLike slabBlock, ItemLike pressurePlate) {
+    protected void pressurePlateRecipe(ItemLike baseBlock, @Nullable ItemLike slabBlock, ItemLike pressurePlate) {
         if (ModList.get().isLoaded("detour") && slabBlock != null) {
             ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, pressurePlate, 1)
                     .requires(slabBlock, 1)
                     .unlockedBy(getHasName(slabBlock), has(slabBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, pressurePlate, 1)
                     .pattern("BB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void trapdoorRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, @Nullable ItemLike slabBlock, ItemLike trapdoorBlock) {
+    protected void trapdoorRecipe(ItemLike baseBlock, @Nullable ItemLike slabBlock, ItemLike trapdoorBlock) {
         if (ModList.get().isLoaded("detour")  && slabBlock != null) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, trapdoorBlock, 1)
                     .pattern("BB")
                     .define('B', slabBlock)
                     .unlockedBy(getHasName(slabBlock), has(slabBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, trapdoorBlock, 2)
                     .pattern("BBB")
                     .pattern("BBB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void doorRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike doorBlock) {
+    protected void doorRecipe(ItemLike baseBlock, ItemLike doorBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, doorBlock, 2)
                     .pattern("BB")
@@ -300,7 +330,7 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .pattern("BB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, doorBlock, 3)
                     .pattern("BB")
@@ -308,18 +338,18 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .pattern("BB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void stairsRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike stairsBlock) {
+    protected void stairsRecipe(ItemLike baseBlock, ItemLike stairsBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, stairsBlock, 4)
                     .pattern("B  ")
                     .pattern("BB ")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, stairsBlock, 4)
                     .pattern("B  ")
@@ -327,29 +357,29 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .pattern("BBB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void woodRecipe(Consumer<FinishedRecipe> writer, ItemLike logBlock, ItemLike woodBlock) {
+    protected void woodRecipe(ItemLike logBlock, ItemLike woodBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, woodBlock, 4)
                     .pattern("BB")
                     .pattern("BB")
                     .define('B', logBlock)
                     .unlockedBy(getHasName(logBlock), has(logBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, woodBlock, 3)
                     .pattern("BB")
                     .pattern("BB")
                     .define('B', logBlock)
                     .unlockedBy(getHasName(logBlock), has(logBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void fenceRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike wallBlock) {
+    protected void fenceRecipe(ItemLike baseBlock, ItemLike wallBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wallBlock, 4)
                     .pattern("BS")
@@ -357,7 +387,7 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('B', baseBlock)
                     .define('S', Items.STICK)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wallBlock, 3)
                     .pattern("BSB")
@@ -365,25 +395,25 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
                     .define('B', baseBlock)
                     .define('S', Items.STICK)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 
-    protected void wallRecipe(Consumer<FinishedRecipe> writer, ItemLike baseBlock, ItemLike wallBlock) {
+    protected void wallRecipe(ItemLike baseBlock, ItemLike wallBlock) {
         if (ModList.get().isLoaded("detour")) {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wallBlock, 2)
                     .pattern("B")
                     .pattern("B")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         } else {
             ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, wallBlock, 6)
                     .pattern("BBB")
                     .pattern("BBB")
                     .define('B', baseBlock)
                     .unlockedBy(getHasName(baseBlock), has(baseBlock))
-                    .save(writer);
+                    .save(pWriter);
         }
     }
 

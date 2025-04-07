@@ -15,16 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.annotation.Nullable;
 
 @Mixin(AbstractClientPlayer.class)
-@OnlyIn(Dist.CLIENT)
 public abstract class AbstractClientPlayerMixin {
     @Shadow
     @Nullable
     protected abstract PlayerInfo getPlayerInfo();
 
-
-
-
-    @Inject(method = "getElytraTextureLocation", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getElytraTextureLocation", at = @At("RETURN"), cancellable = true)
     private void vminus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         PlayerInfo playerInfo = this.getPlayerInfo();
         if (playerInfo != null) {
@@ -36,7 +32,7 @@ public abstract class AbstractClientPlayerMixin {
         }
     }
 
-    @Inject(method = "getCloakTextureLocation", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getCloakTextureLocation", at = @At("RETURN"), cancellable = true)
     private void vminus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         PlayerInfo playerInfo = this.getPlayerInfo();
         if (playerInfo != null) {
