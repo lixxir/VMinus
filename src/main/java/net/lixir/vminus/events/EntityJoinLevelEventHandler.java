@@ -1,22 +1,22 @@
 package net.lixir.vminus.events;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionBaseAttribute;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
+import net.lixir.vminus.network.VMinusNetworking;
+import net.lixir.vminus.network.VariantSyncPacket;
+import net.lixir.vminus.util.VariantEntity;
 import net.lixir.vminus.visions.EntityVision;
 import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.IItemVisionAccessor;
-import net.lixir.vminus.network.mobvariants.SyncVariantTexturePacket;
-import net.lixir.vminus.util.EntityVariantUtil;
-import net.minecraft.server.level.ServerLevel;
+import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.lixir.vminus.visions.util.VisionBaseAttribute;
+import net.lixir.vminus.visions.util.VisionEntityVariant;
+import net.lixir.vminus.visions.util.VisionItemReplacement;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -51,15 +51,11 @@ public class EntityJoinLevelEventHandler {
         }
 
 
-
-
-        if (entity instanceof ItemEntity itemEntity) {
+        if (entity instanceof ItemEntity itemEntity && itemEntity.getItem().getItem() instanceof ItemVisionAccessor) {
             ItemStack stack = itemEntity.getItem();
             Item item = stack.getItem();
-            if (!(item instanceof IItemVisionAccessor))
-                return;
 
-            VisionConditionArguments visionConditionArguments = new VisionConditionArguments.Builder().passItemStack(stack).passEntity(entity).build();
+            VisionConditionArguments visionConditionArguments = new VisionConditionArguments.Builder().pass(stack).pass(entity).build();
             VisionItemReplacement visionItemReplacement = ItemVision.of(item).replace.value(visionConditionArguments);
             if (visionItemReplacement == null)
                 return;
@@ -90,20 +86,6 @@ public class EntityJoinLevelEventHandler {
         }
 
 
-        // entity variants!
-        if (level instanceof ServerLevel serverLevel && !(entity instanceof Player)) {
-            EntityVariantUtil.setOrGetVariant(entity);
-            String texture = EntityVariantUtil.getVariantTexture(entity);
-
-            if (texture != null) {
-                serverLevel.getServer().execute(() -> VMinus.PACKET_HANDLER.send(
-                        PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-                        new SyncVariantTexturePacket(entity.getId(), texture)
-                ));
-            }
-        }
-
-
         if (entity instanceof LivingEntity livingEntity) {
             // Adjust health from setting new health
             if (!entity.getPersistentData().contains("health_adjust") || !entity.getPersistentData().getBoolean("health_adjust")) {
@@ -121,6 +103,20 @@ public class EntityJoinLevelEventHandler {
                 if (attributeInstance != null)
                     attributeInstance.setBaseValue(value);
             }
+            if (livingEntity instanceof VariantEntity variantEntity) {
+                VisionEntityVariant  visionEntityVariant = null;
+                if (variantEntity.vminus$getVariantName() == null && variantEntity.vminus$getVariantTexture() == null) {
+                    if (!level.isClientSide())
+                        visionEntityVariant = VariantEntity.setFromWeightedList(livingEntity);
+                }
+                if (visionEntityVariant != null && visionEntityVariant.texture() != null && visionEntityVariant.name() != null) {
+                    VMinus.queueServerWork(1, () -> VMinusNetworking.CHANNEL.send(
+                            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
+                            new VariantSyncPacket(entity.getId(), variantEntity.vminus$getVariantName(), variantEntity.vminus$getVariantTexture())
+                    ));
+                }
+            }
+
         }
     }
 }

@@ -1,10 +1,11 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.network.mobvariants.RequestVariantTexturePacket;
-import net.lixir.vminus.network.mobvariants.SyncVariantTexturePacket;
-import net.lixir.vminus.registry.*;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.lixir.vminus.item.VMinusItems;
+import net.lixir.vminus.item.trait.ItemTraits;
+import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.block.VMinusBlocks;
+import net.lixir.vminus.registry.VMinusSounds;
+import net.lixir.vminus.registry.UnifiedRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -12,12 +13,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,63 +23,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Mod("vminus")
 public class VMinus {
     public static final Logger LOGGER = LogManager.getLogger(VMinus.class);
     public static final String ID = "vminus";
-    private static final String PROTOCOL_VERSION = "1";
-    public static final SimpleChannel PACKET_HANDLER = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(ID, "network_channel"),
-            () -> PROTOCOL_VERSION,
-            PROTOCOL_VERSION::equals,
-            PROTOCOL_VERSION::equals
-    );
+    public static final UnifiedRegistry REGISTRY = UnifiedRegistry.create(ID, reg -> {
+        VMinusBlocks.init();
+        VMinusItems.init();
+    });
+
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
-    private static int messageID = 0;
 
     public VMinus() {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        VMinusBlocks.BLOCKS.register(bus);
-        VMinusItems.ITEMS.register(bus);
         VMinusSounds.SOUNDS.register(bus);
         VMinusAttributes.ATTRIBUTES.register(bus);
-        VMinusBlockEntities.BLOCK_ENTITIES.register(bus);
-        // Custom registries
-        Traits.TRAITS.register(bus);
-
+        ItemTraits.TRAITS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
-
-        VMinusBlockSets.initialize();
-
-        registerPackets();
-    }
-
-    public static void registerPackets() {
-        VMinus.addNetworkMessage(
-                RequestVariantTexturePacket.class,
-                RequestVariantTexturePacket::encode,
-                RequestVariantTexturePacket::decode,
-                RequestVariantTexturePacket::handle
-        );
-        VMinus.addNetworkMessage(
-                SyncVariantTexturePacket.class,
-                SyncVariantTexturePacket::encode,
-                SyncVariantTexturePacket::decode,
-                SyncVariantTexturePacket::handle
-        );
-    }
-
-    public static <T> void addNetworkMessage(Class<T> messageType,
-                                             BiConsumer<T, FriendlyByteBuf> encoder,
-                                             Function<FriendlyByteBuf, T> decoder,
-                                             BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
-        PACKET_HANDLER.registerMessage(messageID, messageType, encoder, decoder, messageConsumer);
-        messageID++;
     }
 
     public static void queueServerWork(int tick, Runnable action) {

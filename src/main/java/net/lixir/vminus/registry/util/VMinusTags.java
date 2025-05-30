@@ -14,6 +14,7 @@ public class VMinusTags {
     public static class Blocks {
         public static final TagKey<Block> SOUL_TORCHES = tag("soul_torches");
         public static final TagKey<Block> TORCHES = tag("torches");
+        public static final TagKey<Block> ALL_TORCHES = tag("all_torches");
         public static final TagKey<Block> FROGLIGHTS = tag("froglights");
         public static final TagKey<Block> MOB_HEADS = tag("mob_heads");
         public static final TagKey<Block> CONCRETE_POWDER = tag("concrete_powder");
@@ -34,6 +35,8 @@ public class VMinusTags {
         public static final TagKey<Block> DYED_CONCRETE_POWDER = tag("dyed/concrete_powder");
         public static final TagKey<Block> DYED_STAINED_GLASS = tag("dyed/stained_glass");
         public static final TagKey<Block> DYED_STAINED_GLASS_PANE = tag("dyed/stained_glass_pane");
+        public static final TagKey<Block> GRASSES = tag("grasses");
+        public static final TagKey<Block> TALL_GRASSES = tag("tall_grasses");
 
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(VMinus.ID, name));
@@ -41,8 +44,8 @@ public class VMinusTags {
     }
 
     public static class Entities {
-        // public static final TagKey<EntityType<?>> IGNORES_TRANSLUCENCE = create(new ResourceLocation(VMinus.ID, "ignores_translucence"));
         public static final TagKey<EntityType<?>> ZOMBIES = create(new ResourceLocation(VMinus.ID, "zombies"));
+        public static final TagKey<EntityType<?>> BANNED = create(new ResourceLocation(VMinus.ID, "banned"));
 
         private static TagKey<EntityType<?>> create(ResourceLocation p_203849_) {
             return TagKey.create(Registries.ENTITY_TYPE, p_203849_);
@@ -65,6 +68,7 @@ public class VMinusTags {
         public static final TagKey<Item> IRON_ARMOR = tag("armor/iron");
         public static final TagKey<Item> DIAMOND_ARMOR = tag("armor/diamond");
         public static final TagKey<Item> NETHERITE_ARMOR = tag("armor/netherite");
+        public static final TagKey<Item> ARMOR = tag("armor");
 
         public static final TagKey<Item> GOLDEN_EQUIPMENT = tag("equipment/golden");
         public static final TagKey<Item> IRON_EQUIPMENT = tag("equipment/iron");
@@ -81,10 +85,15 @@ public class VMinusTags {
 
         public static final TagKey<Item> BANNER_PATTERNS = tag("banner_patterns");
         public static final TagKey<Item> CONCRETE_POWDER = tag("concrete_powder");
+        public static final TagKey<Item> GLAZED_TERRACOTTA = tag("glazed_terracotta");
         public static final TagKey<Item> CHEST_BOATS = tag("chest_boats");
         public static final TagKey<Item> BOATS = tag("boats");
         public static final TagKey<Item> SHULKER_BOXES = tag("shulker_boxes");
-
+        public static final TagKey<Item> BUCKETS = tag("buckets");
+        public static final TagKey<Item> LIQUID_BUCKETS = tag("buckets/liquid");
+        public static final TagKey<Item> SOLID_BUCKETS = tag("buckets/solid");
+        public static final TagKey<Item> MOB_BUCKETS = tag("buckets/mob");
+        public static final TagKey<Item> FOOD_BUCKETS = tag("buckets/food");
 
         private static TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinus.ID, name));

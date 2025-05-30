@@ -1,9 +1,8 @@
 package net.lixir.vminus.mixins.client.renderers.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.lixir.vminus.util.EntityVariantUtil;
-import net.lixir.vminus.util.IEntityVariantAccessor;
 import net.lixir.vminus.util.SizeAttributeUtil;
+import net.lixir.vminus.util.VariantEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -48,20 +46,27 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> extends 
             this.shadowRadius = vminus$initialShadowRadius * width;
     }
 
-    @Redirect(method = "getRenderType(Lnet/minecraft/world/entity/LivingEntity;ZZZ)Lnet/minecraft/client/renderer/RenderType;",
+
+    @Redirect(
+            method = "getRenderType(Lnet/minecraft/world/entity/LivingEntity;ZZZ)Lnet/minecraft/client/renderer/RenderType;",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/client/renderer/entity/LivingEntityRenderer;getTextureLocation(Lnet/minecraft/world/entity/Entity;)Lnet/minecraft/resources/ResourceLocation;"
             )
     )
-    private ResourceLocation redirectGetTextureLocation(LivingEntityRenderer instance, Entity entity) {
-        IEntityVariantAccessor entityVariantAccessor = (IEntityVariantAccessor) entity;
-        ResourceLocation variantTexture = entityVariantAccessor.vminus$getVariantTexture();
-        if (variantTexture != null) {
-            return variantTexture;
+    private ResourceLocation vminus$getTextureLocation(LivingEntityRenderer livingEntityRenderer, Entity entity) {
+        if (entity instanceof VariantEntity variantEntity) {
+            ResourceLocation variantTexture = variantEntity.vminus$getVariantTexture();
+            ResourceLocation variantName = variantEntity.vminus$getVariantName();
+            if (variantName != null && variantTexture != null)  {
+                return variantTexture;
+            }
         }
-        return instance.getTextureLocation(entity);
+        return livingEntityRenderer.getTextureLocation(entity);
     }
+
+
+
 
 
 }

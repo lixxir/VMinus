@@ -1,26 +1,23 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.datagen.util.simple.*;
-import net.lixir.vminus.registry.util.BlockItemRegistryPair;
-import net.lixir.vminus.registry.util.BlockSet;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class VRecipeProvider extends RecipeProvider implements IConditionBuilder {
+    public String getModId() {
+        return modId;
+    }
+
     final private String modId;
     protected Consumer<FinishedRecipe> pWriter = null;
 
@@ -32,93 +29,6 @@ public class VRecipeProvider extends RecipeProvider implements IConditionBuilder
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
         this.pWriter = pWriter;
-        BlockSet.BLOCK_SETS.stream()
-                .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(this::blockSets);
-        simpleDatagen();
-    }
-
-    private void simpleDatagen() {
-        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
-            if (!simpleDatagen.hasRecipes())
-                continue;
-            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
-                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
-                Block block = blockItemPair.block();
-                Item item = blockItemPair.item();
-                switch (simpleDatagen.getType()) {
-                    case ORE -> {
-                        OreDatagen oreDatagen = (OreDatagen) blockItemSimpleDatagen;
-                        RegistryObject<Item> oreDropRegistryObject = oreDatagen.getOreDrop();
-                        Item oreDrop = oreDropRegistryObject.get();
-                        List<ItemLike> inputs = List.of(item);
-                        String oreDropPath = oreDropRegistryObject.getId().getPath();
-                        oreSmelting(pWriter, inputs, RecipeCategory.MISC, oreDrop, 0.7f, 200, oreDropPath);
-                        oreBlasting(pWriter, inputs, RecipeCategory.MISC, oreDrop, 0.7f, 100, oreDropPath);
-                    }
-                    case FLOWER -> {
-                        FlowerDatagen flowerDatagen = (FlowerDatagen) blockItemSimpleDatagen;
-                        Item dyeItem = flowerDatagen.getDyeItem();
-                        dyeRecipe(block, dyeItem, 1);
-                    }
-                    case LARGE_FLOWER -> {
-                        FlowerDatagen flowerDatagen = (FlowerDatagen) blockItemSimpleDatagen;
-                        Item dyeItem = flowerDatagen.getDyeItem();
-                        dyeRecipe(block, dyeItem, 2);
-                    }
-                }
-            }
-        }
-    }
-
-    private void blockSets(BlockSet blockSet) {
-        ItemLike baseBlock = blockSet.getBaseBlock();
-        if (baseBlock == null)
-            return;
-        if (blockSet.getStairs() != null) {
-            ItemLike slabBlock = blockSet.getStairs().item();
-            stairsRecipe(baseBlock, slabBlock);
-        }
-        if (blockSet.getSlab() != null) {
-            ItemLike stairsBlock = blockSet.getSlab().item();
-            slabRecipe(baseBlock, stairsBlock);
-        }
-        if (blockSet.getWall() != null) {
-            ItemLike wallBlock = blockSet.getWall().item();
-            wallRecipe(baseBlock, wallBlock);
-        }
-        if (blockSet.getFence() != null) {
-            ItemLike fenceBlock = blockSet.getFence().item();
-            fenceRecipe(baseBlock, fenceBlock);
-        }
-        if (blockSet.getDoor() != null) {
-            ItemLike doorBlock = blockSet.getDoor().item();
-            doorRecipe(baseBlock, doorBlock);
-        }
-        if (blockSet.getTrapdoor() != null) {
-            ItemLike trapdoorBlock = blockSet.getTrapdoor().item();
-            doorRecipe(baseBlock, trapdoorBlock);
-        }
-        if (blockSet.getPressurePlate() != null) {
-            ItemLike pressurePlate = blockSet.getPressurePlate().item();
-            ItemLike slab = blockSet.getSlab().item();
-            pressurePlateRecipe(baseBlock, slab, pressurePlate);
-        }
-        if (blockSet.getButton() != null) {
-            ItemLike buttonBlock = blockSet.getButton().item();
-            buttonRecipe(baseBlock, buttonBlock);
-        }
-        if (blockSet.getSign() != null) {
-            ItemLike signItem = blockSet.getSign().item();
-            signRecipe(baseBlock, signItem);
-        }
-        if (blockSet.getHangingSign() != null) {
-            ItemLike hangingSignItem = blockSet.getHangingSign().item();
-            hangingSignRecipe(baseBlock, blockSet.getStrippedLog().block(), hangingSignItem);
-        }
-        if (blockSet.getLog() != null) {
-            planksFromLog(pWriter, baseBlock, blockSet.getLogsTag().getSecond(), 4);
-        }
     }
 
     protected void chestplateRecipe(Item material, Item output) {

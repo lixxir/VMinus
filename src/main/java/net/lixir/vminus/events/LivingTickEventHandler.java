@@ -1,18 +1,14 @@
 package net.lixir.vminus.events;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.registry.Traits;
-import net.lixir.vminus.world.Trait;
+import net.lixir.vminus.item.trait.ItemTraits;
+import net.lixir.vminus.item.trait.ItemTrait;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -56,8 +52,8 @@ public class LivingTickEventHandler {
             }
         }
         for (ItemStack armorStack : entity.getArmorSlots()) {
-            for (Trait trait : Traits.getTraits(armorStack)) {
-                if (trait.armorTick(armorStack, entity, world))
+            for (ItemTrait itemTrait : ItemTraits.getTraits(armorStack)) {
+                if (itemTrait.armorTick(armorStack, entity, world))
                     if (event.isCancelable())
                         event.setCanceled(true);
             }

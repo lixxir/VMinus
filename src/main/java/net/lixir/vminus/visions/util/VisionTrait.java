@@ -1,5 +1,5 @@
 package net.lixir.vminus.visions.util;
 
-import net.lixir.vminus.world.Trait;
+import net.lixir.vminus.item.trait.ItemTrait;
 
-public record VisionTrait(Trait trait, Boolean value) {}
+public record VisionTrait(ItemTrait itemTrait, Boolean value) {}

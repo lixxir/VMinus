@@ -1,13 +1,13 @@
 package net.lixir.vminus.visions;
 
-import net.lixir.vminus.visions.resources.parser.VisionBaseAttributeParser;
-import net.lixir.vminus.visions.resources.parser.VisionBooleanParser;
-import net.lixir.vminus.visions.resources.parser.VisionEntityVariantParser;
-import net.lixir.vminus.visions.resources.parser.VisionIntParser;
+import net.lixir.vminus.visions.resources.VisionCodecs;
+import net.lixir.vminus.visions.resources.codec.VisionBaseAttributeCodec;
+import net.lixir.vminus.visions.resources.codec.VisionEntityVariantCodec;
 import net.lixir.vminus.visions.util.VisionBaseAttribute;
 import net.lixir.vminus.visions.util.VisionEntityVariant;
+import net.lixir.vminus.visions.util.VisionType;
 import net.lixir.vminus.visions.values.VisionProperty;
-import net.lixir.vminus.visions.accessors.IEntityVisionAccessor;
+import net.lixir.vminus.visions.accessors.EntityVisionAccessor;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,18 +23,23 @@ public class EntityVision extends Vision {
     public final VisionProperty<VisionEntityVariant> variant;
 
     public EntityVision() {
-        silent = create("silent", new VisionBooleanParser());
-        dampens_vibration = create("dampens_vibration", new VisionBooleanParser());
-        ban = create("ban", new VisionBooleanParser());
-        base_attribute = create("base_attribute", new VisionBaseAttributeParser());
-        variant = create("variant", new VisionEntityVariantParser());
+        silent = create("silent", VisionCodecs.booleanCodec());
+        dampens_vibration = create("dampens_vibration", VisionCodecs.booleanCodec());
+        ban = create("ban", VisionCodecs.booleanCodec());
+        base_attribute = create("base_attribute", new VisionBaseAttributeCodec(), true);
+        variant = create("variant", new VisionEntityVariantCodec(), true);
     }
 
     public static @NotNull EntityVision of(@Nullable Entity entity) {
         if (entity == null)
             return EMPTY;
-        if (entity.getType() instanceof IEntityVisionAccessor entityVisionAccessor)
+        if (entity.getType() instanceof EntityVisionAccessor entityVisionAccessor)
             return entityVisionAccessor.vminus$getVision();
         return EMPTY;
+    }
+
+    @Override
+    public String getEntryListName() {
+        return VisionType.ENTITY.getListName();
     }
 }

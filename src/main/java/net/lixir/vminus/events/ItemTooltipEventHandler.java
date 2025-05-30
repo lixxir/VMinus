@@ -18,7 +18,6 @@ import java.util.Objects;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class ItemTooltipEventHandler {
-    // Requesting to accumulate all the stored jsons on the server-side for visions.
     @SubscribeEvent
     public static void onItemTooltip(ItemTooltipEvent event) {
         Entity player = event.getEntity();

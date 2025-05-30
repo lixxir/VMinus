@@ -1,10 +1,14 @@
 package net.lixir.vminus.visions.resources.managers;
 
-import net.lixir.vminus.visions.VisionType;
+import net.lixir.vminus.visions.ItemVision;
+import net.lixir.vminus.visions.util.VisionType;
+import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
 import net.lixir.vminus.visions.resources.VisionProcessor;
 import net.lixir.vminus.visions.resources.VisionDeserializer;
 import net.lixir.vminus.visions.BlockVision;
-import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
+import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
+import net.lixir.vminus.visions.values.VisionValue;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -29,8 +33,17 @@ public class BlockVisionManager extends VisionManager<BlockVision> {
                     copyVision.merge(vision);
                 }
             }
-            if (block instanceof IBlockVisionAccessor visionable) {
-                visionable.vminus$setVision(copyVision);
+            if (block instanceof BlockVisionAccessor visionable) {
+                visionable.vminus$mergeVision(copyVision);
+                // Attempt to ban block item counterparts if the block is banned
+                if (Boolean.TRUE.equals(copyVision.ban.value())) {
+                    Item item = block.asItem();
+                    if (item instanceof ItemVisionAccessor itemVisionAccessor) {
+                        ItemVision itemVision = new ItemVision();
+                        itemVision.ban.add(new VisionValue<>(true, List.of()));
+                        itemVisionAccessor.vminus$mergeVision(itemVision);
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package net.lixir.vminus.visions.conditions;
 
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,6 +19,7 @@ public class VisionConditionArguments {
     private Block block = null;
     private BlockBehaviour.BlockStateBase blockStateBase = null;
     private BlockState blockState = null;
+    private MobEffect mobEffect = null;
     private EntityType<?> entityType = null;
 
     private VisionConditionArguments(Builder builder) {
@@ -47,6 +49,11 @@ public class VisionConditionArguments {
         this.item = item;
     }
 
+
+    public VisionConditionArguments(MobEffect mobEffect) {
+        this.mobEffect = mobEffect;
+    }
+
     public VisionConditionArguments(EntityType<?> entityType) {
         this.entityType = entityType;
     }
@@ -59,11 +66,10 @@ public class VisionConditionArguments {
     public VisionConditionArguments(Block block) {
         this.block = block;
     }
+
     public VisionConditionArguments(BlockBehaviour.BlockStateBase blockStateBase) {
         this.blockStateBase = blockStateBase;
     }
-
-
 
 
     public boolean hasItem() {
@@ -115,31 +121,31 @@ public class VisionConditionArguments {
         private BlockBehaviour.BlockStateBase blockStateBase = null;
         private BlockState blockState = null;
 
-        public Builder passItem(Item item) {
+        public Builder pass(Item item) {
             this.item = item;
             return this;
         }
 
-        public Builder passItemStack(ItemStack itemStack) {
+        public Builder pass(ItemStack itemStack) {
             this.itemStack = itemStack;
             if (this.item == null)
                 this.item = itemStack.getItem();
             return this;
         }
 
-        public Builder passEntity(Entity entity) {
+        public Builder pass(Entity entity) {
             this.entity = entity;
             return this;
         }
 
-        public Builder passBlock(Block block) {
+        public Builder pass(Block block) {
             this.block = block;
             if (this.item == null)
                 this.item = block.asItem();
             return this;
         }
 
-        public Builder passBlockState(BlockState blockState) {
+        public Builder pass(BlockState blockState) {
             this.blockState = blockState;
             if (this.block == null)
                 this.block = blockState.getBlock();
@@ -148,7 +154,7 @@ public class VisionConditionArguments {
             return this;
         }
 
-        public Builder passBlockStateBase(BlockBehaviour.BlockStateBase blockStateBase) {
+        public Builder pass(BlockBehaviour.BlockStateBase blockStateBase) {
             this.blockStateBase = blockStateBase;
             if (this.block == null)
                 this.block = blockStateBase.getBlock();

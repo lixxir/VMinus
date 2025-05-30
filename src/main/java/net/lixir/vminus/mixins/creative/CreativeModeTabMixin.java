@@ -5,14 +5,13 @@ import net.lixir.vminus.visions.util.VisionCreativeOrder;
 import net.lixir.vminus.visions.util.VisionItemReplacement;
 import net.lixir.vminus.visions.CreativeTabVision;
 import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.ICreativeTabVisionAccessor;
-import net.lixir.vminus.registry.util.BlockSet;
-import net.lixir.vminus.registry.util.BlockSetCreativeOrder;
+import net.lixir.vminus.visions.accessors.CreativeTabVisionAccessor;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +23,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 @Mixin(value = CreativeModeTab.class, priority = 12000)
-public class CreativeModeTabMixin implements ICreativeTabVisionAccessor {
+public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
     @Unique
     private final CreativeModeTab vminus$creativeModeTab = (CreativeModeTab) (Object) this;
     @Unique
@@ -115,20 +114,6 @@ public class CreativeModeTabMixin implements ICreativeTabVisionAccessor {
 
         WAITING_LIST.clear();
         WAITING_LIST_ORDER.clear();
-        List<BlockSet> blockSets = new ArrayList<>(BlockSet.BLOCK_SETS);
-        Collections.reverse(blockSets);
-
-        for (BlockSet set : blockSets) {
-            BlockSetCreativeOrder order = set.getCreativeOrder();
-            if (order != null && vminus$creativeModeTab == order.getCreativeTab()) {
-                List<Item> resolvedItems = order.getResolvedItems();
-                Item targetItem = order.getTarget();
-
-                for (Item item : resolvedItems) {
-                    vminus$addItemsToTab(targetItem, item, order.isBefore());
-                }
-            }
-        }
         vminus$creativeModeTab.rebuildSearchTree();
     }
 
@@ -233,12 +218,24 @@ public class CreativeModeTabMixin implements ICreativeTabVisionAccessor {
     }
 
     @Override
-    public CreativeTabVision vminus$getVision() {
+    public @NotNull CreativeTabVision vminus$getVision() {
         return vminus$creativeTabVision;
     }
 
     @Override
-    public void vminus$setVision(CreativeTabVision vision) {
+    public void vminus$mergeVision(CreativeTabVision vision) {
         this.vminus$creativeTabVision = vision;
+    }
+
+    @Override
+    public void vminus$clearVision() {
+        if (vminus$creativeTabVision != null)
+            this.vminus$creativeTabVision = new CreativeTabVision();
+    }
+
+    @Override
+    public void vminus$freezeVision() {
+        if (vminus$creativeTabVision != null)
+            this.vminus$creativeTabVision.freeze();
     }
 }

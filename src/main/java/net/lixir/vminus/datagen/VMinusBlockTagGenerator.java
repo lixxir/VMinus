@@ -29,6 +29,10 @@ public class VMinusBlockTagGenerator extends VBlockTagGenerator {
         froglights.add(Blocks.VERDANT_FROGLIGHT);
         froglights.add(Blocks.PEARLESCENT_FROGLIGHT);
 
+        var allTorches = tag(VMinusTags.Blocks.ALL_TORCHES);
+        allTorches.addTag(VMinusTags.Blocks.TORCHES);
+        allTorches.addTag(VMinusTags.Blocks.SOUL_TORCHES);
+
         var torches = tag(VMinusTags.Blocks.TORCHES);
         torches.add(Blocks.TORCH);
         torches.add(Blocks.WALL_TORCH);
@@ -78,6 +82,12 @@ public class VMinusBlockTagGenerator extends VBlockTagGenerator {
         dyeable.add(Blocks.GLASS_PANE);
         dyeable.add(Blocks.WHITE_BED);
         dyeable.add(Blocks.WHITE_CONCRETE_POWDER);
+
+        var grasses = tag(VMinusTags.Blocks.GRASSES);
+        grasses.add(Blocks.GRASS);
+
+        var tallGrasses = tag(VMinusTags.Blocks.TALL_GRASSES);
+        tallGrasses.add(Blocks.TALL_GRASS);
 
         var brushable = tag(VMinusTags.Blocks.BRUSHABLE);
 

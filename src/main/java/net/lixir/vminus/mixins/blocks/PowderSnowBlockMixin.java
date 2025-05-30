@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.blocks;
 
-import net.lixir.vminus.registry.Traits;
+import net.lixir.vminus.item.trait.ItemTraits;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,15 +18,15 @@ public class PowderSnowBlockMixin {
     private static void canEntityWalkOnPowderSnow(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (entity instanceof LivingEntity livingEntity) {
             ItemStack boots = livingEntity.getItemBySlot(EquipmentSlot.FEET);
-            if (Traits.hasTrait(boots, Traits.LIGHTFOOTED.get())) {
-                cir.setReturnValue(Traits.getTrait(boots, Traits.LIGHTFOOTED.get()));
+            if (ItemTraits.hasTrait(boots, ItemTraits.LIGHTFOOTED.get())) {
+                cir.setReturnValue(ItemTraits.getTrait(boots, ItemTraits.LIGHTFOOTED.get()));
                 return;
             }
 
             if (livingEntity instanceof Horse horse) {
                 ItemStack horseArmor = horse.getItemBySlot(EquipmentSlot.CHEST);
-                if (Traits.hasTrait(horseArmor, Traits.LIGHTFOOTED.get())) {
-                    cir.setReturnValue(Traits.getTrait(boots, Traits.LIGHTFOOTED.get()));
+                if (ItemTraits.hasTrait(horseArmor, ItemTraits.LIGHTFOOTED.get())) {
+                    cir.setReturnValue(ItemTraits.getTrait(boots, ItemTraits.LIGHTFOOTED.get()));
                 }
             }
         }

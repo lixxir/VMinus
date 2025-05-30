@@ -1,17 +1,14 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.VMinus;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.EntityVision;
-import net.lixir.vminus.visions.accessors.IEntityVisionAccessor;
-import net.lixir.vminus.network.mobvariants.RequestVariantTexturePacket;
+import net.lixir.vminus.visions.accessors.EntityVisionAccessor;
 import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.util.IEntityVariantAccessor;
 import net.lixir.vminus.util.ISpeedGetter;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,18 +18,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor, IEntityVariantAccessor {
+public abstract class EntityMixin implements ISpeedGetter, EntityVisionAccessor {
     @Unique
     private final Entity vminus$entity = (Entity) (Object) this;
 
     @Unique
     private double vminus$speed = 0.0;
-
-    @Unique
-    private ResourceLocation vminus$variantTexture = null;
-
-    @Unique
-    private boolean vminus$hasRequestedVariant = false;
 
 
     @Inject(method = "setOldPosAndRot", at = @At("HEAD"))
@@ -43,20 +34,6 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor
         vminus$speed = deltaX * deltaX + deltaZ * deltaZ;
     }
 
-
-
-    @Override
-    public void vminus$setVariantTexture(ResourceLocation texture) {
-        this.vminus$variantTexture = texture;
-    }
-
-
-
-    @Override
-    public ResourceLocation vminus$getVariantTexture() {
-        return vminus$variantTexture;
-    }
-
     @Unique
     public double vminus$getSpeed() {
         return vminus$speed;
@@ -65,33 +42,6 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor
     @Unique
     private EntityVision vminus$entityVision = new EntityVision();
 
-    @Inject(method = "<init>" , at = @At(value = "TAIL"))
-    public void init(CallbackInfo ci) {
-        /*
-        if (vminus$entity != null && vminus$entity.level().isClientSide() && vminus$variantTexture == null) {
-            VMinus.PACKET_HANDLER.sendToServer(new RequestVariantTexturePacket(vminus$entity.getId()));
-        }
-
-         */
-    }
-
-    @Inject(method = "baseTick", at = @At(value = "TAIL"))
-    public void baseTick(CallbackInfo ci) {
-        // vminus$entity.refreshDimensions();
-        /*
-        if (vminus$entity.level() instanceof ServerLevel)
-        serverLevel.getServer().execute(() -> VMinus.PACKET_HANDLER.send(
-                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity),
-                new MobVariantSyncPacket(entity.getId(), chosenVariant)
-        ));
-
-         */
-
-        if (!vminus$hasRequestedVariant && vminus$entity != null && vminus$entity.level().isClientSide() && vminus$variantTexture == null) {
-            vminus$hasRequestedVariant = true;
-            VMinus.PACKET_HANDLER.sendToServer(new RequestVariantTexturePacket(vminus$entity.getId()));
-        }
-    }
 
     @Inject(method = "getEyeY", at = @At("RETURN"), cancellable = true)
     public void getEyeY(CallbackInfoReturnable<Double> cir) {
@@ -103,7 +53,7 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor
         float translucency = vminus$entity.getPersistentData().getFloat(VMinusAttributes.TRANSLUCENCE_KEY)*2f;
         if (translucency >= 1f)
             cir.setReturnValue(true);
-        Boolean value = vminus$getVision().silent.value(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
+        Boolean value = vminus$getVision().silent.value(new VisionConditionArguments.Builder().pass(vminus$entity).build());
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -112,7 +62,7 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor
         float translucency = vminus$entity.getPersistentData().getFloat(VMinusAttributes.TRANSLUCENCE_KEY)*1.5f;
         if (translucency >= 1f)
             cir.setReturnValue(true);
-        Boolean value = vminus$getVision().dampens_vibration.value(new VisionConditionArguments.Builder().passEntity(vminus$entity).build());
+        Boolean value = vminus$getVision().dampens_vibration.value(new VisionConditionArguments.Builder().pass(vminus$entity).build());
         if (value != null) cir.setReturnValue(value);
     }
 
@@ -166,13 +116,13 @@ public abstract class EntityMixin implements ISpeedGetter, IEntityVisionAccessor
 
 
     @Override
-    public void vminus$setVision(EntityVision vision) {
+    public void vminus$mergeVision(EntityVision vision) {
         this.vminus$entityVision = vision;
     }
 
     @Override
-    public EntityVision vminus$getVision() {
-        if (vminus$entity.getType() instanceof IEntityVisionAccessor entityVisionable) {
+    public @NotNull EntityVision vminus$getVision() {
+        if (vminus$entity.getType() instanceof EntityVisionAccessor entityVisionable) {
             return entityVisionable.vminus$getVision();
         }
         return this.vminus$entityVision;

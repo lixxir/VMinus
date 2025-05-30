@@ -1,7 +1,5 @@
 package net.lixir.vminus.mixins.client;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.network.mobvariants.RequestVariantTexturePacket;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

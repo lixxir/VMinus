@@ -19,51 +19,13 @@ import java.util.List;
 
 @Mod.EventBusSubscriber
 public class AttributeHelper {
-
     public static float applyProtection(float damage, LivingEntity entity, DamageSource source, Attribute attribute, ResourceLocation resourceLocation) {
         if (source.is(TagKey.create(Registries.DAMAGE_TYPE, resourceLocation))) {
-            float protectionPercentage = getAttributesFromArmor(entity, attribute);
-            damage = damage - (damage * protectionPercentage);
+            float specific = (float) entity.getAttributeValue(attribute) / 100f;
+            damage -= damage * specific;
         }
-        float genericProtection = getAttributesFromArmor(entity, VMinusAttributes.PROTECTION.get());
-        damage = damage - (damage * genericProtection);
+        float generic = (float) entity.getAttributeValue(VMinusAttributes.PROTECTION.get()) / 100f;
+        damage -= damage * generic;
         return Math.max(damage, 0);
     }
-
-
-    public static float getAttributesFromArmor(Entity entity, Attribute attribute) {
-        if (!(entity instanceof LivingEntity livingEntity)) {
-            return 0;
-        }
-        float prot = 0;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.isArmor()) {
-                ItemStack itemStack = livingEntity.getItemBySlot(slot);
-                float protection = getAttributeFromItem(itemStack, attribute);
-                prot += protection;
-            }
-        }
-        return Math.max(Math.min(prot, 1.0f), 0);
-    }
-
-    public static float getAttributeFromItem(ItemStack itemStack, Attribute attribute) {
-        if (itemStack.isEmpty())
-            return 0.0f;
-
-
-        float total = 0.0f;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            Collection<AttributeModifier> modifiers = itemStack.getAttributeModifiers(slot).get(attribute);
-
-            if (modifiers.isEmpty()) {
-                continue;
-            }
-            for (AttributeModifier modifier : modifiers) {
-                total += modifier.getAmount();
-            }
-        }
-        return total;
-    }
-
-
 }

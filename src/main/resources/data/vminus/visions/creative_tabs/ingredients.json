@@ -1,0 +1,34 @@
+{
+  "creative_tab": "ingredients",
+  "order": [
+    {
+      "item": "minecraft:oak_planks",
+      "target": "minecraft:coal",
+      "before": true
+    },
+    {
+      "item": "minecraft:cobblestone",
+      "target": "minecraft:oak_planks"
+    }
+  ],
+  "remove": [
+    "minecraft:elytra",
+    "minecraft:stick",
+    "minecraft:wheat",
+    "minecraft:honeycomb",
+    "minecraft:bone",
+    "minecraft:paper",
+    "minecraft:string",
+    "minecraft:ender_pearl",
+    "minecraft:lapis_lazuli",
+    "minecraft:echo_shard",
+    "minecraft:diamond",
+    "#vminus:banner_patterns",
+    "#forge:dyes",
+    "#minecraft:trim_templates",
+    "minecraft:snowball",
+    "minecraft:egg",
+    "minecraft:bone_meal",
+    "minecraft:firework_star"
+  ]
+}

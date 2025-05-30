@@ -2,10 +2,11 @@ package net.lixir.vminus.mixins.blocks;
 
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.BlockVision;
-import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
+import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockBehaviour.BlockStateBase.class)
-public abstract class BlockStateBaseMixin  implements IBlockVisionAccessor {
+public abstract class BlockStateBaseMixin  implements BlockVisionAccessor {
     @Unique
     private final BlockBehaviour.BlockStateBase vminus$blockBaseState = (BlockBehaviour.BlockStateBase) (Object) this;
 
@@ -49,8 +50,8 @@ public abstract class BlockStateBaseMixin  implements IBlockVisionAccessor {
     }
 
     @Unique
-    public BlockVision vminus$getVision() {
-        if (vminus$blockBaseState.getBlock() instanceof IBlockVisionAccessor iVisionable) {
+    public @NotNull BlockVision vminus$getVision() {
+        if (vminus$blockBaseState.getBlock() instanceof BlockVisionAccessor iVisionable) {
             return iVisionable.vminus$getVision();
         }
         return null;

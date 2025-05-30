@@ -30,6 +30,7 @@ public abstract class VisionManager<T> extends SimpleJsonResourceReloadListener 
         this.gson = new GsonBuilder().registerTypeAdapter(visionClass, deserializer).setPrettyPrinting().disableHtmlEscaping().create();
     }
 
+
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> resourceLocationJsonElementMap, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profilerFiller) {
         ArrayList<T> visions = new ArrayList<>();

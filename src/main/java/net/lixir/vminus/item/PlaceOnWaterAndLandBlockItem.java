@@ -13,16 +13,9 @@ import net.minecraft.world.level.material.FluidState;
 import java.util.function.Supplier;
 
 public class PlaceOnWaterAndLandBlockItem extends PlaceOnWaterBlockItem {
-    private final Supplier<Block> blockSupplier;
 
-    public PlaceOnWaterAndLandBlockItem(Supplier<Block> blockSupplier, Item.Properties properties) {
-        super(null, properties);
-        this.blockSupplier = blockSupplier;
-    }
-
-    @Override
-    public Block getBlock() {
-        return blockSupplier.get();
+    public PlaceOnWaterAndLandBlockItem(Block block, Item.Properties properties) {
+        super(block, properties);
     }
 
     @Override
@@ -30,9 +23,8 @@ public class PlaceOnWaterAndLandBlockItem extends PlaceOnWaterBlockItem {
         Level level = context.getLevel();
         BlockPos targetPos = context.getClickedPos().relative(context.getClickedFace());
         FluidState fluidState = level.getFluidState(targetPos);
-        if (!fluidState.isEmpty()) {
+        if (!fluidState.isEmpty())
             return InteractionResult.PASS;
-        }
 
         InteractionResult interactionResult = this.place(new BlockPlaceContext(context));
         if (!interactionResult.consumesAction() && this.isEdible()) {

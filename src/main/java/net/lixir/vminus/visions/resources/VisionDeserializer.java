@@ -1,18 +1,19 @@
 package net.lixir.vminus.visions.resources;
 
 import com.google.gson.*;
-import net.lixir.vminus.visions.VisionType;
+import net.lixir.vminus.visions.util.VisionType;
 import net.lixir.vminus.visions.values.VisionProperty;
 import net.lixir.vminus.visions.Vision;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 
 public class VisionDeserializer<T extends Vision> implements JsonDeserializer<T> {
     private final ICondition.IContext context;
     private final Class<T> visionClass;
 
-    public VisionDeserializer(Class<T> visionClass, ICondition.IContext context) {
+    public VisionDeserializer(Class<T> visionClass, @Nullable ICondition.IContext context) {
         this.visionClass = visionClass;
         this.context = context;
     }

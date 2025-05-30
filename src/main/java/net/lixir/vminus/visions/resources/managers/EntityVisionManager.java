@@ -1,10 +1,10 @@
 package net.lixir.vminus.visions.resources.managers;
 
-import net.lixir.vminus.visions.VisionType;
+import net.lixir.vminus.visions.util.VisionType;
 import net.lixir.vminus.visions.resources.VisionDeserializer;
 import net.lixir.vminus.visions.resources.VisionProcessor;
 import net.lixir.vminus.visions.EntityVision;
-import net.lixir.vminus.visions.accessors.IEntityVisionAccessor;
+import net.lixir.vminus.visions.accessors.EntityVisionAccessor;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -29,8 +29,8 @@ public class EntityVisionManager extends VisionManager<EntityVision> {
                     copyVision.merge(vision);
                 }
             }
-            if (entity instanceof IEntityVisionAccessor visionable) {
-                visionable.vminus$setVision(copyVision);
+            if (entity instanceof EntityVisionAccessor visionable) {
+                visionable.vminus$mergeVision(copyVision);
             }
         }
     }

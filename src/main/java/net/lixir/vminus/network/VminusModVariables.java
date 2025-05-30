@@ -30,7 +30,7 @@ public class VminusModVariables {
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        VMinus.addNetworkMessage(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer, PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
+        VMinusNetworking.addNetworkMessage(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer, PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
     }
 
     @SubscribeEvent
@@ -101,7 +101,7 @@ public class VminusModVariables {
 
         public void syncPlayerVariables(Entity entity) {
             if (entity instanceof ServerPlayer serverPlayer)
-                VMinus.PACKET_HANDLER.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PlayerVariablesSyncMessage(this));
+                VMinusNetworking.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PlayerVariablesSyncMessage(this));
         }
 
         public Tag writeNBT() {

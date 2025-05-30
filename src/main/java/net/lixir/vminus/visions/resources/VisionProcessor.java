@@ -1,8 +1,7 @@
 package net.lixir.vminus.visions.resources;
 
 import com.google.gson.*;
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.visions.VisionType;
+import net.lixir.vminus.visions.util.VisionType;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -22,7 +21,8 @@ public class VisionProcessor {
         JsonObject jsonFileObject = jsonFile.getAsJsonObject();
         String listType = visionType.getListName();
         String singleName = visionType.getSingleName();
-
+        if (!jsonFileObject.has(listType))
+            jsonFileObject.add(listType, new JsonArray());
         // Wrap single keys in a list
         keyToArray(jsonFileObject, singleName, listType);
         keyToArray(jsonFileObject, "tag", listType);
@@ -119,7 +119,6 @@ public class VisionProcessor {
                 throw new JsonParseException("Invalid list key: '" + listKey + "'. Allowed characters: [a-z, 0-9, :, !, #, *, /, _]");
             }
         }
-        VMinus.LOGGER.info("PROCESSED JSON: {}", processedJsonObject);
         return processedJsonObject;
     }
 
@@ -244,7 +243,7 @@ public class VisionProcessor {
         return matchKey.matches("[a-z0-9:!#*/_]+");
     }
 
-    public static boolean visionApplies(@Nullable Object object, String id, List<String> applicantList, @Nullable ICondition.IContext context) {
+    public static boolean visionApplies(@Nullable Object object, String id, ArrayDeque<String> applicantList, @Nullable ICondition.IContext context) {
         boolean invalidMatch = false;
         boolean validMatchFound = false;
 
@@ -276,6 +275,7 @@ public class VisionProcessor {
             } else if (isTag) {
                 ResourceLocation tagLocation = new ResourceLocation(matchKey);
                 if (object instanceof Item item) {
+
                     found = isItemTagged(item, tagLocation, context);
                 } else if (object instanceof Block block) {
                     found = isBlockTagged(block, tagLocation, context);
@@ -314,6 +314,7 @@ public class VisionProcessor {
 
 
     private static boolean isItemTagged(Item item, ResourceLocation matchKey, @Nullable ICondition.IContext context) {
+
         if (context == null)
             return false;
 

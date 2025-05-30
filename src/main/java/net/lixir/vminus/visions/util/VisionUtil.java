@@ -1,27 +1,31 @@
 package net.lixir.vminus.visions.util;
 
+import net.lixir.vminus.visions.Vision;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.ItemVision;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.lixir.vminus.visions.values.VisionProperty;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.item.Item;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import javax.annotation.Nullable;
 
 public class VisionUtil {
-    public static boolean matchesIngredient(ItemStack targetStack, Ingredient.Value[] values) {
-        for (Ingredient.Value value : values) {
-            for (ItemStack stack : value.getItems()) {
-                if (stack == null || stack.isEmpty())
-                    continue;
-                VisionItemReplacement visionItemReplacement = ItemVision.of(stack).replace.value(new VisionConditionArguments(stack));
-                ItemStack replacementStack = visionItemReplacement != null ? visionItemReplacement.itemStack() : ItemStack.EMPTY;
-                Boolean banned = visionItemReplacement != null ? ItemVision.of(stack).ban.value(new VisionConditionArguments(stack)) : null;
-                if (replacementStack != null && !replacementStack.isEmpty() && replacementStack.is(targetStack.getItem())) {
-                    return true;
-                }
-                if ((banned == null || !banned) && stack.is(targetStack.getItem())) {
-                    return true;
-                }
-            }
+    public static <T> void visionOverride(CallbackInfoReturnable<T> cir, T t) {
+        if (t != null) {
+            cir.setReturnValue(t);
         }
-        return false;
+    }
+
+    public static <T>  void visionOverride(CallbackInfoReturnable<T> cir, VisionProperty<T> visionProperty, MobEffect mobEffect) {
+        T value = visionProperty.value(new VisionConditionArguments(mobEffect));
+        if (value != null)
+            cir.setReturnValue(value);
+    }
+
+    public static <T>  void visionOverride(CallbackInfoReturnable<T> cir, VisionProperty<T> visionProperty, Item item) {
+        T value = visionProperty.value(new VisionConditionArguments(item));
+        if (value != null)
+            cir.setReturnValue(value);
     }
 }
+

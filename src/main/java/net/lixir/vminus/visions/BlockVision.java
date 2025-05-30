@@ -1,8 +1,10 @@
 package net.lixir.vminus.visions;
 
-import net.lixir.vminus.visions.resources.parser.*;
+import net.lixir.vminus.visions.resources.VisionCodecs;
+import net.lixir.vminus.visions.resources.codec.*;
+import net.lixir.vminus.visions.util.VisionType;
 import net.lixir.vminus.visions.values.VisionProperty;
-import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
+import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 
@@ -23,25 +25,30 @@ public class BlockVision extends Vision {
     public final VisionProperty<SoundType> sound;
 
     public BlockVision() {
-        light_level = create("light_level", new VisionIntParser());
-        speed_boost = create("speed_boost", new VisionFloatParser());
-        jump_boost = create("jump_boost", new VisionFloatParser());
-        friction = create("friction", new VisionFloatParser());
-        blast_resistance = create("blast_resistance", new VisionFloatParser());
-        break_speed = create("break_speed", new VisionFloatParser());
-        replace = create("replace", new VisionBlockParser());
-        emissive = create("emissive", new VisionBooleanParser());
-        occlude = create("occlude", new VisionBooleanParser());
-        redstone_conductor = create("redstone_conductor", new VisionBooleanParser());
-        ban = create("ban", new VisionBooleanParser());
-        sound = create("sound", new VisionSoundTypeParser());
+        light_level = create("light_level", VisionCodecs.intCodec());
+        speed_boost = create("speed_boost", VisionCodecs.floatCodec());
+        jump_boost = create("jump_boost", VisionCodecs.floatCodec());
+        friction = create("friction", VisionCodecs.floatCodec());
+        blast_resistance = create("blast_resistance", VisionCodecs.floatCodec());
+        break_speed = create("break_speed", VisionCodecs.floatCodec());
+        replace = create("replace", new VisionBlockCodec());
+        emissive = create("emissive", VisionCodecs.booleanCodec());
+        occlude = create("occlude", VisionCodecs.booleanCodec());
+        redstone_conductor = create("redstone_conductor", VisionCodecs.booleanCodec());
+        ban = create("ban", VisionCodecs.booleanCodec());
+        sound = create("sound", new VisionSoundTypeCodec());
 
         VisionExtensions.applyExtensions(this);
     }
 
     public static BlockVision of(Block block) {
-        if (block instanceof IBlockVisionAccessor iBlockVisionAccessor)
-            return iBlockVisionAccessor.vminus$getVision();
+        if (block instanceof BlockVisionAccessor blockVisionAccessor)
+            return blockVisionAccessor.vminus$getVision();
         return EMPTY;
+    }
+
+    @Override
+    public String getEntryListName() {
+        return VisionType.BLOCK.getListName();
     }
 }

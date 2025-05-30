@@ -9,7 +9,10 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ConcretePowderBlock;
+import net.minecraft.world.level.block.GlazedTerracottaBlock;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +93,9 @@ public class VMinusItemTagGenerator extends VItemTagGenerator {
         chainmailArmor.add(Items.CHAINMAIL_LEGGINGS);
         chainmailArmor.add(Items.CHAINMAIL_BOOTS);
 
+        var armor = tag(VMinusTags.Items.ARMOR);
+        armor.addOptionalTag(Tags.Items.ARMORS);
+
         var goldenArmor = tag(VMinusTags.Items.GOLDEN_ARMOR);
         goldenArmor.add(Items.GOLDEN_HELMET);
         goldenArmor.add(Items.GOLDEN_CHESTPLATE);
@@ -130,10 +136,25 @@ public class VMinusItemTagGenerator extends VItemTagGenerator {
         diamondEquipment.addTag(VMinusTags.Items.DIAMOND_ARMOR);
         diamondEquipment.addTag(VMinusTags.Items.DIAMOND_TOOLS);
 
+        var buckets = tag(VMinusTags.Items.BUCKETS);
+        buckets.addTag(VMinusTags.Items.MOB_BUCKETS);
+        buckets.addTag(VMinusTags.Items.SOLID_BUCKETS);
+        buckets.addTag(VMinusTags.Items.FOOD_BUCKETS);
+        buckets.addTag(VMinusTags.Items.LIQUID_BUCKETS);
+
+        var foodBuckets = tag(VMinusTags.Items.FOOD_BUCKETS);
+        foodBuckets.add(Items.MILK_BUCKET);
+
         var bannerPatterns = tag(VMinusTags.Items.BANNER_PATTERNS);
         var chestBoats = tag(VMinusTags.Items.CHEST_BOATS);
         var boats = tag(VMinusTags.Items.BOATS);
         var shulkerBoxes = tag(VMinusTags.Items.SHULKER_BOXES);
+        var concretePowder = tag(VMinusTags.Items.CONCRETE_POWDER);
+        var glazedTerracotta = tag(VMinusTags.Items.GLAZED_TERRACOTTA);
+
+        var solidBuckets = tag(VMinusTags.Items.SOLID_BUCKETS);
+        var mobBuckets = tag(VMinusTags.Items.MOB_BUCKETS);
+        var liquidBuckets = tag(VMinusTags.Items.LIQUID_BUCKETS);
 
         for (Map.Entry<ResourceKey<Item>, Item> entry : ForgeRegistries.ITEMS.getEntries()) {
             Item item = entry.getValue();
@@ -145,9 +166,20 @@ public class VMinusItemTagGenerator extends VItemTagGenerator {
                     chestBoats.add(item);
                 else
                     boats.add(item);
-            } else if (item instanceof BlockItem blockItem
-            && blockItem.getBlock() instanceof ShulkerBoxBlock) {
-                shulkerBoxes.add(item);
+            } else if (item instanceof SolidBucketItem) {
+                solidBuckets.add(item);
+            } else if (item instanceof MobBucketItem) {
+                mobBuckets.add(item);
+            } else if (item instanceof BucketItem) {
+                liquidBuckets.add(item);
+            } else if (item instanceof BlockItem blockItem) {
+                Block block = blockItem.getBlock();
+                if (block instanceof ShulkerBoxBlock)
+                    shulkerBoxes.add(item);
+                else if (block instanceof ConcretePowderBlock)
+                    concretePowder.add(item);
+                else if (block instanceof GlazedTerracottaBlock)
+                    glazedTerracotta.add(item);
             }
         }
     }

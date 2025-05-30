@@ -1,18 +1,19 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.block.ModHangingSignBlock;
-import net.lixir.vminus.block.ModStandingSignBlock;
-import net.lixir.vminus.block.ModWallHangingSignBlock;
-import net.lixir.vminus.block.ModWallSignBlock;
-import net.lixir.vminus.datagen.util.simple.BlockItemDatagen;
-import net.lixir.vminus.datagen.util.simple.DatagenObject;
-import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
-import net.lixir.vminus.registry.util.BlockItemRegistryPair;
-import net.lixir.vminus.registry.util.BlockSet;
+import net.lixir.vminus.mixins.client.RenderStateShardAccessor;
+import net.lixir.vminus.registry.entry.BlockEntry;
+import net.lixir.vminus.registry.entry.BlockEntryAccessor;
+import net.lixir.vminus.registry.TintType;
+import net.lixir.vminus.registry.UnifiedRegistry;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.SlabType;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class VBlockStateProvider extends BlockStateProvider {
@@ -36,92 +38,81 @@ public class VBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        BlockSet.BLOCK_SETS.stream()
-                .filter(blockSet -> blockSet.getModId().equals(modId))
-                .forEach(this::blockSets);
-        simpleDatagen();
-    }
-
-    private void simpleDatagen() {
-        for (DatagenObject simpleDatagen : DatagenRegistry.getValuesFromModId(modId)) {
-            if (!simpleDatagen.hasModel())
+        for (Block block : UnifiedRegistry.fromId(modId).getBlocks()) {
+            BlockEntryAccessor accessor = (BlockEntryAccessor) block;
+            BlockEntry blockEntry = accessor.vminus$getEntry();
+            if (blockEntry == null)
                 continue;
-            if (simpleDatagen instanceof BlockItemDatagen blockItemSimpleDatagen) {
-                BlockItemRegistryPair blockItemPair = blockItemSimpleDatagen.getBlockItemRegistryPair();
-                RegistryObject<Block> blockRegistryObject = blockItemPair.blockObject();
-                Block block = blockItemPair.block();
-                switch (simpleDatagen.getType()) {
-                    case ORE -> allSidedCubeWithItem(block, blockRegistryObject);
-                    case FLOWER, PLANT -> crossWithItem(block, blockRegistryObject);
+            BlockEntry.Model model = blockEntry.getModel();
+            if (model == null || model == BlockEntry.Model.UNSET)
+                continue;
+            RenderType renderType = blockEntry.getRenderType();
+            TintType tintType = blockEntry.getTintType();
+            switch (model) {
+                case ALL_SIDED_CUBE -> {
+                    if (tintType == null || tintType == TintType.UNSET)
+                        allSidedCube(block, renderType);
+                    else
+                        tintedAllSidedCube(block, renderType);
                 }
+                case STAIRS -> stairs(block, renderType);
+                case SLAB -> slab(block, renderType);
+                case CROSS -> {
+                    if (tintType != null)
+                        tintedCross(block, renderType);
+                    else
+                        cross(block, renderType);
+                }
+                case DOUBLE_CROSS -> {
+                    if (tintType != null)
+                        tintedDoubleCross(block, renderType);
+                    else
+                        doubleCross(block, renderType);
+                }
+                case AXIS -> axisBlock(block);
+                case CUBE_COLUMN -> cubeColumn(block);
+                case CUBE_BOTTOM_TOP -> cubeBottomTop(block);
             }
         }
     }
 
-    protected void stainedGlassPane(RegistryObject<Block> blockRegistryObject) {
-        Block block = blockRegistryObject.get();
-        String path = blockRegistryObject.getId().getPath();
-        String namespace = blockRegistryObject.getId().getNamespace();
+
+    protected void stainedGlassPane(Block block) {
+        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
+        String path = resourceLocation.getPath();
         String glassPath = path.substring(0, path.indexOf("_pane"));
     }
 
-    protected void allSidedCubeWithItem(RegistryObject<Block> registryObject) {
-        allSidedCubeWithItem(registryObject.get(), registryObject);
+    protected void allSidedCube(Block block, RenderType renderType) {
+        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
+        simpleBlock(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(((RenderStateShardAccessor) renderType).getName()));
+    }
+
+    protected void tintedAllSidedCube(Block block, RenderType renderType) {
+        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
+        simpleBlock(block, models().leaves(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(((RenderStateShardAccessor) renderType).getName()));
+    }
+
+    protected void allSidedCubeWithItem(Block block, RenderType renderType) {
+        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
+        simpleBlockWithItem(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(((RenderStateShardAccessor) renderType).getName()));
     }
 
     protected void allSidedCubeWithItem(Block block, RegistryObject<Block> registryObject) {
         simpleBlockWithItem(block, models().cubeAll(registryObject.getId().getPath(), modLoc("block/" + registryObject.getId().getPath())));
     }
 
-    private void blockSets(BlockSet blockSet) {
-        String baseName = blockSet.getBaseBlockName();
-        Block block = blockSet.getBaseBlock();
-        if (blockSet.getBaseBlockRegistryObject() != null)
-            simpleBlockWithItem(block, cubeAll(block));
-        if (blockSet.getStairs() != null)
-            blockSetStairs(blockSet,(StairBlock) blockSet.getStairs().block(), baseName);
-        if (blockSet.getSlab() != null)
-            blockSetSlab(blockSet, (SlabBlock) blockSet.getSlab().block(), baseName);
-        if (blockSet.getWall() != null)
-            blockSetWall(blockSet, (WallBlock) blockSet.getWall().block(), baseName);
-        if (blockSet.getFence() != null)
-            blockSetFenceBlock(blockSet, (FenceBlock) blockSet.getFence().block(), baseName);
-        if (blockSet.getFenceGate() != null)
-            blockSetFenceGateBlock(blockSet, (FenceGateBlock) blockSet.getFenceGate().block(), baseName);
-        if (blockSet.getPressurePlate() != null)
-            blockSetPressurePlateBlock(blockSet, (PressurePlateBlock) blockSet.getPressurePlate().block(), baseName);
-        if (blockSet.getButton() != null)
-            blockSetButtonBlock(blockSet, (ButtonBlock) blockSet.getButton().block(), baseName);
-        if (blockSet.getDoor() != null)
-            blockSetDoorBlock(blockSet, (DoorBlock) blockSet.getDoor().block(), baseName);
-        if (blockSet.getTrapdoor() != null)
-            blockSetTrapdoorBlock(blockSet, (TrapDoorBlock) blockSet.getTrapdoor().block(), baseName);
-        if (blockSet.getSign() != null
-                && blockSet.getWallSign() != null)
-            blockSetSign((ModStandingSignBlock) blockSet.getSign().block(), (ModWallSignBlock) blockSet.getWallSign().block(), baseName);
-        if (blockSet.getHangingSign() != null
-                && blockSet.getWallHangingSign() != null)
-            blockSetHangingSign((ModHangingSignBlock) blockSet.getHangingSign().block(), (ModWallHangingSignBlock) blockSet.getWallHangingSign().block(), baseName);
-        if (blockSet.getLog() != null) {
-            Block logBlock = blockSet.getLog().block();
-            Block strippedLogBlock = blockSet.getStrippedLog().block();
-            Block woodBlock = blockSet.getWood().block();
-            Block strippedWoodBlock = blockSet.getStrippedWood().block();
+    protected void translucentCubeWithItem(Block block) {
+        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
+        simpleBlockWithItem(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType("translucent"));
+    }
 
+    protected void translucentCubeWithItem(Block block, RegistryObject<Block> registryObject) {
+        simpleBlockWithItem(block, models().cubeAll(registryObject.getId().getPath(), modLoc("block/" + registryObject.getId().getPath())));
+    }
 
-            logBlock(((RotatedPillarBlock) logBlock));
-            axisBlock(((RotatedPillarBlock) woodBlock), blockTexture(logBlock), blockTexture(logBlock));
-
-            axisBlock(((RotatedPillarBlock) strippedLogBlock), blockTexture(strippedLogBlock),
-                    new ResourceLocation(blockTexture(strippedLogBlock) + "_top"));
-            axisBlock(((RotatedPillarBlock) strippedWoodBlock), blockTexture(strippedLogBlock),
-                    blockTexture(strippedLogBlock));
-
-            blockItem(logBlock);
-            blockItem(woodBlock);
-            blockItem(strippedLogBlock);
-            blockItem(strippedWoodBlock);
-        }
+    protected void translucentCubeWithItem(RegistryObject<Block> registryObject) {
+        translucentCubeWithItem(registryObject.get(), registryObject);
     }
 
     private void registerLeaves(Block block) {
@@ -150,6 +141,42 @@ public class VBlockStateProvider extends BlockStateProvider {
                 .texture("cross", blockTexture(block)));
     }
 
+    public void veinBlock(RegistryObject<Block> registryObject) {
+        veinBlock(registryObject.get());
+    }
+
+
+    public void axisBlock(Block block) {
+        ResourceLocation name = ForgeRegistries.BLOCKS.getKey(block);
+        String path = name.getPath();
+
+        ModelFile logY = models().cubeColumn(path,
+                blockTexture(block),
+                new ResourceLocation(blockTexture(block).getNamespace(), blockTexture(block).getPath() + "_top"));
+        ModelFile logX = models().cubeColumnHorizontal(path + "_horizontal",
+                blockTexture(block),
+                new ResourceLocation(blockTexture(block).getNamespace(), blockTexture(block).getPath() + "_top"));
+
+        getVariantBuilder(block)
+                .partialState().with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
+                .modelForState().modelFile(logY).addModel()
+                .partialState().with(RotatedPillarBlock.AXIS, Direction.Axis.X)
+                .modelForState().modelFile(logX).addModel()
+                .partialState().with(RotatedPillarBlock.AXIS, Direction.Axis.Z)
+                .modelForState().modelFile(logY).addModel();
+
+        simpleBlockItem(block, logY);
+    }
+
+    public void veinBlock(Block block) {
+        String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
+        simpleBlock(block, models().withExistingParent(
+                        blockPath,
+                        new ResourceLocation("minecraft", "block/sculk_vein"))
+                .texture("sculk_vein", blockTexture(block))
+        );
+    }
+
     public void cubeColumn(Block block) {
         String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
         simpleBlock(block, models().withExistingParent(
@@ -160,17 +187,30 @@ public class VBlockStateProvider extends BlockStateProvider {
         );
     }
 
-    public void cross(Block block) {
-        simpleBlock(block, models().cross(blockTexture(block).getPath(),
-                blockTexture(block)).renderType("cutout"));
+    public void cubeBottomTop(Block block) {
+        String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
+        ResourceLocation baseTexture = blockTexture(block);
+
+        simpleBlock(block, models().withExistingParent(
+                        blockPath,
+                        new ResourceLocation("minecraft", "block/cube_bottom_top"))
+                .texture("top", new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + "_top"))
+                .texture("bottom", new ResourceLocation(baseTexture.getNamespace(), baseTexture.getPath() + "_bottom"))
+                .texture("side", baseTexture)
+        );
     }
 
-    public void crossWithItem(Block block, RegistryObject<Block> blockRegistryObject) {
+    public void cross(Block block, RenderType renderType) {
         simpleBlock(block, models().cross(blockTexture(block).getPath(),
-                blockTexture(block)).renderType("cutout"));
-        itemModels().getBuilder(blockRegistryObject.getId().getPath())
-                .parent(itemModels().getExistingFile(mcLoc("item/generated")))
-                .texture("layer0", modLoc("block/" + blockRegistryObject.getId().getPath()));
+                blockTexture(block)).renderType(((RenderStateShardAccessor) renderType).getName()));
+    }
+
+    public void tintedCross(Block block, RenderType renderType) {
+        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
+        String name = resourceLocation.getPath();
+        simpleBlock(block, models().withExistingParent(name, mcLoc("block/tinted_cross"))
+                .texture("cross", blockTexture(block))
+                .renderType(((RenderStateShardAccessor) renderType).getName()));
     }
 
 
@@ -179,11 +219,74 @@ public class VBlockStateProvider extends BlockStateProvider {
                 ":block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath()));
     }
 
-    private void blockSetStairs(BlockSet blockSet, StairBlock stairBlock, String baseName) {
-        stairsBlockWithRenderType(stairBlock, blockSet.getBaseTexture(), "solid");
-        itemModels().withExistingParent(baseName + "_stairs", modId + ":block/" + baseName + "_stairs");
+    public void tintedDoubleCross(Block block, RenderType renderType) {
+        doubleCross(block, renderType, "block/tinted_cross");
     }
 
+    public void doubleCross(Block block, RenderType renderType) {
+        doubleCross(block, renderType, "block/cross");
+    }
+
+    public void doubleCross(Block block, RenderType renderType, String modelPath) {
+        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
+        String name = resourceLocation.getPath();
+        ResourceLocation topTexture = modLoc("block/" + name + "_top");
+        ResourceLocation bottomTexture = modLoc("block/" + name + "_bottom");
+
+        getVariantBuilder(block)
+                .partialState().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER)
+                .modelForState().modelFile(models().withExistingParent(name + "_lower", new ResourceLocation("minecraft", modelPath))
+                        .texture("cross", bottomTexture).renderType(((RenderStateShardAccessor) renderType).getName())).addModel()
+                .partialState().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER)
+                .modelForState().modelFile(models().withExistingParent(name + "_upper", new ResourceLocation("minecraft", modelPath))
+                        .texture("cross", topTexture).renderType(((RenderStateShardAccessor) renderType).getName())).addModel();
+    }
+
+
+    private void stairs(Block block) {
+        stairs(block, null);
+    }
+
+    private void stairs(Block block, @Nullable RenderType renderType) {
+        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
+        String baseTexture = name.endsWith("_stairs") ? name.substring(0, name.length() - "_stairs".length()) : name;
+        stairsBlockWithRenderType((StairBlock) block, modLoc("block/" + baseTexture), renderType != null ? ((RenderStateShardAccessor) renderType).getName() : "solid");
+        itemModels().withExistingParent(name, modLoc("block/" + name));
+    }
+
+    private void slab(Block block) {
+        slab(block, null);
+    }
+
+    private void slab(Block block, @Nullable RenderType renderType) {
+        String name = ForgeRegistries.BLOCKS.getKey(block).getPath();
+        String baseTexture = name.endsWith("_slab") ? name.substring(0, name.length() - "_slab".length()) : name;
+        ResourceLocation texture = modLoc("block/" + baseTexture);
+
+        SlabBlock slabBlock = (SlabBlock) block;
+
+        BlockModelBuilder bottom = models().slab(name, texture, texture, texture);
+        BlockModelBuilder top = models().slabTop(name + "_top", texture, texture, texture);
+        BlockModelBuilder doubleSlab = models().cubeAll(name + "_double", texture);
+
+        if (renderType != null) {
+            bottom.renderType(((RenderStateShardAccessor) renderType).getName());
+            top.renderType(((RenderStateShardAccessor) renderType).getName());
+            doubleSlab.renderType(((RenderStateShardAccessor) renderType).getName());
+        }
+
+        getVariantBuilder(slabBlock)
+                .partialState().with(SlabBlock.TYPE, SlabType.BOTTOM)
+                .addModels(new ConfiguredModel(bottom))
+                .partialState().with(SlabBlock.TYPE, SlabType.TOP)
+                .addModels(new ConfiguredModel(top))
+                .partialState().with(SlabBlock.TYPE, SlabType.DOUBLE)
+                .addModels(new ConfiguredModel(doubleSlab));
+
+        itemModels().withExistingParent(name, modLoc("block/" + name));
+    }
+
+    /*
     private void blockSetSign(ModStandingSignBlock standingSignBlock, ModWallSignBlock wallSignBlock, String baseName) {
         signBlock(standingSignBlock, wallSignBlock, new ResourceLocation(modId, "entity/signs/" + baseName));
         itemModels().basicItem(new ResourceLocation(modId,  baseName + "_sign"));
@@ -197,17 +300,6 @@ public class VBlockStateProvider extends BlockStateProvider {
     }
 
 
-    private void blockSetSlab(BlockSet blockSet, SlabBlock slabBlock, String baseName) {
-        ResourceLocation texture = blockSet.getBaseTexture();
-        getVariantBuilder(slabBlock)
-                .partialState().with(SlabBlock.TYPE, SlabType.BOTTOM)
-                .addModels(new ConfiguredModel(models().slab(baseName + "_slab", texture, texture, texture)))
-                .partialState().with(SlabBlock.TYPE, SlabType.TOP)
-                .addModels(new ConfiguredModel(models().slabTop(baseName + "_slab_top", texture, texture, texture)))
-                .partialState().with(SlabBlock.TYPE, SlabType.DOUBLE)
-                .addModels(new ConfiguredModel(models().cubeAll(baseName + "_slab_double", texture)));
-        itemModels().withExistingParent(baseName + "_slab", modId + ":block/" + baseName + "_slab");
-    }
 
     private void blockSetWall(BlockSet blockSet, WallBlock wallBlock, String baseName) {
         ResourceLocation texture = blockSet.getBaseTexture();
@@ -249,6 +341,8 @@ public class VBlockStateProvider extends BlockStateProvider {
         trapdoorBlockWithRenderType(block, trapdoorTexture, true, "cutout");
         itemModels().trapdoorBottom(trapdoorName, trapdoorTexture);
     }
+
+     */
 
     public void simpleBlockWithItem(Block block, ModelFile model) {
         simpleBlock(block, model);

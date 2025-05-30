@@ -75,24 +75,6 @@ public class EntityAttackedEventHandler {
                     }
                 }
             }
-            // Stun hit entities if they have a certain nbt.
-            if ((sourceentity instanceof Player _plr ? _plr.getAttackStrengthScale(0) : 0) == 1) {
-                if (!(mainHand.getItem() == ItemStack.EMPTY.getItem())) {
-                    if (mainHand.getOrCreateTag().getBoolean("stun")) {
-                        new Object() {
-                            void timedLoop(int current, int total, int ticks) {
-                                entity.makeStuckInBlock(Blocks.AIR.defaultBlockState(), new Vec3(0.25, 0.05, 0.25));
-                                final int tick2 = ticks;
-                                VMinus.queueServerWork(tick2, () -> {
-                                    if (total > current + 1) {
-                                        timedLoop(current + 1, total, tick2);
-                                    }
-                                });
-                            }
-                        }.timedLoop(0, 10, 1);
-                    }
-                }
-            }
         }
     }
 }

@@ -1,15 +1,16 @@
 package net.lixir.vminus.visions.util;
 
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 public class VisionCreativeOrder {
     private @Nullable ItemStack itemStack;
     private final ItemStack targetItemStack;
-    private final Boolean before;
+    private final @NotNull Boolean before;
 
-    public VisionCreativeOrder(@Nullable ItemStack itemStack, ItemStack targetItemStack, Boolean before) {
+    public VisionCreativeOrder(@Nullable ItemStack itemStack, ItemStack targetItemStack, @NotNull Boolean before) {
         this.itemStack = itemStack;
         this.targetItemStack = targetItemStack;
         this.before = before;
@@ -27,7 +28,7 @@ public class VisionCreativeOrder {
         return targetItemStack;
     }
 
-    public Boolean isBefore() {
+    public @NotNull Boolean isBefore() {
         return before;
     }
 }

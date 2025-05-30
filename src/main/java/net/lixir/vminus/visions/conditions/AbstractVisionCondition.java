@@ -91,5 +91,4 @@ public abstract class AbstractVisionCondition {
             throw new JsonParseException(conditionObject + " has no defined value string.");
         return conditionObject.getAsJsonPrimitive(valueName);
     }
-
 }

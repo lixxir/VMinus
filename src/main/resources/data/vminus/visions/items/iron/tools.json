@@ -1,0 +1,11 @@
+{
+  "tag": "vminus:tools/iron",
+  "attribute": [
+    {
+      "id": "vminus:mining_speed",
+      "value": 12,
+      "replace": true
+    }
+  ],
+  "max_damage": 712
+}

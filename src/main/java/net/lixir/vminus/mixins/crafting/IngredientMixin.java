@@ -4,8 +4,12 @@ import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionItemReplacement;
 import net.lixir.vminus.visions.util.VisionUtil;
 import net.lixir.vminus.visions.ItemVision;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,6 +25,7 @@ public abstract class IngredientMixin {
     @Unique
     private final Ingredient vminus$ingredient = (Ingredient) (Object) this;
 
+    /*
     @Inject(method = "test*", at = @At("HEAD"), cancellable = true)
     public void vminus$test(@Nullable ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
         IngredientAccessor accessor = (IngredientAccessor) vminus$ingredient;
@@ -36,6 +41,10 @@ public abstract class IngredientMixin {
         cir.setReturnValue(VisionUtil.matchesIngredient(itemStack, accessor.getValues()));
     }
 
+     */
+
+
+
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
     public void vminus$getItems(CallbackInfoReturnable<ItemStack[]> cir) {
         List<ItemStack> replacedItems = new ArrayList<>();
@@ -44,9 +53,24 @@ public abstract class IngredientMixin {
         for (Ingredient.Value value : accessor.getValues()) {
             for (ItemStack stack : value.getItems()) {
                 VisionItemReplacement visionItemReplacement = ItemVision.of(stack).replace.value(new VisionConditionArguments(stack));
-                ItemStack replacementStack = visionItemReplacement != null ? visionItemReplacement.itemStack() : ItemStack.EMPTY;
-                Boolean banned = visionItemReplacement != null ? ItemVision.of(stack).ban.value(new VisionConditionArguments(stack)) : null;
-                if (replacementStack != null && !replacementStack.isEmpty()) {
+                if (visionItemReplacement == null)
+                    continue;
+                TagKey<Item> tagKey = visionItemReplacement.tag();
+                ItemStack replacementStack = visionItemReplacement.itemStack();
+                Boolean banned = ItemVision.of(stack).ban.value(new VisionConditionArguments(stack));
+                if (tagKey != null ) {
+                    var tagCollection = ForgeRegistries.ITEMS.tags();
+                    if (tagCollection == null)
+                        continue;
+                    ITag<Item> tag = tagCollection.getTag(tagKey);
+                    if (tag.isEmpty())
+                        continue;
+                    List<Item> itemList = tag.stream().toList();
+                    for (Item item : itemList) {
+                        changed = true;
+                        replacedItems.add(item.getDefaultInstance());
+                    }
+                } else if (replacementStack != null && !replacementStack.isEmpty()) {
                     changed = true;
                     replacedItems.add(replacementStack);
                 } else if ((banned == null || !banned)) {

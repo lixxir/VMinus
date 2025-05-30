@@ -1,28 +1,28 @@
 package net.lixir.vminus.visions.values;
 
-public class VisionConstant<V> {
-    private V v = null;
-    private boolean set = false;
-    private int priority = 0;
+import javax.annotation.Nullable;
 
-    public V getValue() {
-        return v;
+public class VisionConstant<V> {
+    private V value = null;
+    private short priority = 0;
+
+    public @Nullable V getValue() {
+        return value;
     }
 
     public void setValue(V v) {
-        this.v = v;
-        this.set = true;
+        this.value = v;
     }
 
     public boolean isSet() {
-        return set;
+        return value != null;
     }
 
-    public int getPriority() {
+    public short getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(short priority) {
         this.priority = priority;
     }
 }

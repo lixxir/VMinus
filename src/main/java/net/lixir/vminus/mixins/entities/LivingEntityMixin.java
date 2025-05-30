@@ -1,36 +1,69 @@
 package net.lixir.vminus.mixins.entities;
 
-import com.google.gson.JsonObject;
-import net.lixir.vminus.registry.Traits;
+import net.lixir.vminus.item.trait.ItemTraits;
 import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.util.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
-import net.minecraft.core.particles.ParticleTypes;
+import net.lixir.vminus.visions.EffectVision;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityDimensions;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ConcurrentModificationException;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
-    @Shadow protected abstract int increaseAirSupply(int p_21307_);
+public abstract class LivingEntityMixin extends Entity implements VariantEntity {
+    public LivingEntityMixin(EntityType<?> p_19870_, Level p_19871_) {
+        super(p_19870_, p_19871_);
+    }
+
+    @Unique
+    private ResourceLocation vminus$variantTexture = null;
+
+    @Unique
+    private ResourceLocation vminus$variantName = null;
+
+    @Override
+    public void vminus$setVariant(@Nullable ResourceLocation name, @Nullable ResourceLocation texture) {
+        if (name != null && name.getPath().isEmpty()) {
+            vminus$variantName = null;
+        } else {
+            vminus$variantName = name;
+        }
+        if (texture != null && texture.getPath().isEmpty()) {
+            vminus$variantTexture = null;
+        } else {
+            vminus$variantTexture = texture;
+        }
+    }
+
+    @Override
+    public @Nullable ResourceLocation vminus$getVariantTexture() {
+        return vminus$variantTexture;
+    }
+
+    @Override
+    public @Nullable ResourceLocation vminus$getVariantName() {
+        return vminus$variantName;
+    }
 
     @Unique
     private final LivingEntity vminus$entity = (LivingEntity) (Object) this;
@@ -48,6 +81,20 @@ public abstract class LivingEntityMixin {
                 cir.setReturnValue(customLoot);
             }
         }
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    public void vminus$addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
+        compoundTag.putString("VariantTexture",  vminus$variantTexture == null ? "null" : vminus$variantTexture.toString());
+        compoundTag.putString("VariantName", vminus$variantName == null ? "null" : vminus$variantName.toString());
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    public void vminus$readAdditionalSaveDataCompoundTag(CompoundTag compoundTag, CallbackInfo ci) {
+        if (compoundTag.contains("VariantName"))
+            vminus$variantName = compoundTag.getString("VariantName").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantName"));
+        if (compoundTag.contains("VariantTexture"))
+            vminus$variantTexture = compoundTag.getString("VariantTexture").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantTexture"));
     }
 
     @Inject(method = "getJumpBoostPower", at = @At("RETURN"), cancellable = true)
@@ -92,6 +139,12 @@ public abstract class LivingEntityMixin {
     private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
         cir.getReturnValue().add(VMinusAttributes.WIDTH.get());
         cir.getReturnValue().add(VMinusAttributes.HEIGHT.get());
+        cir.getReturnValue().add(VMinusAttributes.PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.FALL_PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.FIRE_PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.BLUNT_PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.BLAST_PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.MAGIC_PROTECTION.get());
     }
 
 
@@ -100,85 +153,49 @@ public abstract class LivingEntityMixin {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {
                 ItemStack armorPiece = vminus$entity.getItemBySlot(slot);
-                if (Traits.hasTrait(armorPiece, Traits.INSULATED.get())) {
-                    cir.setReturnValue(Traits.getTrait(armorPiece, Traits.INSULATED.get()));
+                if (ItemTraits.hasTrait(armorPiece, ItemTraits.INSULATED.get())) {
+                    cir.setReturnValue(ItemTraits.getTrait(armorPiece, ItemTraits.INSULATED.get()));
                     return;
                 }
             }
         }
     }
 
+    @Redirect(
+            method = "tickEffects",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+            )
+    )
+    private void vminus$tickEffects(Level level, ParticleOptions original, double x, double y, double z, double dx, double dy, double dz) {
 
-    @Inject(method = "tickEffects", at = @At("HEAD"), cancellable = true)
-    private void tickEffects(CallbackInfo ci) {
-        /*
-        LivingEntityAccessor accessor = (LivingEntityAccessor) vminus$entity;
-        Iterator<MobEffect> iterator = accessor.getActiveEffects().keySet().iterator();
-        try {
-            while (iterator.hasNext()) {
-                MobEffect mobeffect = iterator.next();
-                MobEffectInstance mobeffectinstance = accessor.getActiveEffects().get(mobeffect);
-                if (!mobeffectinstance.tick(vminus$entity, () -> {
-                    accessor.callOnEffectUpdated(mobeffectinstance, true, null);
-                })) {
-                    if (!vminus$entity.level().isClientSide) {
-                        iterator.remove();
-                        accessor.callOnEffectRemoved(mobeffectinstance);
+        List<MobEffectInstance> effects = vminus$entity.getActiveEffects().stream().toList();
+        List<ParticleType<?>> customParticles = new ArrayList<>();
+
+        for (MobEffectInstance instance : effects) {
+            MobEffect effect = instance.getEffect();
+            EffectVision vision = EffectVision.of(effect);
+
+            if (vision.particle != null) {
+                ParticleType<?> particleType = vision.particle.value(new VisionConditionArguments(effect));
+
+                if (particleType != null) {
+                    for (int i = 0; i < 1; i++) {
+                        customParticles.add(particleType);
                     }
-                } else if (mobeffectinstance.getDuration() % 600 == 0) {
-                    accessor.callOnEffectUpdated(mobeffectinstance, false, null);
-                }
-            }
-        } catch (ConcurrentModificationException ignored) {
-        }
-        if (accessor.isEffectsDirty()) {
-            if (!vminus$entity.level().isClientSide) {
-                accessor.callUpdateInvisibilityStatus();
-                accessor.callUpdateGlowingStatus();
-            }
-            accessor.setEffectsDirty(false);
-        }
-        int i = -1;
-        boolean flag1 = false;
-
-        for (MobEffectInstance effectInstance : accessor.getActiveEffects().values()) {
-            if (!effectInstance.getEffect().isInstantenous()) {
-                JsonObject visionData = Visions.getData(effectInstance.getEffect());
-                if (visionData == null || !visionData.has("particle")) {
-                    i = effectInstance.getEffect().getColor();
-                    flag1 = effectInstance.getEffect().getCategory() == MobEffectCategory.BENEFICIAL;
-                    break;
                 }
             }
         }
-
-        if (i > 0) {
-            Random random = new Random(System.nanoTime());
-            boolean flag = random.nextBoolean();
-
-            if (flag1) {
-                flag &= random.nextInt(8) == 0;
-            }
-
-            if (flag && i > 0) {
-                double d0 = (double) (i >> 16 & 255) / 255.0D;
-                double d1 = (double) (i >> 8 & 255) / 255.0D;
-                double d2 = (double) (i >> 0 & 255) / 255.0D;
-                vminus$entity.level().addParticle(flag1 ? ParticleTypes.AMBIENT_ENTITY_EFFECT : ParticleTypes.ENTITY_EFFECT,
-                        vminus$entity.getRandomX(0.5D), vminus$entity.getRandomY(), vminus$entity.getRandomZ(0.5D), d0, d1, d2);
-            }
+        if (customParticles.isEmpty()) {
+            level.addParticle(original, x, y, z, dx, dy, dz);
+        } else {
+            ParticleOptions chosen = (ParticleOptions) customParticles.get(vminus$entity.getRandom().nextInt(customParticles.size()));
+            dx = ((random.nextFloat() * 2) - 1f) * 0.3;
+            dy = (random.nextFloat() * 0.2) + 0.1;
+            dz = ((random.nextFloat() * 2) - 1f) * 0.3;
+            level.addParticle(chosen, x, y, z, dx, dy, dz);
         }
-        ci.cancel();
-    }
-
-    @Inject(method = "isSensitiveToWater", at = @At("RETURN"), cancellable = true)
-    private void isSensitiveToWater(CallbackInfoReturnable<Boolean> cir) {
-        /*
-        if (VisionProperties.searchElement(VisionProperties.Names.WATER_SENSITIVE, vminus$entity) != null)
-            cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.WATER_SENSITIVE, vminus$entity, cir.getReturnValue()));
-
-         */
-
     }
 
     @Inject(method = "canBreatheUnderwater", at = @At("RETURN"), cancellable = true)

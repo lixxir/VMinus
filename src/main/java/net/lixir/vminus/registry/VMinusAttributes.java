@@ -49,6 +49,6 @@ public class VMinusAttributes {
 
 
     private static RegistryObject<Attribute> register(String name, double defaultValue, double minimumValue, double maximumValue) {
-        return ATTRIBUTES.register(name, () -> new RangedAttribute("attribute." + VMinus.ID + ".name.generic." + name, defaultValue, minimumValue, maximumValue).setSyncable(true));
+        return ATTRIBUTES.register(name, () -> new RangedAttribute("attribute." + VMinus.ID + ".name." + name, defaultValue, minimumValue, maximumValue).setSyncable(true));
     }
 }

@@ -1,13 +1,13 @@
 package net.lixir.vminus.visions.resources.managers;
 
-import net.lixir.vminus.visions.VisionType;
+import net.lixir.vminus.visions.util.VisionType;
 import net.lixir.vminus.visions.resources.VisionProcessor;
 import net.lixir.vminus.visions.resources.VisionDeserializer;
 import net.lixir.vminus.visions.values.VisionValue;
 import net.lixir.vminus.visions.BlockVision;
 import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.IBlockVisionAccessor;
-import net.lixir.vminus.visions.accessors.IItemVisionAccessor;
+import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
+import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.ICondition;
@@ -33,16 +33,16 @@ public class ItemVisionManager extends VisionManager<ItemVision> {
                     copyVision.merge(vision);
                 }
             }
-            if (item instanceof IItemVisionAccessor itemVisionable) {
-                itemVisionable.vminus$setVision(copyVision);
+            if (item instanceof ItemVisionAccessor itemVisionable) {
+                itemVisionable.vminus$mergeVision(copyVision);
                 if (Boolean.TRUE.equals(copyVision.ban.value())) {
                     Block block = ForgeRegistries.BLOCKS.getValue(ForgeRegistries.ITEMS.getKey(item));
                     if (block == null)
-                        return;
-                    if (block instanceof IBlockVisionAccessor blockVisionable) {
+                        continue;
+                    if (block instanceof BlockVisionAccessor blockVisionable) {
                         BlockVision blockVision = new BlockVision();
                         blockVision.ban.add(new VisionValue<>(true, List.of()));
-                        blockVisionable.vminus$setVision(blockVision);
+                        blockVisionable.vminus$mergeVision(blockVision);
                     }
                 }
             }

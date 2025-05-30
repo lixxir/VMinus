@@ -1,86 +1,88 @@
 package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
+import net.lixir.vminus.item.trait.ItemTraits;
+import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.visions.ItemVision;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionAttribute;
 import net.lixir.vminus.visions.util.VisionTrait;
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.IItemVisionAccessor;
-import net.lixir.vminus.registry.Traits;
-import net.lixir.vminus.registry.VMinusAttributes;
-import net.lixir.vminus.world.Trait;
+import net.lixir.vminus.item.trait.ItemTrait;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Equipable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import java.util.*;
 
 @Mod.EventBusSubscriber
 public class ItemAttributeEventHandler {
-    private static final ConcurrentHashMap<String, UUID> UUID_CACHE = new ConcurrentHashMap<>();
-
     @SubscribeEvent
     public static void addAttributeModifier(ItemAttributeModifierEvent event) {
         ItemStack itemStack = event.getItemStack();
         Item item = itemStack.getItem();
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
-        if (item instanceof IItemVisionAccessor iVisionable) {
-            ItemVision itemVision = iVisionable.vminus$getVision();
-            List<VisionAttribute> visionAttributes = itemVision.attribute.values(new VisionConditionArguments(itemStack));
-            List<VisionTrait> visionTraits = itemVision.trait.values(new VisionConditionArguments(itemStack));
 
-            for (VisionAttribute visionAttribute : visionAttributes) {
-                boolean replace = visionAttribute.replace();
-                boolean remove = visionAttribute.remove();
-
-                if (replace || remove) {
-                    Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
-                    for (Attribute a : originalModifiers.keySet()) {
-                        for (AttributeModifier modifier : originalModifiers.get(a)) {
-                            String modifierId = Objects.requireNonNull(ForgeRegistries.ATTRIBUTES.getKey(a)).toString();
-                            if (modifierId.equals(visionAttribute.id())) {
-                                event.removeModifier(a, modifier);
-                            }
+        ItemVision itemVision = ItemVision.of(item);
+        List<VisionAttribute> visionAttributes = itemVision.attribute.values(new VisionConditionArguments(itemStack));
+        List<VisionTrait> visionTraits = itemVision.trait.values(new VisionConditionArguments(itemStack));
+        for (VisionAttribute visionAttribute : visionAttributes) {
+            boolean replace = visionAttribute.replace();
+            boolean remove = visionAttribute.remove();
+            if (replace || remove) {
+                Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
+                for (Attribute a : originalModifiers.keySet()) {
+                    for (AttributeModifier modifier : originalModifiers.get(a)) {
+                        String modifierId = Objects.requireNonNull(ForgeRegistries.ATTRIBUTES.getKey(a)).toString();
+                        if (modifierId.equals(visionAttribute.id())) {
+                            event.removeModifier(a, modifier);
                         }
                     }
-                    if (remove)
-                        continue;
                 }
-                EquipmentSlot equipmentSlot = visionAttribute.equipmentSlot();
-                if (equipmentSlot == null) {
-                    if (item instanceof Equipable equipable) {
-                        equipmentSlot = equipable.getEquipmentSlot();
-                    } else {
-                        equipmentSlot = EquipmentSlot.MAINHAND;
-                    }
+            }
+        }
+
+        for (VisionAttribute visionAttribute : visionAttributes) {
+            boolean remove = visionAttribute.remove();
+            if (remove)
+                continue;
+            EquipmentSlot equipmentSlot = visionAttribute.equipmentSlot();
+            if (equipmentSlot == null) {
+                if (item instanceof Equipable equipable) {
+                    equipmentSlot = equipable.getEquipmentSlot();
+                } else {
+                    equipmentSlot = EquipmentSlot.MAINHAND;
                 }
-                if (eventSlot == equipmentSlot) {
+            }
+            if (eventSlot == equipmentSlot ) {
+
                     if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED.get()))
                         miningFlag = true;
+                    event.removeModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
                     event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
-                }
-            }
 
-            for (VisionTrait visionTrait : visionTraits) {
-                Trait trait = visionTrait.trait();
-                boolean value = visionTrait.value();
-                if (!Traits.hasTrait(itemStack, trait))
-                    Traits.setTrait(itemStack, trait, value);
             }
-
         }
+
+        for (VisionTrait visionTrait : visionTraits) {
+            ItemTrait itemTrait = visionTrait.itemTrait();
+            boolean value = visionTrait.value();
+            if (!ItemTraits.hasTrait(itemStack, itemTrait))
+                ItemTraits.setTrait(itemStack, itemTrait, value);
+        }
+
 
         if (eventSlot == EquipmentSlot.MAINHAND) {
 
@@ -104,15 +106,5 @@ public class ItemAttributeEventHandler {
                 event.addModifier(VMinusAttributes.MINING_SPEED.get(), tierMiningSpeedModifier);
             }
         }
-    }
-
-    private static AttributeModifier.@NotNull Operation getOperation(String operationId) {
-        if (operationId == null)
-            return AttributeModifier.Operation.ADDITION;
-        return switch (operationId) {
-            case "multiply_base" -> AttributeModifier.Operation.MULTIPLY_BASE;
-            case "multiply_total" -> AttributeModifier.Operation.MULTIPLY_TOTAL;
-            default -> AttributeModifier.Operation.ADDITION;
-        };
     }
 }

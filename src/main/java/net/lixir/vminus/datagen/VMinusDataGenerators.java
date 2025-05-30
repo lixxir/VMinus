@@ -1,13 +1,11 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
+import net.lixir.vminus.datagen.util.VItemModelProvider;
+import net.lixir.vminus.datagen.util.loottable.VBlockLootTables;
 import net.lixir.vminus.datagen.util.loottable.VLootTableProvider;
 import net.lixir.vminus.datagen.util.VBlockStateProvider;
 import net.lixir.vminus.datagen.util.VRecipeProvider;
-import net.lixir.vminus.datagen.util.simple.DatagenRegistry;
-import net.lixir.vminus.datagen.util.simple.OreDatagen;
-import net.lixir.vminus.registry.VMinusBlocks;
-import net.lixir.vminus.registry.VMinusItems;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -35,8 +33,12 @@ public class VMinusDataGenerators {
         ).contentsGetter();
 
         generator.addProvider(event.includeClient(), new VBlockStateProvider(packOutput, existingFileHelper, VMinus.ID));
-        generator.addProvider(event.includeServer(), VLootTableProvider.create(packOutput, VMinus.ID));
-
+        generator.addProvider(event.includeClient(), new VItemModelProvider(packOutput, existingFileHelper, VMinus.ID));
+     //   generator.addProvider(event.includeServer(), VLootTableProvider.create(packOutput, () -> new VBlockLootTables(VMinus.ID)));
+        generator.addProvider(
+                event.includeServer(),
+                new VMinusEntityTypeTagGenerator(packOutput, lookupProvider, existingFileHelper)
+        );
         generator.addProvider(
                 event.includeServer(),
                 new VMinusItemTagGenerator(packOutput, lookupProvider, blockTagLookup, existingFileHelper)
@@ -45,5 +47,6 @@ public class VMinusDataGenerators {
                 event.includeServer(),
                 new VRecipeProvider(packOutput, VMinus.ID)
         );
+        generator.addProvider(event.includeClient(), new VMinusLangProvider(packOutput, "en_us"));
     }
 }
