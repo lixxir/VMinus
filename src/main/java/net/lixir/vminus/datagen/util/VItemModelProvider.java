@@ -34,7 +34,7 @@ public class VItemModelProvider extends ItemModelProvider {
             switch (model) {
                 case HANDHELD -> handheld(item);
                 case PANE -> pane((BlockItem) item);
-                case BASIC -> basic(item);
+                case BASIC -> basic(item, itemEntry);
                 case PARENT_BLOCK -> withBlockParent((BlockItem) item);
                 case DOUBLE_PANE -> doublePane((BlockItem) item);
             }
@@ -61,10 +61,10 @@ public class VItemModelProvider extends ItemModelProvider {
                 .texture("layer0", new ResourceLocation(modId, "item/" + id.getPath()));
     }
 
-    protected ItemModelBuilder basic(Item item) {
+    protected ItemModelBuilder basic(Item item, ItemEntry itemEntry) {
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
         String path;
-        if (item instanceof BlockItem) {
+        if (itemEntry.isFromBlock()) {
             path = "block/" + id.getPath();
         } else {
             path = "item/" + id.getPath();

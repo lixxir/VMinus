@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.item.trait.ItemTraits;
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.lixir.vminus.util.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
 import net.lixir.vminus.visions.EffectVision;
@@ -100,8 +100,8 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
     @Inject(method = "getJumpBoostPower", at = @At("RETURN"), cancellable = true)
     public void getJumpBoostPower(CallbackInfoReturnable<Float> cir) {
         float increase = 0;
-        if (vminus$entity.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST.get()))
-            increase += (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST.get()) * 0.15f;
+        if (vminus$entity.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST))
+            increase += (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST) * 0.15f;
         if (increase != 0)
             cir.setReturnValue((cir.getReturnValue() * increase) * SizeAttributeUtil.getHeight(vminus$entity) * 0.2f);
     }
@@ -137,14 +137,14 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
 
     @Inject(method = "createLivingAttributes", at = @At("RETURN"))
     private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
-        cir.getReturnValue().add(VMinusAttributes.WIDTH.get());
-        cir.getReturnValue().add(VMinusAttributes.HEIGHT.get());
-        cir.getReturnValue().add(VMinusAttributes.PROTECTION.get());
-        cir.getReturnValue().add(VMinusAttributes.FALL_PROTECTION.get());
-        cir.getReturnValue().add(VMinusAttributes.FIRE_PROTECTION.get());
-        cir.getReturnValue().add(VMinusAttributes.BLUNT_PROTECTION.get());
-        cir.getReturnValue().add(VMinusAttributes.BLAST_PROTECTION.get());
-        cir.getReturnValue().add(VMinusAttributes.MAGIC_PROTECTION.get());
+        cir.getReturnValue().add(VMinusAttributes.WIDTH);
+        cir.getReturnValue().add(VMinusAttributes.HEIGHT);
+        cir.getReturnValue().add(VMinusAttributes.PROTECTION);
+        cir.getReturnValue().add(VMinusAttributes.FALL_PROTECTION);
+        cir.getReturnValue().add(VMinusAttributes.FIRE_PROTECTION);
+        cir.getReturnValue().add(VMinusAttributes.BLUNT_PROTECTION);
+        cir.getReturnValue().add(VMinusAttributes.BLAST_PROTECTION);
+        cir.getReturnValue().add(VMinusAttributes.MAGIC_PROTECTION);
     }
 
 

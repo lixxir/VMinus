@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -31,7 +31,7 @@ public abstract class DiggerItemMixin {
         for (Attribute attribute : modifiers.keySet()) {
             Collection<AttributeModifier> attributeModifiers = modifiers.get(attribute);
             for (AttributeModifier modifier : attributeModifiers) {
-                if (attribute == VMinusAttributes.MINING_SPEED.get()) {
+                if (attribute == VMinusAttributes.MINING_SPEED) {
                     newSpeed += (float) modifier.getAmount();
                 }
             }

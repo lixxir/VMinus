@@ -2,9 +2,9 @@ package net.lixir.vminus.datagen.util;
 
 import net.lixir.vminus.mixins.client.RenderStateShardAccessor;
 import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.BlockEntryAccessor;
 import net.lixir.vminus.registry.TintType;
 import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.registry.entry.BlockEntryAccessor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;

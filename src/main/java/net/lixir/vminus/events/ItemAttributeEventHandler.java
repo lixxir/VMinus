@@ -2,7 +2,7 @@ package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
 import net.lixir.vminus.item.trait.ItemTraits;
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.lixir.vminus.visions.ItemVision;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionAttribute;
@@ -44,6 +44,8 @@ public class ItemAttributeEventHandler {
             if (replace || remove) {
                 Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
                 for (Attribute a : originalModifiers.keySet()) {
+                    if (a.equals(VMinusAttributes.MINING_SPEED))
+                        miningFlag = true;
                     for (AttributeModifier modifier : originalModifiers.get(a)) {
                         String modifierId = Objects.requireNonNull(ForgeRegistries.ATTRIBUTES.getKey(a)).toString();
                         if (modifierId.equals(visionAttribute.id())) {
@@ -68,7 +70,7 @@ public class ItemAttributeEventHandler {
             }
             if (eventSlot == equipmentSlot ) {
 
-                    if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED.get()))
+                    if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED))
                         miningFlag = true;
                     event.removeModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
                     event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
@@ -97,13 +99,13 @@ public class ItemAttributeEventHandler {
         if (efficiencyLevel > 0) {
             double miningSpeedValue = efficiencyLevel * efficiencyLevel + 1;
             AttributeModifier miningSpeedModifier = new AttributeModifier(UUID.fromString("83e34d00-65ae-11ef-814d-325096b39f47"), "Efficiency Mining Speed", miningSpeedValue, AttributeModifier.Operation.ADDITION);
-            event.addModifier(VMinusAttributes.MINING_SPEED.get(), miningSpeedModifier);
+            event.addModifier(VMinusAttributes.MINING_SPEED, miningSpeedModifier);
         }
         if (itemStack.getItem() instanceof TieredItem tieredItem) {
             if (!miningFlag) {
                 double tierMiningSpeed = tieredItem.getTier().getSpeed();
                 AttributeModifier tierMiningSpeedModifier = new AttributeModifier(UUID.fromString("e14d7c20-65ae-11ef-814d-325096b39f47"), "Tier Mining Speed", tierMiningSpeed, AttributeModifier.Operation.ADDITION);
-                event.addModifier(VMinusAttributes.MINING_SPEED.get(), tierMiningSpeedModifier);
+                event.addModifier(VMinusAttributes.MINING_SPEED, tierMiningSpeedModifier);
             }
         }
     }

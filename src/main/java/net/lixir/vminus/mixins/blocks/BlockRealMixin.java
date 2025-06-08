@@ -6,6 +6,7 @@ import net.lixir.vminus.registry.entry.RegistryEntryDefaults;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.BlockVision;
 import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
+import net.lixir.vminus.visions.util.VisionUtil;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -18,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Block.class)
-public class BlockRealMixin implements BlockVisionAccessor, BlockEntryAccessor, RegistryEntryDefaults<BlockEntry> {
+public class BlockRealMixin implements BlockVisionAccessor, BlockEntryAccessor, RegistryEntryDefaults<BlockEntry, Block> {
     @Unique
     private final Block vminus$block = (Block) (Object) this;
 
@@ -30,29 +31,27 @@ public class BlockRealMixin implements BlockVisionAccessor, BlockEntryAccessor, 
 
     @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
     private void getSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().speed_boost.value(new VisionConditionArguments(vminus$block));
-        if (value != null) cir.setReturnValue(value);
+        VisionUtil.tryOverride(cir, vminus$getVision().speed_boost, new VisionConditionArguments(vminus$block));
     }
 
     @Inject(method = "getFriction", at = @At("RETURN"), cancellable = true)
     private void getFriction(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().friction.value(new VisionConditionArguments(vminus$block));
-        if (value != null) cir.setReturnValue(value);
+        VisionUtil.tryOverride(cir, vminus$getVision().friction, new VisionConditionArguments(vminus$block));
     }
 
     @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
     private void getJumpFactor(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().jump_boost.value(new VisionConditionArguments(vminus$block));
-        if (value != null) cir.setReturnValue(value);
+        VisionUtil.tryOverride(cir, vminus$getVision().jump_boost, new VisionConditionArguments(vminus$block));
     }
 
     @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
     private void getExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        Float value = vminus$getVision().blast_resistance.value(new VisionConditionArguments(vminus$block));
-        if (value != null) cir.setReturnValue(value);
+        VisionUtil.tryOverride(cir, vminus$getVision().blast_resistance, new VisionConditionArguments(vminus$block));
     }
+
+    @SuppressWarnings("deprecation")
     @Inject(method = "getSoundType", at = @At("RETURN"), cancellable = true)
-    private void getSoundType(BlockState state, CallbackInfoReturnable<SoundType> cir) {
+    private void getSoundType(BlockState state, @NotNull CallbackInfoReturnable<SoundType> cir) {
         SoundType original = cir.getReturnValue();
         SoundType override = vminus$getVision().sound.value(new VisionConditionArguments(vminus$block));
 

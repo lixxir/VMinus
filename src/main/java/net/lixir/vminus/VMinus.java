@@ -2,7 +2,7 @@ package net.lixir.vminus;
 
 import net.lixir.vminus.item.VMinusItems;
 import net.lixir.vminus.item.trait.ItemTraits;
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.lixir.vminus.block.VMinusBlocks;
 import net.lixir.vminus.registry.VMinusSounds;
 import net.lixir.vminus.registry.UnifiedRegistry;
@@ -31,6 +31,8 @@ public class VMinus {
     public static final UnifiedRegistry REGISTRY = UnifiedRegistry.create(ID, reg -> {
         VMinusBlocks.init();
         VMinusItems.init();
+        VMinusSounds.init();
+        VMinusAttributes.init();
     });
 
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
@@ -38,8 +40,6 @@ public class VMinus {
     public VMinus() {
         MinecraftForge.EVENT_BUS.register(this);
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        VMinusSounds.SOUNDS.register(bus);
-        VMinusAttributes.ATTRIBUTES.register(bus);
         ItemTraits.TRAITS.register(bus);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
     }

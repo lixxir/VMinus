@@ -2,6 +2,7 @@ package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.datagen.util.VItemModelProvider;
+import net.lixir.vminus.datagen.util.VSoundDefinitionProvider;
 import net.lixir.vminus.datagen.util.loottable.VBlockLootTables;
 import net.lixir.vminus.datagen.util.loottable.VLootTableProvider;
 import net.lixir.vminus.datagen.util.VBlockStateProvider;
@@ -31,7 +32,7 @@ public class VMinusDataGenerators {
                 event.includeServer(),
                 new VMinusBlockTagGenerator(packOutput, lookupProvider, existingFileHelper)
         ).contentsGetter();
-
+        generator.addProvider(event.includeClient(), new VSoundDefinitionProvider(packOutput, existingFileHelper, VMinus.ID));
         generator.addProvider(event.includeClient(), new VBlockStateProvider(packOutput, existingFileHelper, VMinus.ID));
         generator.addProvider(event.includeClient(), new VItemModelProvider(packOutput, existingFileHelper, VMinus.ID));
      //   generator.addProvider(event.includeServer(), VLootTableProvider.create(packOutput, () -> new VBlockLootTables(VMinus.ID)));

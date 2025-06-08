@@ -6,12 +6,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
 
-public class LogBlock extends RotatedPillarBlock implements RegistryEntryDefaults<BlockEntry> {
+public class LogBlock extends RotatedPillarBlock implements RegistryEntryDefaults<BlockEntry, Block> {
     public LogBlock(Properties pProperties) {
         super(pProperties);
     }

@@ -1,9 +1,16 @@
 package net.lixir.vminus.datagen.util;
 
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.mixins.SoundDefinitionAccessor;
+import net.lixir.vminus.mixins.SoundDefinitionSoundAccessor;
+import net.lixir.vminus.mixins.SoundDefinitionsProviderAccessor;
 import net.lixir.vminus.registry.SoundDefinitionInfo;
 import net.lixir.vminus.registry.UnifiedRegistry;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.SoundDefinition;
 import net.minecraftforge.common.data.SoundDefinitionsProvider;
@@ -11,13 +18,20 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
-    private final String modId;
+    protected final PackOutput output;
+    protected final String modId;
+    protected final ExistingFileHelper helper;
 
-    public VSoundDefinitionProvider(PackOutput output, String modId, ExistingFileHelper helper) {
+    public VSoundDefinitionProvider(PackOutput output, ExistingFileHelper helper, String modId) {
         super(output, modId, helper);
+        this.output = output;
         this.modId = modId;
+
+        this.helper = helper;
     }
 
     public String getModId() {
@@ -92,5 +106,75 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
         return definition()
                 .with(sound(new ResourceLocation(modId, soundPath)));
     }
+
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache) {
+        var accessor = (SoundDefinitionsProviderAccessor) this;
+        Map<String, SoundDefinition> sounds = accessor.getSoundList();
+        sounds.clear();
+        this.registerSounds();
+
+        List<String> notValid = sounds.entrySet().stream()
+                .filter(entry -> !validateCustom(entry.getKey(), entry.getValue()))
+                .map(Map.Entry::getKey)
+                .map(key -> this.getModId() + ":" + key)
+                .toList();
+
+        if (!notValid.isEmpty()) {
+            throw new IllegalStateException("Invalid sound events: " + notValid);
+        }
+
+        if (!sounds.isEmpty()) {
+            return DataProvider.saveStable(
+                    cache,
+                    accessor.invokeMapToJson(sounds),
+                    output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
+                            .resolve(this.getModId())
+                            .resolve("sounds.json")
+            );
+        }
+
+        return CompletableFuture.allOf();
+    }
+
+    private boolean validateCustom(String name, SoundDefinition def) {
+        var accessor = (SoundDefinitionAccessor) (Object) def;
+        assert accessor != null;
+        return accessor.getSoundList().stream().allMatch(sound -> validateSoundAllowingOpus(name, sound));
+    }
+
+    private boolean validateSoundAllowingOpus(String soundEventName, SoundDefinition.Sound sound) {
+        var accessor = (SoundDefinitionSoundAccessor) (Object) sound;
+        assert accessor != null;
+        return switch (accessor.getType()) {
+            case SOUND -> {
+                ResourceLocation location = accessor.getName();
+
+                boolean ogg = soundFileExists(location, ".ogg");
+                boolean opus = soundFileExists(location, ".opus");
+
+                if (!ogg && !opus) {
+                    VMinus.LOGGER.warn("Missing sound for '{}': {}.ogg or {}.opus not found",
+                            soundEventName, location, location);
+                    yield false;
+                }
+
+                yield true;
+            }
+            case EVENT -> ForgeRegistries.SOUND_EVENTS.containsKey(accessor.getName());
+        };
+    }
+
+
+    private boolean soundFileExists(ResourceLocation name, String extension) {
+        return helper.exists(
+                name,
+                PackType.CLIENT_RESOURCES,
+                extension,
+                "sounds"
+        );
+    }
+
+
 
 }

@@ -1,8 +1,8 @@
 package net.lixir.vminus.datagen.util;
 
 import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.BlockEntryAccessor;
 import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.registry.entry.BlockEntryAccessor;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.TagKey;

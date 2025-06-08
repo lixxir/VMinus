@@ -1,13 +1,16 @@
 package net.lixir.vminus.mixins.items;
 
 import net.lixir.vminus.item.MaxDurationGetter;
+import net.lixir.vminus.registry.entry.BlockEntry;
 import net.lixir.vminus.registry.entry.ItemEntry;
 import net.lixir.vminus.registry.entry.ItemEntryAccessor;
+import net.lixir.vminus.registry.entry.RegistryEntryDefaults;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionFoodProperties;
 import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
 import net.lixir.vminus.visions.ItemVision;
 import net.lixir.vminus.visions.util.VisionUtil;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDurationGetter {
-
+public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDurationGetter, RegistryEntryDefaults<ItemEntry, Item> {
     @Unique
     private final Item vminus$item = (Item) (Object) this;
 
@@ -32,38 +34,29 @@ public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDura
 
     @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)
     public void getUseAnimation(ItemStack p_41452_, CallbackInfoReturnable<UseAnim> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().use_animation, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().use_animation, new VisionConditionArguments(vminus$item));
     }
 
     @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
     private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
         VisionFoodProperties value = vminus$getVision().food_properties.value(new VisionConditionArguments(vminus$item));
-        if (value != null) cir.setReturnValue(value.mergeFoodProperties(cir.getReturnValue()));
+        if (value != null)
+            cir.setReturnValue(value.mergeFoodProperties(cir.getReturnValue()));
     }
-
 
     @Inject(method = "getMaxStackSize", at = @At("RETURN"), cancellable = true)
     public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().max_stack_size, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().max_stack_size, new VisionConditionArguments(vminus$item));
     }
-
 
     @Inject(method = "isFireResistant", at = @At("RETURN"), cancellable = true)
     public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().fire_resistant, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().fire_resistant, new VisionConditionArguments(vminus$item));
     }
-
-    /*
-    @Inject(method = "isValidRepairItem", at = @At("RETURN"), cancellable = true)
-    public void isValidRepairItem(ItemStack p_41402_, ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
-
-    }
-
-     */
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().use_duration, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().use_duration, new VisionConditionArguments(vminus$item));
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
@@ -75,12 +68,12 @@ public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDura
 
     @Inject(method = "getEnchantmentValue", at = @At("RETURN"), cancellable = true)
     private void getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().enchantability, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().enchantability, new VisionConditionArguments(vminus$item));
     }
 
     @Inject(method = "getRarity", at = @At("RETURN"), cancellable = true)
     private void getRarity(ItemStack itemStack, CallbackInfoReturnable<Rarity> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().rarity, vminus$item);
+        VisionUtil.tryOverride(cir, vminus$getVision().rarity, new VisionConditionArguments(vminus$item));
     }
 
     @Override
@@ -97,8 +90,6 @@ public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDura
             return ItemVision.EMPTY;
         return this.vminus$itemVision;
     }
-
-
 
     @Override
     public void vminus$clearVision() {
@@ -120,6 +111,13 @@ public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDura
     @Override
     public @Nullable ItemEntry vminus$getEntry() {
         return vminus$itemEntry;
+    }
+
+    @Override
+    public ItemEntry vminus$getDefault() {
+        ItemEntry itemEntry = ItemEntry.of();
+        itemEntry.model(ItemEntry.Model.BASIC);
+        return itemEntry;
     }
 
     @Override

@@ -2,7 +2,7 @@ package net.lixir.vminus.events;
 
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.util.AttributeHelper;
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -27,10 +27,10 @@ public class LivingHurtEventHandler {
         float damage = event.getAmount();
 
         List<ProtectionConfig> protectionTypes = List.of(
-                new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/fire")),
-                new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/magic")),
-                new ProtectionConfig(VMinusAttributes.FALL_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/fall")),
-                new ProtectionConfig(VMinusAttributes.BLUNT_PROTECTION.get(), new ResourceLocation(VMinus.ID, "protection/blunt"))
+                new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fire")),
+                new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION, new ResourceLocation(VMinus.ID, "protection/magic")),
+                new ProtectionConfig(VMinusAttributes.FALL_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fall")),
+                new ProtectionConfig(VMinusAttributes.BLUNT_PROTECTION, new ResourceLocation(VMinus.ID, "protection/blunt"))
         );
 
         for (ProtectionConfig protectionConfig : protectionTypes) {

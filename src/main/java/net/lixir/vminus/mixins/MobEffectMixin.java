@@ -2,6 +2,7 @@ package net.lixir.vminus.mixins;
 
 import net.lixir.vminus.visions.EffectVision;
 import net.lixir.vminus.visions.accessors.EffectVisionAccessor;
+import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionUtil;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -22,12 +23,12 @@ public class MobEffectMixin implements EffectVisionAccessor {
 
     @Inject(method = "getColor", at = @At("RETURN"), cancellable = true)
     private void getColor(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().color, vminus$mobEffect);
+        VisionUtil.tryOverride(cir, vminus$getVision().color, new VisionConditionArguments(vminus$mobEffect));
     }
 
     @Inject(method = "getCategory", at = @At("RETURN"), cancellable = true)
     public void getCategory(CallbackInfoReturnable<MobEffectCategory> cir) {
-        VisionUtil.visionOverride(cir, vminus$getVision().category, vminus$mobEffect);
+        VisionUtil.tryOverride(cir, vminus$getVision().category,  new VisionConditionArguments(vminus$mobEffect));
     }
 
     @Override

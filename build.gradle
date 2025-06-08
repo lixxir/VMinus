@@ -84,18 +84,23 @@ minecraft {
 }
 
 repositories {
+    mavenLocal()
     maven {
         name = 'MinecraftForge'
         url = 'https://maven.minecraftforge.net/'
     }
+    mavenCentral()
     maven {
         url = "https://api.modrinth.com/maven"
     }
+
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.3.22'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation 'org.concentus:Concentus:1.0-SNAPSHOT'
+
 }
 
 mixin {

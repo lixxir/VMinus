@@ -1,9 +1,6 @@
 package net.lixir.vminus.registry;
 
-import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.BlockEntryAccessor;
-import net.lixir.vminus.registry.entry.ItemEntry;
-import net.lixir.vminus.registry.entry.ItemEntryAccessor;
+import net.lixir.vminus.registry.entry.*;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -15,6 +12,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
@@ -46,6 +45,7 @@ public class UnifiedRegistry {
     private static final ConcurrentHashMap<String, UnifiedRegistry> REGISTRIES = new ConcurrentHashMap<>();
     private static final ArrayDeque<ParticleProviderRegistration<?>> PARTICLE_PROVIDER_REGISTRATIONS = new ArrayDeque<>();
     private final ArrayDeque<Block> blocks = new ArrayDeque<>();
+    private final ArrayDeque<EntityType<?>> entityTypes = new ArrayDeque<>();
     private final ArrayDeque<SoundEvent> soundEvents = new ArrayDeque<>();
     private final ArrayDeque<Item> items = new ArrayDeque<>();
     private final ArrayDeque<SoundDefinitionInfo> soundDefinitionInfo = new ArrayDeque<>();
@@ -60,10 +60,6 @@ public class UnifiedRegistry {
         return REGISTRIES.values().stream().toList();
     }
 
-    public void setSetup(Consumer<UnifiedRegistry> setup) {
-        this.setup = setup;
-    }
-
     public static UnifiedRegistry fromId(String id) {
         return REGISTRIES.get(id);
     }
@@ -75,7 +71,6 @@ public class UnifiedRegistry {
         registry.setSetup(setup);
         return registry;
     }
-
 
     public static <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<T> provider) {
         PARTICLE_PROVIDER_REGISTRATIONS.add(new ParticleProviderRegistration<>(type, provider));
@@ -89,17 +84,20 @@ public class UnifiedRegistry {
         }
     }
 
-    public void init() {
-        if (setup != null) {
-            setup.accept(this);
-        }
-    }
-
-
     @SuppressWarnings("unchecked")
     private static <T extends ParticleOptions> void register(ParticleProviderRegistration<?> reg, @NotNull RegisterParticleProvidersEvent event) {
         ParticleProviderRegistration<T> casted = (ParticleProviderRegistration<T>) reg;
         event.registerSpriteSet(casted.type, casted.provider);
+    }
+
+    public void setSetup(Consumer<UnifiedRegistry> setup) {
+        this.setup = setup;
+    }
+
+    public void init() {
+        if (setup != null) {
+            setup.accept(this);
+        }
     }
 
     public ArrayDeque<SoundEvent> getSoundEvents() {
@@ -114,47 +112,53 @@ public class UnifiedRegistry {
         return modId;
     }
 
-    public Block block(String name, Block block) {
+    public Block block(@NotNull String name, @NotNull Block block) {
         return block(name, block, BlockEntry.defaults());
     }
 
-    public Item blockItem(Block block) {
-        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
-        String name = resourceLocation.getPath();
-        return item(name, new BlockItem(block, new Item.Properties()), ItemEntry.from(block));
+    public Item blockItem(@NotNull Block block) {
+        return blockItem(null, block, new BlockItem(block, new Item.Properties()), ItemEntry.from(block));
     }
 
-    public Item blockItem(Block block, @Nullable ItemEntry itemEntry) {
-        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
-        String name = resourceLocation.getPath();
-        return item(name, new BlockItem(block, new Item.Properties()), itemEntry);
+    public Item blockItem(@NotNull Block block, @NotNull BlockItem blockItem) {
+        return blockItem(null, block, blockItem, ItemEntry.from(block));
     }
 
-    public Item blockItem(String name, Block block) {
-        return item(name, new BlockItem(block, new Item.Properties()), ItemEntry.from(block));
+    public Item blockItem(@NotNull Block block, @NotNull BlockItem blockItem, @Nullable ItemEntry itemEntry) {
+        return blockItem(null, block, blockItem, itemEntry);
     }
 
-    public Item blockItem(String name, Block block, @Nullable ItemEntry itemEntry) {
-        return item(name, new BlockItem(block, new Item.Properties()), itemEntry);
+    public Item blockItem(@Nullable String name, @NotNull Block block, @NotNull BlockItem blockItem, @Nullable ItemEntry itemEntry) {
+        if (name == null) {
+            ResourceLocation blockKey = BuiltInRegistries.BLOCK.getKey(block);
+            name = blockKey.getPath();
+        }
+        return item(name, blockItem, itemEntry);
     }
 
-    public Item blockItem(BlockItem blockItem) {
+    public Item blockItem(@NotNull Block block, @Nullable ItemEntry itemEntry) {
+        return blockItem(null, block, new BlockItem(block, new Item.Properties()), itemEntry);
+    }
+
+    public Item blockItem(@NotNull String name, @NotNull Block block) {
+        return this.blockItem(name, block, new BlockItem(block, new Item.Properties()), ItemEntry.from(block));
+    }
+
+    public Item blockItem(@NotNull String name, @NotNull Block block, @Nullable ItemEntry itemEntry) {
+        return this.blockItem(name, block, new BlockItem(block, new Item.Properties()), itemEntry);
+    }
+
+    public Item blockItem(@NotNull BlockItem blockItem) {
         Block block = blockItem.getBlock();
-        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
-        String name = resourceLocation.getPath();
-        return this.item(name, blockItem, ItemEntry.from(block));
+        return this.blockItem(null, block, blockItem, ItemEntry.from(block));
     }
 
-    public Item blockItem(BlockItem blockItem, @Nullable ItemEntry itemEntry) {
+    public Item blockItem(@NotNull BlockItem blockItem, @Nullable ItemEntry itemEntry) {
         Block block = blockItem.getBlock();
-        ResourceLocation resourceLocation = BuiltInRegistries.BLOCK.getKey(block);
-        String name = resourceLocation.getPath();
-        return this.item(name, blockItem, itemEntry);
+        return this.blockItem(null, block, blockItem, itemEntry);
     }
 
-    public Block block(String name, Block block, @Nullable BlockEntry blockEntry) {
-        if (block == null)
-            throw new IllegalArgumentException("Trying to register null block for name: " + name);
+    public Block block(@NotNull String name, @NotNull Block block, @Nullable BlockEntry blockEntry) {
         BlockEntryAccessor accessor = (BlockEntryAccessor) block;
         if (blockEntry != null && blockEntry.isDefaulted())
             blockEntry = blockEntry.setDefault(block);
@@ -163,18 +167,23 @@ public class UnifiedRegistry {
         return Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(modId, name), block);
     }
 
-    public Item item(String name) {
-        return item(name, new Item(new Item.Properties()), null);
+    public Item item(@NotNull String name) {
+        return item(name, new Item(new Item.Properties()), ItemEntry.defaults());
     }
 
-    public Item item(String name, Item item) {
-        return item(name, item, null);
+    public Item item(@NotNull String name, @NotNull Item item) {
+        return item(name, item, ItemEntry.defaults());
     }
 
-    public Item item(String name, Item item, @Nullable ItemEntry itemEntry) {
-        if (itemEntry == null)
-            itemEntry = ItemEntry.of();
+    public Item item(@NotNull String name, @Nullable ItemEntry itemEntry) {
+
+        return item(name, new Item(new Item.Properties()), itemEntry);
+    }
+
+    public Item item(@NotNull String name, @NotNull Item item, @Nullable ItemEntry itemEntry) {
         ItemEntryAccessor accessor = (ItemEntryAccessor) item;
+        if (itemEntry != null && itemEntry.isDefaulted())
+            itemEntry = itemEntry.setDefault(item);
         accessor.vminus$setEntry(itemEntry);
         items.add(item);
         if (item instanceof BlockItem blockItem)
@@ -182,78 +191,100 @@ public class UnifiedRegistry {
         return Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(modId, name), item);
     }
 
-    public MobEffect effect(String name, MobEffect mobEffect) {
+    public MobEffect effect(@NotNull String name, @NotNull MobEffect mobEffect) {
         return Registry.register(BuiltInRegistries.MOB_EFFECT, ResourceLocation.fromNamespaceAndPath(modId, name), mobEffect);
     }
 
-    public <T extends Entity> EntityType<T> entity(String name, EntityType.@NotNull Builder<T> entityTypeBuilder) {
-        return Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), entityTypeBuilder.build(name));
+    public <T extends Entity> EntityType<T> entity(@NotNull String name, EntityType.@NotNull Builder<T> entityTypeBuilder) {
+        return entity(name, entityTypeBuilder, null);
     }
 
-    public CreativeModeTab tab(String name, CreativeModeTab creativeModeTab) {
+    public <T extends Entity> EntityType<T> entity(@NotNull String name, EntityType.@NotNull Builder<T> entityTypeBuilder, @Nullable EntityEntry entityEntry) {
+        EntityType<T> entityType = Registry.register(BuiltInRegistries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), entityTypeBuilder.build(name));
+        EntityEntryAccessor accessor = (EntityEntryAccessor) entityType;
+        if (entityEntry == null)
+            entityEntry = EntityEntry.of();
+        accessor.vminus$setEntry(entityEntry);
+        entityTypes.add(entityType);
+        return entityType;
+    }
+
+    public CreativeModeTab tab(@NotNull String name, @NotNull CreativeModeTab creativeModeTab) {
         return Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(modId, name), creativeModeTab);
     }
 
-    public Feature<?> feature(String name, Feature<?> feature) {
+    public Feature<?> feature(@NotNull String name, @NotNull Feature<?> feature) {
         return Registry.register(BuiltInRegistries.FEATURE, ResourceLocation.fromNamespaceAndPath(modId, name), feature);
     }
 
-    public <T extends FoliagePlacer> FoliagePlacerType<T> foliagePlacer(String name, FoliagePlacerType<T> foliagePlacerType) {
+    public <T extends FoliagePlacer> FoliagePlacerType<T> foliagePlacer(@NotNull String name, @NotNull FoliagePlacerType<T> foliagePlacerType) {
         return Registry.register(BuiltInRegistries.FOLIAGE_PLACER_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), foliagePlacerType);
     }
 
-    public <T extends TrunkPlacer> TrunkPlacerType<T> trunkPlacer(String name, TrunkPlacerType<T> trunkPlacerType) {
+    public <T extends TrunkPlacer> TrunkPlacerType<T> trunkPlacer(@NotNull String name, @NotNull TrunkPlacerType<T> trunkPlacerType) {
         return Registry.register(BuiltInRegistries.TRUNK_PLACER_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), trunkPlacerType);
     }
 
-    public PaintingVariant painting(String name, int width, int height) {
+    public PaintingVariant painting(@NotNull String name, int width, int height) {
         return painting(name, new PaintingVariant(width * 16, height * 16));
     }
 
-    public PaintingVariant painting(String name, PaintingVariant paintingVariant) {
+    public Attribute attribute(@NotNull String name, @NotNull Attribute attribute) {
+        return Registry.register(BuiltInRegistries.ATTRIBUTE, ResourceLocation.fromNamespaceAndPath(modId, name), attribute);
+    }
+
+    public Attribute attribute(@NotNull String name, double defaultValue, double minimumValue, double maximumValue) {
+        return Registry.register(BuiltInRegistries.ATTRIBUTE, ResourceLocation.fromNamespaceAndPath(modId, name), new RangedAttribute("attribute." + modId + ".name." + name, defaultValue, minimumValue, maximumValue).setSyncable(true));
+    }
+
+    public PaintingVariant painting(@NotNull String name, @NotNull PaintingVariant paintingVariant) {
         return Registry.register(BuiltInRegistries.PAINTING_VARIANT, ResourceLocation.fromNamespaceAndPath(modId, name), paintingVariant);
     }
 
-    public <T extends BlockEntity> BlockEntityType<T> blockEntity(String name, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityType<T> blockEntity(@NotNull String name, @NotNull BlockEntityType<T> type) {
         return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), type);
     }
 
-    public Item dye(String id, DyeColor dyeColor) {
+    public Item dye(@NotNull String id, @NotNull DyeColor dyeColor) {
         return item(id, new DyeItem(dyeColor, new Item.Properties()));
     }
 
-    public <T extends BlockEntity> BlockEntityType<T> blockEntity(String name, BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {
+    public <T extends BlockEntity> BlockEntityType<T> blockEntity(@NotNull String name, @NotNull BlockEntityType.BlockEntitySupplier<T> factory, Block... blocks) {
         return Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), BlockEntityType.Builder.of(factory, blocks).build(null));
     }
 
-    public SoundEvent sound(String name, String eventPath) {
+    public SoundEvent sound(@NotNull String name, String eventPath) {
         return sound(name, SoundDefinitionInfo.of(eventPath));
     }
 
-    public SoundEvent sound(String name, SoundDefinitionInfo soundDefinitionInfo) {
+    public SoundEvent sound(@NotNull String name, @NotNull SoundDefinitionInfo soundDefinitionInfo) {
         SoundEvent soundEvent = Registry.register(BuiltInRegistries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(modId, name), SoundEvent.createVariableRangeEvent(new ResourceLocation(modId, name)));
         this.soundDefinitionInfo.add(soundDefinitionInfo.setSoundEvent(soundEvent));
         return soundEvent;
     }
 
-    public Holder.Reference<SoundEvent> soundHolder(String name, SoundDefinitionInfo soundDefinitionInfo) {
+    public Holder.Reference<SoundEvent> soundHolder(@NotNull String name, @NotNull SoundDefinitionInfo soundDefinitionInfo) {
         SoundEvent soundEvent = Registry.register(BuiltInRegistries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(modId, name), SoundEvent.createVariableRangeEvent(new ResourceLocation(modId, name)));
         this.soundDefinitionInfo.add(soundDefinitionInfo.setSoundEvent(soundEvent));
         return BuiltInRegistries.SOUND_EVENT.getHolder(BuiltInRegistries.SOUND_EVENT.getResourceKey(soundEvent).orElseThrow()).orElseThrow();
     }
 
-    public <T extends ParticleOptions> ParticleType<T> particle(String name, ParticleType<T> particleType, ParticleEngine.SpriteParticleRegistration<T> registration) {
+    public <T extends ParticleOptions> ParticleType<T> particle(@NotNull String name, @NotNull ParticleType<T> particleType, @NotNull ParticleEngine.SpriteParticleRegistration<T> registration) {
         ParticleType<T> particleType1 = Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), particleType);
         registerParticleProvider(particleType1, registration);
         return particleType1;
     }
 
-    public <T extends TreeDecorator> TreeDecoratorType<T> treeDecorator(String name, TreeDecoratorType<T> treeDecoratorType) {
+    public <T extends TreeDecorator> TreeDecoratorType<T> treeDecorator(@NotNull String name, @NotNull TreeDecoratorType<T> treeDecoratorType) {
         return Registry.register(BuiltInRegistries.TREE_DECORATOR_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), treeDecoratorType);
     }
 
     public ArrayDeque<Block> getBlocks() {
         return blocks;
+    }
+
+    public ArrayDeque<EntityType<?>> getEntityTypes() {
+        return entityTypes;
     }
 
     public ArrayDeque<Item> getItems() {

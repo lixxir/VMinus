@@ -12,15 +12,13 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BlockEntry extends RegistryEntry<BlockEntry> implements TaggedRegistryEntry<Block, BlockEntry> {
+public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements TaggedRegistryEntry<BlockEntry, Block> {
     protected final List<TagKey<Block>> tags = new ArrayList<>();
     protected RenderType renderType = null;
     protected TintType tintType = TintType.UNSET;
     protected Model model = Model.UNSET;
     private boolean isDefaulted = false;
 
-    private BlockEntry() {
-    }
 
     @Contract(" -> new")
     public static @NotNull BlockEntry of() {
@@ -36,14 +34,15 @@ public class BlockEntry extends RegistryEntry<BlockEntry> implements TaggedRegis
 
     @SuppressWarnings("unchecked")
     public BlockEntry setDefault(Block block) {
-        RegistryEntryDefaults<BlockEntry> accessor = (RegistryEntryDefaults<BlockEntry>) block;
+        RegistryEntryDefaults<BlockEntry, Block> accessor = (RegistryEntryDefaults<BlockEntry, Block>) block;
         BlockEntry blockEntry = accessor.vminus$getDefault();
         blockEntry = blockEntry == null ? new BlockEntry() : blockEntry;
         merge(this, blockEntry);
         return blockEntry;
     }
 
-    private void merge(BlockEntry self, BlockEntry other) {
+    @Override
+    public void merge(@NotNull BlockEntry self, @NotNull BlockEntry other) {
         other.tags(self.tags);
         if (self.tintType != TintType.UNSET)
             other.tintType = self.tintType;

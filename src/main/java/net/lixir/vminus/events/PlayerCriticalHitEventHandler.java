@@ -1,6 +1,6 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.registry.VMinusAttributes;
+import net.lixir.vminus.attribute.VMinusAttributes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -29,7 +29,7 @@ public class PlayerCriticalHitEventHandler {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             ItemStack itemStack = entity.getItemBySlot(slot);
             if (!itemStack.isEmpty()) {
-                modifierSum += getCritValueFromItem(itemStack, slot, VMinusAttributes.CRITICAL_DAMAGE.get());
+                modifierSum += getCritValueFromItem(itemStack, slot, VMinusAttributes.CRITICAL_DAMAGE);
             }
         }
         if (ModList.get().isLoaded("detour")) {

@@ -46,7 +46,9 @@ public class VisionCreativeOrderCodec extends AbstractVisionCodec<VisionCreative
                     targetValue = parts[1].trim();
                     before = true;
                 } else {
-                    throw new JsonParseException("Invalid value format for " + key + ": " + value);
+                    itemValue = value;
+                    targetValue = null;
+                    before = false;
                 }
             } else {
                 itemValue = arrayObject.getAsJsonPrimitive("item").getAsString();
@@ -118,9 +120,7 @@ public class VisionCreativeOrderCodec extends AbstractVisionCodec<VisionCreative
             if (targetId != null)
                 jsonObject.addProperty("target", targetId.toString());
         }
-        if (value.isBefore() != null) {
-            jsonObject.addProperty("before", value.isBefore());
-        }
+        jsonObject.addProperty("before", value.isBefore());
 
         return jsonObject;
     }

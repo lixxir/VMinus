@@ -12,10 +12,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemEntry extends RegistryEntry<ItemEntry> implements TaggedRegistryEntry<Item, ItemEntry> {
+public class ItemEntry extends RegistryEntry<ItemEntry, Item> implements TaggedRegistryEntry<ItemEntry, Item> {
     protected final List<TagKey<Item>> tags = new ArrayList<>();
     protected Model model = Model.UNSET;
     protected TintType tintType;
+    private boolean isFromBlock = false;
 
     private ItemEntry() {}
 
@@ -36,14 +37,23 @@ public class ItemEntry extends RegistryEntry<ItemEntry> implements TaggedRegistr
             BlockEntry.Model blockModel = blockEntry.getModel();
             if (blockModel != null)
                 itemEntry.model = blockModel.getItemModel();
+            itemEntry.isFromBlock = true;
         }
         return itemEntry;
     }
+
+
 
     public static @NotNull ItemEntry copy(Item item) {
         ItemEntryAccessor accessor = (ItemEntryAccessor) item;
         ItemEntry itemEntry = accessor.vminus$getEntry();
         return itemEntry == null ? new ItemEntry() : itemEntry;
+    }
+
+    public static @NotNull ItemEntry defaults() {
+        ItemEntry itemEntry = new ItemEntry();
+        itemEntry.isDefaulted = true;
+        return itemEntry;
     }
 
 
@@ -83,10 +93,26 @@ public class ItemEntry extends RegistryEntry<ItemEntry> implements TaggedRegistr
         return this;
     }
 
+    public ItemEntry isFromBlock(boolean isFromBlock) {
+        this.isFromBlock = isFromBlock;
+        return this;
+    }
+
     @Override
     public ItemEntry lang(String langValue) {
         this.langValue = langValue;
         return this;
+    }
+
+    @Override
+    void merge(ItemEntry self, ItemEntry other) {
+
+    }
+
+
+
+    public boolean isFromBlock() {
+        return isFromBlock;
     }
 
     public enum Model {

@@ -1,6 +1,7 @@
 package net.lixir.vminus.visions.conditions;
 
 import com.google.gson.*;
+import net.lixir.vminus.registry.VMinusRarities;
 import net.minecraft.world.item.Rarity;
 
 import javax.annotation.Nullable;
@@ -72,8 +73,16 @@ public abstract class AbstractVisionCondition {
     }
 
     private static AbstractVisionCondition parseRarityCondition(JsonObject conditionObject, boolean inverted) throws JsonParseException {
-        String value = getConditionValue(conditionObject).getAsString();
-        return new RarityVisionCondition(Rarity.valueOf(value.toUpperCase()), inverted);
+        String value = getConditionValue(conditionObject).getAsString().toUpperCase();
+        Rarity rarity;
+        switch (value) {
+            case "INVERTED" -> rarity = VMinusRarities.INVERTED;
+            case "DELICACY" -> rarity = VMinusRarities.DELICACY;
+            case "LEGENDARY" -> rarity = VMinusRarities.LEGENDARY;
+            case "UNOBTAINABLE" -> rarity = VMinusRarities.UNOBTAINABLE;
+            default -> rarity = Rarity.valueOf(value);
+        }
+        return new RarityVisionCondition(rarity, inverted);
     }
 
     private static AbstractVisionCondition parseEntityStringNbtCondition(JsonObject conditionObject, boolean inverted) throws JsonParseException {

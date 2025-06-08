@@ -1,14 +1,17 @@
 package net.lixir.vminus.registry;
 
 import net.lixir.vminus.VMinus;
+import net.lixir.vminus.block.VMinusBlocks;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class VMinusSounds {
-	public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, VMinus.ID);
+import static net.lixir.vminus.VMinus.REGISTRY;
 
-	public static final RegistryObject<SoundEvent> ITEM_DROP = SOUNDS.register("ui.inventory.item.drop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(VMinus.ID, "ui.inventory.item.drop")));
+public class VMinusSounds {
+	public static void init() {}
+	public static final SoundEvent ITEM_DROP = REGISTRY.sound("ui.inventory.item.drop", "ui/inventory/item/drop");
 }
