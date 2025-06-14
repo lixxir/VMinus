@@ -1,8 +1,9 @@
 package net.lixir.vminus.registry.entry;
 
+import net.lixir.vminus.registry.BlockModel;
 import net.lixir.vminus.registry.TaggedRegistryEntry;
 import net.lixir.vminus.registry.TintType;
-import net.minecraft.client.renderer.RenderType;
+import net.lixir.vminus.registry.UnifiedRegistry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Contract;
@@ -14,17 +15,15 @@ import java.util.List;
 
 public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements TaggedRegistryEntry<BlockEntry, Block> {
     protected final List<TagKey<Block>> tags = new ArrayList<>();
-    protected RenderType renderType = null;
+    protected String renderType = "unset";
     protected TintType tintType = TintType.UNSET;
-    protected Model model = Model.UNSET;
+    protected BlockModel model = BlockModel.UNSET;
     private boolean isDefaulted = false;
-
 
     @Contract(" -> new")
     public static @NotNull BlockEntry of() {
         return new BlockEntry();
     }
-
 
     public static @NotNull BlockEntry defaults() {
         BlockEntry blockEntry = new BlockEntry();
@@ -32,30 +31,23 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return blockEntry;
     }
 
-    @SuppressWarnings("unchecked")
-    public BlockEntry setDefault(Block block) {
-        RegistryEntryDefaults<BlockEntry, Block> accessor = (RegistryEntryDefaults<BlockEntry, Block>) block;
-        BlockEntry blockEntry = accessor.vminus$getDefault();
-        blockEntry = blockEntry == null ? new BlockEntry() : blockEntry;
+    public BlockEntry setDefault(@NotNull Block block) {
+        BlockEntry blockEntry = UnifiedRegistry.getBlockEntry(block.getClass());
         merge(this, blockEntry);
-        return blockEntry;
+        return this;
     }
 
     @Override
-    public void merge(@NotNull BlockEntry self, @NotNull BlockEntry other) {
-        other.tags(self.tags);
-        if (self.tintType != TintType.UNSET)
-            other.tintType = self.tintType;
-        if (self.model != Model.UNSET)
-            other.model = self.model;
-        if (self.renderType != null)
-            other.renderType = self.renderType;
-    }
-
-    public static @NotNull BlockEntry copy(Block block) {
-        BlockEntryAccessor accessor = (BlockEntryAccessor) block;
-        BlockEntry blockEntry = accessor.vminus$getEntry();
-        return blockEntry == null ? new BlockEntry() : blockEntry;
+    public void merge(@NotNull BlockEntry self, @Nullable BlockEntry other) {
+        if (other == null)
+            return;
+        self.tags(other.tags);
+        if (self.tintType == TintType.UNSET)
+            self.tintType = other.tintType;
+        if (self.model == BlockModel.UNSET)
+            self.model = other.model;
+        if (self.renderType.equals("unset"))
+            self.renderType = other.renderType;
     }
 
     @Override
@@ -64,17 +56,17 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return this;
     }
 
-    public BlockEntry renderType(RenderType renderType) {
+    public BlockEntry renderType(@NotNull String renderType) {
         this.renderType = renderType;
         return this;
     }
 
-    public BlockEntry tintType(TintType tintType) {
+    public BlockEntry tintType(@NotNull TintType tintType) {
         this.tintType = tintType;
         return this;
     }
 
-    public BlockEntry model(Model model) {
+    public BlockEntry model(@NotNull BlockModel model) {
         this.model = model;
         return this;
     }
@@ -90,8 +82,8 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return tags;
     }
 
-    public RenderType getRenderType() {
-        return renderType != null ? renderType : RenderType.solid();
+    public @NotNull String getRenderType() {
+        return renderType;
     }
 
 
@@ -99,7 +91,7 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return tintType;
     }
 
-    public @Nullable Model getModel() {
+    public @NotNull BlockModel getModel() {
         return model;
     }
 
@@ -113,26 +105,15 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return isDefaulted;
     }
 
-    public enum Model {
-        ALL_SIDED_CUBE(ItemEntry.Model.PARENT_BLOCK),
-        STAIRS(ItemEntry.Model.PARENT_BLOCK),
-        AXIS(ItemEntry.Model.PARENT_BLOCK),
-        SLAB(ItemEntry.Model.PARENT_BLOCK),
-        CROSS(ItemEntry.Model.PANE),
-        DOUBLE_CROSS(ItemEntry.Model.DOUBLE_PANE),
-        CUBE_COLUMN(ItemEntry.Model.PARENT_BLOCK),
-        CUBE_BOTTOM_TOP(ItemEntry.Model.PARENT_BLOCK),
-        UNSET(ItemEntry.Model.UNSET);
-
-
-        private final ItemEntry.Model itemModel;
-
-        Model(ItemEntry.Model itemModel) {
-            this.itemModel = itemModel;
-        }
-
-        public ItemEntry.Model getItemModel() {
-            return itemModel;
-        }
+    @Override
+    public String toString() {
+        return "BlockEntry{" +
+                "tags=" + tags +
+                ", renderType='" + renderType + '\'' +
+                ", tintType=" + tintType +
+                ", model=" + (model != null ? model.getClass().getSimpleName() : "null") +
+                ", isDefaulted=" + isDefaulted +
+                ", langValue='" + langValue + '\'' +
+                '}';
     }
 }

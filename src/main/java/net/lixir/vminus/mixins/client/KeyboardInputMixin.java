@@ -37,7 +37,7 @@ public class KeyboardInputMixin {
             }
             if (vBlock != null) {
                 Input blockInput = vBlock.onPlayerInput(level, player, vMinus$input);
-                if (blockInput.equals(vMinus$input))
+                if (blockInput == null)
                     return;
                 vMinus$input.leftImpulse = blockInput.leftImpulse;
                 vMinus$input.forwardImpulse = blockInput.forwardImpulse;

@@ -1,16 +1,13 @@
 package net.lixir.vminus.mixins.items;
 
 import net.lixir.vminus.item.MaxDurationGetter;
-import net.lixir.vminus.registry.entry.BlockEntry;
 import net.lixir.vminus.registry.entry.ItemEntry;
 import net.lixir.vminus.registry.entry.ItemEntryAccessor;
-import net.lixir.vminus.registry.entry.RegistryEntryDefaults;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.util.VisionFoodProperties;
 import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
 import net.lixir.vminus.visions.ItemVision;
 import net.lixir.vminus.visions.util.VisionUtil;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDurationGetter, RegistryEntryDefaults<ItemEntry, Item> {
+public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDurationGetter {
     @Unique
     private final Item vminus$item = (Item) (Object) this;
 
@@ -111,13 +108,6 @@ public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDura
     @Override
     public @Nullable ItemEntry vminus$getEntry() {
         return vminus$itemEntry;
-    }
-
-    @Override
-    public ItemEntry vminus$getDefault() {
-        ItemEntry itemEntry = ItemEntry.of();
-        itemEntry.model(ItemEntry.Model.BASIC);
-        return itemEntry;
     }
 
     @Override

@@ -6,24 +6,37 @@ import org.concentus.OpusException;
 import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class OpusAudioStream implements AudioStream {
-    private final OpusDecoder decoder;
+    private static final int SAMPLE_RATE = 48000;
+    private static final int CHANNELS = 2;
+    private static final int FRAME_SIZE = 960;
+    private static final int MAX_FRAME_BYTES = 4000;
+
     private final InputStream input;
     private final AudioFormat format;
-    private final byte[] pcmBuffer;
-    private final byte[] opusBuffer;
+    private final OpusDecoder decoder;
+    private final short[] decodeBuffer;
+    private final ByteBuffer outputBuffer;
 
-    public OpusAudioStream(InputStream stream) throws OpusException {
-        this.input = stream;
-        this.decoder = new OpusDecoder(48000, 2);
-        this.format = new AudioFormat(48000, 16, 2, true, false);
-        this.pcmBuffer = new byte[1920 * 2 * 2];
-        this.opusBuffer = new byte[4096];
+    private boolean closed = false;
+    private boolean endOfStream = false;
+
+    public OpusAudioStream(InputStream opusStream) throws IOException {
+        this.input = opusStream;
+        this.format = new AudioFormat(SAMPLE_RATE, 16, CHANNELS, true, false);
+        try {
+            this.decoder = new OpusDecoder(SAMPLE_RATE, CHANNELS);
+        } catch (OpusException e) {
+            throw new IOException("Failed to initialize Opus decoder", e);
+        }
+
+        this.decodeBuffer = new short[FRAME_SIZE * CHANNELS];
+        this.outputBuffer = ByteBuffer.allocate(8192);
+        this.outputBuffer.flip();
     }
 
     @Override
@@ -33,37 +46,69 @@ public class OpusAudioStream implements AudioStream {
 
     @Override
     public @NotNull ByteBuffer read(int size) throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int read;
-        while (output.size() < size && (read = input.read(opusBuffer)) != -1) {
-            int samples = 0;
-            try {
-                samples = decoder.decode(opusBuffer, 0, read, pcmBuffer, 0, 960, false);
-            } catch (OpusException e) {
-                throw new RuntimeException(e);
+        if (closed) throw new IOException("Stream closed");
+
+        ByteBuffer result = ByteBuffer.allocate(size);
+        while (result.position() < size && !endOfStream) {
+            if (!outputBuffer.hasRemaining()) {
+                refillOutputBuffer();
             }
-            output.write(pcmBuffer, 0, samples * 2 * 2);
+
+            int toCopy = Math.min(outputBuffer.remaining(), size - result.position());
+            byte[] temp = new byte[toCopy];
+            outputBuffer.get(temp);
+            result.put(temp);
         }
-        return ByteBuffer.wrap(output.toByteArray());
+
+        result.flip();
+        return result;
+    }
+
+    private void refillOutputBuffer() throws IOException {
+        byte[] frameBytes = new byte[MAX_FRAME_BYTES];
+        int bytesRead = input.read(frameBytes);
+        if (bytesRead == -1) {
+            endOfStream = true;
+            return;
+        }
+
+        int decodedSamples;
+        try {
+            decodedSamples = decoder.decode(frameBytes, 0, bytesRead, decodeBuffer, 0, FRAME_SIZE, false);
+        } catch (OpusException e) {
+            throw new IOException("Error decoding Opus frame", e);
+        }
+
+        outputBuffer.clear();
+        for (int i = 0; i < decodedSamples * CHANNELS; i++) {
+            short sample = decodeBuffer[i];
+            outputBuffer.put((byte) (sample & 0xFF));
+            outputBuffer.put((byte) ((sample >> 8) & 0xFF));
+        }
+        outputBuffer.flip();
     }
 
     public ByteBuffer readAll() throws IOException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int read;
-        while ((read = input.read(opusBuffer)) != -1) {
-            int samples = 0;
-            try {
-                samples = decoder.decode(opusBuffer, 0, read, pcmBuffer, 0, 960, false);
-            } catch (OpusException e) {
-                throw new RuntimeException(e);
+        ByteBuffer result = ByteBuffer.allocate(16384);
+        ByteBuffer chunk;
+        while ((chunk = read(2048)).hasRemaining()) {
+            if (result.remaining() < chunk.remaining()) {
+                ByteBuffer bigger = ByteBuffer.allocate(result.capacity() * 2);
+                result.flip();
+                bigger.put(result);
+                result = bigger;
             }
-            output.write(pcmBuffer, 0, samples * 2 * 2);
+            result.put(chunk);
         }
-        return ByteBuffer.wrap(output.toByteArray());
+        result.flip();
+        return result;
     }
 
     @Override
-    public void close() throws IOException {
-        input.close();
+    public void close() {
+        closed = true;
+        try {
+            input.close();
+        } catch (IOException ignored) {}
     }
 }

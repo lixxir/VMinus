@@ -25,11 +25,15 @@ import java.util.List;
 public class OnDatapackSyncEventHandler {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void onDatapackSync(OnDatapackSyncEvent event) {
+        /*
         List<ServerPlayer> players = new ArrayList<>();
         ServerPlayer checkPlayer = event.getPlayer();
 
+        return;
+
         if (checkPlayer != null) {
             players.add(checkPlayer);
+
             if (!checkPlayer.server.isDedicatedServer())
                 return;
         } else
@@ -73,6 +77,8 @@ public class OnDatapackSyncEventHandler {
                     new VisionControlPacket(VisionControlPacket.VisionControlType.FREEZE)
             );
         }
+
+         */
     }
 
     private static void sendVisionDataToClient(ServerPlayer serverPlayer, VisionSyncPacket packet) {

@@ -69,7 +69,7 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
                 soundDefinition = definition().with(sounds);
             }
         }
-        if (subtitle == null)
+        if (subtitle != null)
             soundDefinition.subtitle(subtitle);
         return soundDefinition;
     }
@@ -107,74 +107,49 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
                 .with(sound(new ResourceLocation(modId, soundPath)));
     }
 
+
     @Override
     public CompletableFuture<?> run(CachedOutput cache) {
-        var accessor = (SoundDefinitionsProviderAccessor) this;
-        Map<String, SoundDefinition> sounds = accessor.getSoundList();
+        var accessor =  ((SoundDefinitionsProviderAccessor) this);
+        var sounds = accessor.getSoundList();
         sounds.clear();
         this.registerSounds();
 
         List<String> notValid = sounds.entrySet().stream()
-                .filter(entry -> !validateCustom(entry.getKey(), entry.getValue()))
+                .filter(it -> !this.customValidate(it.getKey(), it.getValue()))
                 .map(Map.Entry::getKey)
-                .map(key -> this.getModId() + ":" + key)
+                .map(it -> this.modId + ":" + it)
                 .toList();
 
         if (!notValid.isEmpty()) {
-            throw new IllegalStateException("Invalid sound events: " + notValid);
+            throw new IllegalStateException("Found invalid sound events: " + notValid);
         }
 
         if (!sounds.isEmpty()) {
-            return DataProvider.saveStable(
-                    cache,
-                    accessor.invokeMapToJson(sounds),
-                    output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
-                            .resolve(this.getModId())
-                            .resolve("sounds.json")
-            );
+            return accessor.invokeSave(cache, this.output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(this.modId).resolve("sounds.json"));
         }
-
         return CompletableFuture.allOf();
     }
 
-    private boolean validateCustom(String name, SoundDefinition def) {
-        var accessor = (SoundDefinitionAccessor) (Object) def;
-        assert accessor != null;
-        return accessor.getSoundList().stream().allMatch(sound -> validateSoundAllowingOpus(name, sound));
+    private boolean customValidate(final String name, final SoundDefinition def) {
+        var accessor =  ((SoundDefinitionAccessor) (Object) def);
+        return accessor.getSoundList().stream().allMatch(it -> {
+            var soundAccessor =  ((SoundDefinitionSoundAccessor) (Object) it);
+            return customValidateSound(name, soundAccessor.getName());
+        });
     }
 
-    private boolean validateSoundAllowingOpus(String soundEventName, SoundDefinition.Sound sound) {
-        var accessor = (SoundDefinitionSoundAccessor) (Object) sound;
-        assert accessor != null;
-        return switch (accessor.getType()) {
-            case SOUND -> {
-                ResourceLocation location = accessor.getName();
+    private boolean customValidateSound(final String soundName, final ResourceLocation name) {
+        boolean oggExists = this.helper.exists(name, PackType.CLIENT_RESOURCES, ".ogg", "sounds");
+        boolean opusExists = this.helper.exists(name, PackType.CLIENT_RESOURCES, ".opus", "sounds");
+        boolean valid = oggExists || opusExists;
 
-                boolean ogg = soundFileExists(location, ".ogg");
-                boolean opus = soundFileExists(location, ".opus");
-
-                if (!ogg && !opus) {
-                    VMinus.LOGGER.warn("Missing sound for '{}': {}.ogg or {}.opus not found",
-                            soundEventName, location, location);
-                    yield false;
-                }
-
-                yield true;
-            }
-            case EVENT -> ForgeRegistries.SOUND_EVENTS.containsKey(accessor.getName());
-        };
+        if (!valid) {
+            String oggPath = name.getNamespace() + ":sounds/" + name.getPath() + ".ogg";
+            String opusPath = name.getNamespace() + ":sounds/" + name.getPath() + ".opus";
+            VMinus.LOGGER.warn("Unable to find corresponding OGG or OPUS file '{}' or '{}' for sound event '{}'", oggPath, opusPath, soundName);
+        }
+        return valid;
     }
-
-
-    private boolean soundFileExists(ResourceLocation name, String extension) {
-        return helper.exists(
-                name,
-                PackType.CLIENT_RESOURCES,
-                extension,
-                "sounds"
-        );
-    }
-
-
 
 }

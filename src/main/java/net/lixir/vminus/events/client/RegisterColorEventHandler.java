@@ -28,7 +28,7 @@ public class RegisterColorEventHandler {
                 if (itemEntry == null)
                     continue;
                 TintType tintType = itemEntry.getTintType();
-                if (tintType == null)
+                if (tintType == null || tintType == TintType.UNSET)
                     continue;
                 switch (tintType) {
                     case FOLIAGE -> event.register((stack, tintIndex) -> tintIndex == 0 ? FoliageColor.getDefaultColor() : -1, item);
@@ -47,7 +47,7 @@ public class RegisterColorEventHandler {
                 if (blockEntry == null)
                     continue;
                 TintType tintType = blockEntry.getTintType();
-                if (tintType == null)
+                if (tintType == null || tintType == TintType.UNSET)
                     continue;
                 switch (tintType) {
                     case FOLIAGE -> event.getBlockColors().register(

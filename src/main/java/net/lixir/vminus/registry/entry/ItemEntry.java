@@ -1,5 +1,7 @@
 package net.lixir.vminus.registry.entry;
 
+import net.lixir.vminus.registry.BlockModel;
+import net.lixir.vminus.registry.ItemModel;
 import net.lixir.vminus.registry.TaggedRegistryEntry;
 import net.lixir.vminus.registry.TintType;
 import net.minecraft.tags.TagKey;
@@ -14,7 +16,7 @@ import java.util.List;
 
 public class ItemEntry extends RegistryEntry<ItemEntry, Item> implements TaggedRegistryEntry<ItemEntry, Item> {
     protected final List<TagKey<Item>> tags = new ArrayList<>();
-    protected Model model = Model.UNSET;
+    protected ItemModel model = ItemModel.UNSET;
     protected TintType tintType;
     private boolean isFromBlock = false;
 
@@ -34,7 +36,7 @@ public class ItemEntry extends RegistryEntry<ItemEntry, Item> implements TaggedR
         if (blockEntry != null) {
             itemEntry.langValue = null;
             itemEntry.tintType = blockEntry.tintType;
-            BlockEntry.Model blockModel = blockEntry.getModel();
+            BlockModel blockModel = blockEntry.getModel();
             if (blockModel != null)
                 itemEntry.model = blockModel.getItemModel();
             itemEntry.isFromBlock = true;
@@ -61,12 +63,12 @@ public class ItemEntry extends RegistryEntry<ItemEntry, Item> implements TaggedR
         return tintType;
     }
 
-    public ItemEntry model(Model model) {
+    public ItemEntry model(ItemModel model) {
         this.model = model;
         return this;
     }
 
-    public @Nullable Model getModel() {
+    public @Nullable ItemModel getModel() {
         return model;
     }
 
@@ -109,18 +111,7 @@ public class ItemEntry extends RegistryEntry<ItemEntry, Item> implements TaggedR
 
     }
 
-
-
     public boolean isFromBlock() {
         return isFromBlock;
-    }
-
-    public enum Model {
-        BASIC,
-        HANDHELD,
-        PANE,
-        DOUBLE_PANE,
-        PARENT_BLOCK,
-        UNSET
     }
 }

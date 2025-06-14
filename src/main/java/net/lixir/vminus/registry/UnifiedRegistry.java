@@ -1,7 +1,7 @@
 package net.lixir.vminus.registry;
 
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.registry.entry.*;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -26,16 +26,13 @@ import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -43,18 +40,63 @@ import java.util.function.Consumer;
 @SuppressWarnings("deprecation")
 public class UnifiedRegistry {
     private static final ConcurrentHashMap<String, UnifiedRegistry> REGISTRIES = new ConcurrentHashMap<>();
-    private static final ArrayDeque<ParticleProviderRegistration<?>> PARTICLE_PROVIDER_REGISTRATIONS = new ArrayDeque<>();
+    private static final ConcurrentHashMap<Class<?>, DefaultRegistryEntry<? extends RegistryEntry<?, ?>, ?>> DEFAULT_ENTRIES_REGISTRY = new ConcurrentHashMap<>();
+
     private final ArrayDeque<Block> blocks = new ArrayDeque<>();
     private final ArrayDeque<EntityType<?>> entityTypes = new ArrayDeque<>();
     private final ArrayDeque<SoundEvent> soundEvents = new ArrayDeque<>();
     private final ArrayDeque<Item> items = new ArrayDeque<>();
     private final ArrayDeque<SoundDefinitionInfo> soundDefinitionInfo = new ArrayDeque<>();
+
     private final String modId;
     private Consumer<UnifiedRegistry> setup;
 
     private UnifiedRegistry(String modId) {
         this.modId = modId;
     }
+
+    public static <E extends RegistryEntry<E, T>, T> void setDefaultRegistryEntry(@NotNull Class<?> clazz, @NotNull DefaultRegistryEntry<E, T> defaultRegistryEntry) {
+        if (!DEFAULT_ENTRIES_REGISTRY.containsKey(clazz) || defaultRegistryEntry.isOverwrite()) {
+            DEFAULT_ENTRIES_REGISTRY.put(clazz, defaultRegistryEntry);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static @Nullable <E extends RegistryEntry<E, T>, T> RegistryEntry<E, T> getRegistryEntry(Class<?> clazz) {
+        Object exact = DEFAULT_ENTRIES_REGISTRY.get(clazz);
+        if (exact instanceof DefaultRegistryEntry<?, ?> exactEntry) {
+            VMinus.LOGGER.info("Found exact for {}", clazz);
+            return (RegistryEntry<E, T>) exactEntry.getRegistryEntry();
+        }
+
+
+        Class<?> bestMatch = null;
+        DefaultRegistryEntry<?, ?> bestEntry = null;
+
+        for (Map.Entry<Class<?>, DefaultRegistryEntry<?, ?>> entry : DEFAULT_ENTRIES_REGISTRY.entrySet()) {
+
+            Class<?> key = entry.getKey();
+            if (key.isAssignableFrom(clazz)) {
+                if (bestMatch == null || bestMatch.isAssignableFrom(key)) {
+                    VMinus.LOGGER.info("Class={} and matches {}", clazz, key);
+                    bestMatch = key;
+                    bestEntry = entry.getValue();
+                }
+            }
+        }
+
+        return bestEntry != null ? (RegistryEntry<E, T>) bestEntry.getRegistryEntry() : null;
+    }
+
+
+
+    public static @Nullable BlockEntry getBlockEntry(Class<? extends Block> clazz) {
+        RegistryEntry<?, ?> entry = getRegistryEntry(clazz);
+        if (entry instanceof BlockEntry)
+            VMinus.LOGGER.info("is a block entry..");
+        return (entry instanceof BlockEntry) ? (BlockEntry) entry : null;
+    }
+
 
     public static @NotNull List<UnifiedRegistry> getRegistries() {
         return REGISTRIES.values().stream().toList();
@@ -72,23 +114,6 @@ public class UnifiedRegistry {
         return registry;
     }
 
-    public static <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<T> provider) {
-        PARTICLE_PROVIDER_REGISTRATIONS.add(new ParticleProviderRegistration<>(type, provider));
-    }
-
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        for (ParticleProviderRegistration<?> reg : PARTICLE_PROVIDER_REGISTRATIONS) {
-            register(reg, event);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends ParticleOptions> void register(ParticleProviderRegistration<?> reg, @NotNull RegisterParticleProvidersEvent event) {
-        ParticleProviderRegistration<T> casted = (ParticleProviderRegistration<T>) reg;
-        event.registerSpriteSet(casted.type, casted.provider);
-    }
 
     public void setSetup(Consumer<UnifiedRegistry> setup) {
         this.setup = setup;
@@ -158,9 +183,9 @@ public class UnifiedRegistry {
         return this.blockItem(null, block, blockItem, itemEntry);
     }
 
-    public Block block(@NotNull String name, @NotNull Block block, @Nullable BlockEntry blockEntry) {
+    public Block block(@NotNull String name, @NotNull Block block, @NotNull BlockEntry blockEntry) {
         BlockEntryAccessor accessor = (BlockEntryAccessor) block;
-        if (blockEntry != null && blockEntry.isDefaulted())
+        if (blockEntry.isDefaulted())
             blockEntry = blockEntry.setDefault(block);
         accessor.vminus$setEntry(blockEntry);
         blocks.add(block);
@@ -176,7 +201,6 @@ public class UnifiedRegistry {
     }
 
     public Item item(@NotNull String name, @Nullable ItemEntry itemEntry) {
-
         return item(name, new Item(new Item.Properties()), itemEntry);
     }
 
@@ -269,10 +293,8 @@ public class UnifiedRegistry {
         return BuiltInRegistries.SOUND_EVENT.getHolder(BuiltInRegistries.SOUND_EVENT.getResourceKey(soundEvent).orElseThrow()).orElseThrow();
     }
 
-    public <T extends ParticleOptions> ParticleType<T> particle(@NotNull String name, @NotNull ParticleType<T> particleType, @NotNull ParticleEngine.SpriteParticleRegistration<T> registration) {
-        ParticleType<T> particleType1 = Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), particleType);
-        registerParticleProvider(particleType1, registration);
-        return particleType1;
+    public <T extends ParticleOptions> ParticleType<T> particle(@NotNull String name, @NotNull ParticleType<T> particleType) {
+        return Registry.register(BuiltInRegistries.PARTICLE_TYPE, ResourceLocation.fromNamespaceAndPath(modId, name), particleType);
     }
 
     public <T extends TreeDecorator> TreeDecoratorType<T> treeDecorator(@NotNull String name, @NotNull TreeDecoratorType<T> treeDecoratorType) {
@@ -291,7 +313,28 @@ public class UnifiedRegistry {
         return items;
     }
 
-    private record ParticleProviderRegistration<T extends ParticleOptions>(ParticleType<T> type,
-                                                                           ParticleEngine.SpriteParticleRegistration<T> provider) {
+    public static final class DefaultRegistryEntry<E extends RegistryEntry<E, T>, T> {
+        private final RegistryEntry<E, T> registryEntry;
+        private final boolean overwrite;
+
+
+        public DefaultRegistryEntry(RegistryEntry<E, T> registryEntry) {
+           this(registryEntry, false);
+        }
+
+
+        public DefaultRegistryEntry(RegistryEntry<E, T> registryEntry, boolean overwrite) {
+            this.registryEntry = registryEntry;
+            this.overwrite = overwrite;
+        }
+
+        public RegistryEntry<E, T> getRegistryEntry() {
+            return registryEntry;
+        }
+
+        public boolean isOverwrite() {
+            return overwrite;
+        }
     }
+
 }

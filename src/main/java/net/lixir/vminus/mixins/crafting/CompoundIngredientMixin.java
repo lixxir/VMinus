@@ -22,7 +22,8 @@ import java.util.List;
 
 @Mixin(CompoundIngredient.class)
 public abstract class CompoundIngredientMixin {
-    @Shadow private List<Ingredient> children;
+    @Shadow
+    private List<Ingredient> children;
 
 
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)

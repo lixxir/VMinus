@@ -2,7 +2,6 @@ package net.lixir.vminus.mixins.blocks;
 
 import net.lixir.vminus.registry.entry.BlockEntry;
 import net.lixir.vminus.registry.entry.BlockEntryAccessor;
-import net.lixir.vminus.registry.entry.RegistryEntryDefaults;
 import net.lixir.vminus.visions.conditions.VisionConditionArguments;
 import net.lixir.vminus.visions.BlockVision;
 import net.lixir.vminus.visions.accessors.BlockVisionAccessor;
@@ -19,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Block.class)
-public class BlockRealMixin implements BlockVisionAccessor, BlockEntryAccessor, RegistryEntryDefaults<BlockEntry, Block> {
+public class BlockRealMixin implements BlockVisionAccessor, BlockEntryAccessor {
     @Unique
     private final Block vminus$block = (Block) (Object) this;
 

@@ -8,9 +8,12 @@ mcmodsrepo/
 
 # gradle
 .gradle/
+gradle/
 build/
 out/
 classes/
+.libs/
+libs/
 
 run/
 .run/
@@ -19,3 +22,8 @@ src/generated/
 
 # idea
 .idea/
+
+
+
+
+

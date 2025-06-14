@@ -1,8 +1,6 @@
 package net.lixir.vminus.registry.entry;
 
-import net.lixir.vminus.registry.TintType;
 import net.lixir.vminus.registry.UnifiedRegistry;
-import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -18,9 +16,8 @@ public abstract class RegistryEntry<E extends RegistryEntry<E,T>, T> {
     public abstract E lang(String langValue);
 
     @SuppressWarnings("unchecked")
-    public E setDefault(T t) {
-        RegistryEntryDefaults<E, T> accessor = (RegistryEntryDefaults<E, T>) t;
-        E entry = accessor.vminus$getDefault();
+    public E setDefault(@NotNull T t) {
+        E entry = (E) UnifiedRegistry.getRegistryEntry(t.getClass());
         merge((E) this, entry);
         return entry;
     }
