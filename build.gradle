@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 version = mod_version
@@ -13,13 +13,16 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 
 
 minecraft {
-
     mappings channel: mapping_channel, version: mapping_version
-
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -27,91 +30,126 @@ minecraft {
 
         client {
             workingDirectory project.file('run')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "$mod_id" {
-                    source sourceSets.main
-                }
-            }
+            mods { "$mod_id" { source sourceSets.main } }
         }
 
         server {
             workingDirectory project.file('run/server')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "$mod_id" {
-                    source sourceSets.main
-                }
-            }
+            mods { "$mod_id" { source sourceSets.main } }
         }
 
         gameTestServer {
             workingDirectory project.file('run/server')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', mod_id
-
-            mods {
-                "$mod_id" {
-                    source sourceSets.main
-                }
-            }
+            mods { "$mod_id" { source sourceSets.main } }
         }
 
         data {
             workingDirectory project.file('run')
-
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources')
-
-            mods {
-                "$mod_id" {
-                    source sourceSets.main
-                }
-            }
+            mods { "$mod_id" { source sourceSets.main } }
         }
     }
 }
 
-
-
 repositories {
     mavenLocal()
-    maven {
-        name = 'MinecraftForge'
-        url = 'https://maven.minecraftforge.net/'
-    }
+    maven { name = 'MinecraftForge'; url = 'https://maven.minecraftforge.net/' }
     mavenCentral()
-    maven {
-        url = "https://api.modrinth.com/maven"
-    }
-    flatDir {
-        dirs 'libs'
-    }
+    maven { url = "https://api.modrinth.com/maven" }
+    flatDir { dirs 'libs' }
+}
+
+sourceSets.main.resources {
+    srcDirs "src/generated/resources"
+    srcDirs "src/main/resources"
+}
+
+configurations {
+    concentusShadow
+    gagravarrShadow
+}
+
+tasks.named('build') {
+    dependsOn tasks.reobfShadowJar
 }
 
 dependencies {
+    concentusShadow files('libs/Concentus-1.0-SNAPSHOT.jar')
+    concentusShadow 'org.gagravarr:vorbis-java-core:0.8'
+
+    implementation files('libs/Concentus-1.0-SNAPSHOT.jar')
+    implementation 'org.gagravarr:vorbis-java-core:0.8'
+
     minecraft 'net.minecraftforge:forge:1.20.1-47.3.22'
+    implementation 'org.spongepowered:mixin:0.8.5'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    implementation(name: 'Concentus-1.0-SNAPSHOT', ext: 'jar')
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
+        jarJar.ranged(it, "[0.4.1,)")
+    }
+}
+
+
+reobf {
+    shadowJar {}
+}
+
+tasks.named("reobfShadowJar") {
+    dependsOn tasks.named("shadowJar")
 }
 
 shadowJar {
+    archiveBaseName.set(mod_id)
+    archiveVersion.set(mod_version)
     archiveClassifier.set("")
-    relocate 'org.concentus', 'net.lixir.vminus.shadow.concentus'
-    configurations = [project.configurations.shadow]
+    finalizedBy tasks.reobfShadowJar
+
+    configurations = [project.configurations.concentusShadow, project.configurations.gagravarrShadow]
+
+    relocate 'org.concentus', "${mod_id}.shadow.org.concentus"
+    relocate 'org.gagravarr', "${mod_id}.shadow.org.gagravarr"
+    from(sourceSets.main.output)
+
+    from(sourceSets.main.resources.srcDirs) {
+        include "mixins.vminus.refmap.json"
+        into ""
+    }
+
+    manifest {
+        attributes([
+                'Specification-Title'      : mod_id,
+                'Specification-Vendor'     : mod_authors,
+                'Specification-Version'    : "1",
+                'groupId'                  : mod_group_id,
+                'artifactId'               : mod_id,
+                'Implementation-Title'     : mod_id,
+                'Implementation-Version'   : mod_version,
+                'Implementation-Vendor'    : mod_authors,
+                'Implementation-Timestamp' : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+tasks.jar {
+    enabled = false
+}
+
+tasks.reobfShadowJar.mustRunAfter tasks.shadowJar
+
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 mixin {
@@ -128,53 +166,23 @@ mixin {
 }
 
 
-jar {
-    manifest {
-        attributes([
-                'Specification-Title'     : mod_id,
-                'Specification-Vendor'    : mod_authors,
-                'Specification-Version'   : "1",
-                'groupId'                 : mod_group_id,
-                'artifactId'              : mod_id,
-                'Implementation-Title'   : mod_id,
-                'Implementation-Version' : mod_version,
-                'Implementation-Vendor'  : mod_authors,
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-    finalizedBy 'reobfJar'
-}
-
-tasks.register('fatJar', Jar) {
-    dependsOn shadowJar
-    archiveClassifier.set('all')
-
-    from {
-        zipTree(shadowJar.archiveFile.get().asFile)
-    }
-
-    manifest {
-        attributes jar.manifest.attributes
-    }
-}
-
-configurations {
-    shadow
-    implementation.extendsFrom shadow
-}
+configurations.shadow.extendsFrom configurations.implementation
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-jar.finalizedBy('reobfJar')
+tasks.named("jar") {
+    dependsOn shadowJar
+    finalizedBy reobfShadowJar
+}
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId = mod_group_id
             artifactId = mod_id
-            artifact jar
+            artifact shadowJar
         }
     }
     repositories {
@@ -182,4 +190,16 @@ publishing {
             url file("${project.rootDir}/mcmodsrepo")
         }
     }
+}
+
+
+afterEvaluate {
+    tasks.findByName('reobfJar')?.enabled = false
+    tasks.findByName('reobfJarJar')?.enabled = false
+    tasks.reobfShadowJar.dependsOn tasks.shadowJar
+    tasks.build.dependsOn tasks.reobfShadowJar
+}
+
+artifacts {
+    archives shadowJar
 }

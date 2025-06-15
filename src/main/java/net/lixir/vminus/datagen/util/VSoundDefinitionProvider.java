@@ -139,14 +139,20 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
         });
     }
 
-    private boolean customValidateSound(final String soundName, final ResourceLocation name) {
+    private boolean customValidateSound(final String soundName, ResourceLocation name) {
+        String namespace = name.getNamespace();
+        String path = name.getPath();
+        if (path.endsWith(".opus")) {
+            path = path.substring(0, path.indexOf(".opus"));
+        }
+        name = new ResourceLocation(namespace, path);
         boolean oggExists = this.helper.exists(name, PackType.CLIENT_RESOURCES, ".ogg", "sounds");
         boolean opusExists = this.helper.exists(name, PackType.CLIENT_RESOURCES, ".opus", "sounds");
         boolean valid = oggExists || opusExists;
 
         if (!valid) {
-            String oggPath = name.getNamespace() + ":sounds/" + name.getPath() + ".ogg";
-            String opusPath = name.getNamespace() + ":sounds/" + name.getPath() + ".opus";
+            String oggPath =  namespace + ":sounds/" + path + ".ogg";
+            String opusPath = namespace + ":sounds/" + path + ".opus";
             VMinus.LOGGER.warn("Unable to find corresponding OGG or OPUS file '{}' or '{}' for sound event '{}'", oggPath, opusPath, soundName);
         }
         return valid;

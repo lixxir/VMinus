@@ -13,5 +13,5 @@ import static net.lixir.vminus.VMinus.REGISTRY;
 
 public class VMinusSounds {
 	public static void init() {}
-	public static final SoundEvent ITEM_DROP = REGISTRY.sound("ui.inventory.item.drop", "ui/inventory/item/drop");
+	public static final SoundEvent ITEM_DROP = REGISTRY.sound("ui.inventory.item.drop", "ui/inventory/item/drop.opus");
 }
