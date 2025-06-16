@@ -17,6 +17,13 @@ import java.util.List;
 
 @Mod.EventBusSubscriber
 public class LivingHurtEventHandler {
+    private List<ProtectionConfig> protectionTypes = List.of(
+            new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fire")),
+            new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION, new ResourceLocation(VMinus.ID, "protection/magic")),
+            new ProtectionConfig(VMinusAttributes.FALL_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fall")),
+            new ProtectionConfig(VMinusAttributes.BLUNT_PROTECTION, new ResourceLocation(VMinus.ID, "protection/blunt"))
+    );
+    
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLivingHurt(LivingHurtEvent event) {
         Entity entity = event.getEntity();
@@ -26,14 +33,7 @@ public class LivingHurtEventHandler {
         DamageSource damageSource = event.getSource();
         float damage = event.getAmount();
 
-        List<ProtectionConfig> protectionTypes = List.of(
-                new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fire")),
-                new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION, new ResourceLocation(VMinus.ID, "protection/magic")),
-                new ProtectionConfig(VMinusAttributes.FALL_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fall")),
-                new ProtectionConfig(VMinusAttributes.BLUNT_PROTECTION, new ResourceLocation(VMinus.ID, "protection/blunt"))
-        );
-
-        for (ProtectionConfig protectionConfig : protectionTypes) {
+        for (ProtectionConfig protectionConfig : this.protectionTypes) {
             damage = AttributeHelper.applyProtection(damage, livingEntity, damageSource, protectionConfig.attribute(), protectionConfig.damageTag());
         }
 
