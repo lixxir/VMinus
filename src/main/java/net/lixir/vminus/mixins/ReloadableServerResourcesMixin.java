@@ -1,6 +1,7 @@
 package net.lixir.vminus.mixins;
 
-import net.lixir.vminus.visions.resources.VisionResourceController;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.resource.managers.VisionManager;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.ReloadableServerResources;
@@ -27,19 +28,7 @@ public abstract class ReloadableServerResourcesMixin {
                                              Executor gameExecutor,
                                              CallbackInfoReturnable<CompletableFuture<ReloadableServerResources>> cir) {
 
-        VisionResourceController.clearVisions();
-    }
-
-    @Inject(method = "loadResources", at = @At("TAIL"))
-    private static void vminus$onReloadComplete(ResourceManager resourceManager,
-                                                RegistryAccess.Frozen registryAccess,
-                                                FeatureFlagSet featureFlags,
-                                                Commands.CommandSelection commandSelection,
-                                                int functionPermissionLevel,
-                                                Executor backgroundExecutor,
-                                                Executor gameExecutor,
-                                                CallbackInfoReturnable<CompletableFuture<ReloadableServerResources>> cir) {
-
-        cir.getReturnValue().thenRun(VisionResourceController::freezeVisions);
+        Vision.resetVisions();
+        VisionManager.clearVisionManagers();
     }
 }

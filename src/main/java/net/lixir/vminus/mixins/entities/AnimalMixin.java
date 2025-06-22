@@ -1,34 +1,29 @@
 package net.lixir.vminus.mixins.entities;
 
+import net.lixir.vminus.sight.resource.SightManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.animal.Animal;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(net.minecraft.world.entity.animal.Animal.class)
+import javax.annotation.Nullable;
+
+@Mixin(Animal.class)
 public class AnimalMixin {
-    @Inject(method = "spawnChildFromBreeding", at = @At("HEAD"), cancellable = true)
-    public void spawnChildFromBreeding(ServerLevel serverLevel, net.minecraft.world.entity.animal.Animal otherParent, CallbackInfo ci) {
-        net.minecraft.world.entity.animal.Animal thisParent = (net.minecraft.world.entity.animal.Animal) (Object) this;
-
-        AgeableMob child = otherParent.getBreedOffspring(serverLevel, thisParent);
+    @Inject(method = "finalizeSpawnChildFromBreeding", at = @At("HEAD"))
+    private void onFinalizeSpawn(ServerLevel level, Animal otherParent, @Nullable AgeableMob child, CallbackInfo ci) {
+        if (!SightManager.get("variant_breeding"))
+            return;
         if (child != null) {
+            child.getPersistentData();
+            String thisVariant = ((Animal) (Object) this).getPersistentData().getString("variant");
+            String otherVariant = otherParent.getPersistentData().getString("variant");
 
-            child.setBaby(true);
-            child.moveTo(otherParent.getX(), otherParent.getY(), otherParent.getZ(), 0.0F, 0.0F);
-
-            String thisParentVariant = thisParent.getPersistentData().getString("variant");
-            String otherParentVariant = otherParent.getPersistentData().getString("variant");
-
-            String childVariant = serverLevel.random.nextBoolean() ? thisParentVariant : otherParentVariant;
-
+            String childVariant = level.random.nextBoolean() ? thisVariant : otherVariant;
             child.getPersistentData().putString("variant", childVariant);
-
-            thisParent.finalizeSpawnChildFromBreeding(serverLevel, otherParent, child);
-            serverLevel.addFreshEntityWithPassengers(child);
         }
-        ci.cancel();
     }
 }

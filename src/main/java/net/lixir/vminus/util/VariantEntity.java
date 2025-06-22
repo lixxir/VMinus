@@ -1,12 +1,7 @@
 package net.lixir.vminus.util;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.visions.EntityVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionEntityVariant;
+import net.lixir.vminus.vision.util.VisionEntityVariant;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,8 +18,9 @@ public interface VariantEntity {
    @Nullable ResourceLocation vminus$getVariantName();
 
    static @Nullable VisionEntityVariant setFromWeightedList(LivingEntity entity) {
+      /*
       if (entity instanceof VariantEntity variantEntity) {
-         List<VisionEntityVariant> entityVariants = EntityVision.of(entity).variant.values(new VisionConditionArguments(entity));
+         List<VisionEntityVariant> entityVariants = EntityVision.of(entity).variant.values(new VisionContext(entity));
          ArrayList<VisionEntityVariant> weightedEntityVariants = getWeightedVisionEntityVariants(entityVariants);
 
          VisionEntityVariant selectedVariant = !weightedEntityVariants.isEmpty()
@@ -36,6 +32,8 @@ public interface VariantEntity {
          variantEntity.vminus$setVariant(selectedVariant.name(), selectedVariant.texture());
          return selectedVariant;
       }
+
+       */
       return null;
    }
 

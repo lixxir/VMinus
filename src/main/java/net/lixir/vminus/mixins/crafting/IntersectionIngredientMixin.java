@@ -1,32 +1,25 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.IntersectionIngredient;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(IntersectionIngredient.class)
 public abstract class IntersectionIngredientMixin {
+    @Shadow
+    private ItemStack[] intersectedMatchingStacks;
 
-    @Shadow private ItemStack[] intersectedMatchingStacks;
-    @Shadow @Final private List<Ingredient> children;
+    @Shadow
+    @Final
+    private List<Ingredient> children;
 
 
+    /*
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
     private void detour$replaceAndIntersectVisionItems(CallbackInfoReturnable<ItemStack[]> cir) {
         if (this.intersectedMatchingStacks != null)
@@ -47,8 +40,8 @@ public abstract class IntersectionIngredientMixin {
             if (!matchesAll)
                 continue;
 
-            VisionItemReplacement replacement = ItemVision.of(original).replace.value(new VisionConditionArguments(original));
-            Boolean banned = ItemVision.of(original).ban.value(new VisionConditionArguments(original));
+            VisionItemReplacement replacement = ItemVision.of(original).replace.value(new VisionContext(original));
+            Boolean banned = ItemVision.of(original).ban.value(new VisionContext(original));
 
             if (Boolean.TRUE.equals(banned))
                 continue;
@@ -81,5 +74,7 @@ public abstract class IntersectionIngredientMixin {
         cir.setReturnValue(this.intersectedMatchingStacks);
     }
 
+
+     */
 
 }

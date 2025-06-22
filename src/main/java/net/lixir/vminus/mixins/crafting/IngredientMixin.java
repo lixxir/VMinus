@@ -1,24 +1,8 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.lixir.vminus.visions.util.VisionUtil;
-import net.lixir.vminus.visions.ItemVision;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(Ingredient.class)
 public abstract class IngredientMixin {
@@ -44,7 +28,7 @@ public abstract class IngredientMixin {
      */
 
 
-
+/*
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
     public void vminus$getItems(CallbackInfoReturnable<ItemStack[]> cir) {
         List<ItemStack> replacedItems = new ArrayList<>();
@@ -52,12 +36,12 @@ public abstract class IngredientMixin {
         boolean changed = false;
         for (Ingredient.Value value : accessor.getValues()) {
             for (ItemStack stack : value.getItems()) {
-                VisionItemReplacement visionItemReplacement = ItemVision.of(stack).replace.value(new VisionConditionArguments(stack));
+                VisionItemReplacement visionItemReplacement = ItemVision.of(stack).replace.value(new VisionContext(stack));
                 if (visionItemReplacement == null)
                     continue;
                 TagKey<Item> tagKey = visionItemReplacement.tag();
                 ItemStack replacementStack = visionItemReplacement.itemStack();
-                Boolean banned = ItemVision.of(stack).ban.value(new VisionConditionArguments(stack));
+                Boolean banned = ItemVision.of(stack).ban.value(new VisionContext(stack));
                 if (tagKey != null ) {
                     var tagCollection = ForgeRegistries.ITEMS.tags();
                     if (tagCollection == null)
@@ -82,4 +66,6 @@ public abstract class IngredientMixin {
         if (changed)
             cir.setReturnValue(replacedItems.toArray(new ItemStack[0]));
     }
+
+ */
 }

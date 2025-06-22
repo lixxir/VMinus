@@ -1,44 +1,21 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.network.VMinusNetworking;
-import net.lixir.vminus.network.VariantSyncPacket;
-import net.lixir.vminus.util.VariantEntity;
-import net.lixir.vminus.visions.EntityVision;
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionBaseAttribute;
-import net.lixir.vminus.visions.util.VisionEntityVariant;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
-
-import java.util.List;
 
 @Mod.EventBusSubscriber
 public class EntityJoinLevelEventHandler {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     public static void onEntityJoin(EntityJoinLevelEvent event) {
+        /*
         Entity entity = event.getEntity();
         if (entity == null)
             return;
         Level level = event.getLevel();
         EntityVision vision = EntityVision.of(entity);
-        Boolean banned = vision.ban.value(new VisionConditionArguments(entity));
+        Boolean banned = vision.ban.value(new VisionContext(entity));
 
         // Banning banned entities
         if (banned != null && banned) {
@@ -55,12 +32,12 @@ public class EntityJoinLevelEventHandler {
             ItemStack stack = itemEntity.getItem();
             Item item = stack.getItem();
 
-            VisionConditionArguments visionConditionArguments = new VisionConditionArguments.Builder().pass(stack).pass(entity).build();
-            VisionItemReplacement visionItemReplacement = ItemVision.of(item).replace.value(visionConditionArguments);
+            VisionContext visionContext = new VisionContext.Builder().pass(stack).pass(entity).build();
+            VisionItemReplacement visionItemReplacement = ItemVision.of(item).replace.value(visionContext);
             if (visionItemReplacement == null)
                 return;
             ItemStack replacementStack = visionItemReplacement.itemStack();
-            Boolean itemBanned = ItemVision.of(stack).ban.value(new VisionConditionArguments(stack));
+            Boolean itemBanned = ItemVision.of(stack).ban.value(new VisionContext(stack));
 
             if (replacementStack != null && !replacementStack.isEmpty()) {
                 replacementStack.setCount(stack.getCount());
@@ -95,7 +72,7 @@ public class EntityJoinLevelEventHandler {
                     entity.getPersistentData().putBoolean("health_adjust", true);
                 }
             }
-            List<VisionBaseAttribute> baseAttributeValues = vision.base_attribute.values(new VisionConditionArguments(entity));
+            List<VisionBaseAttribute> baseAttributeValues = vision.base_attribute.values(new VisionContext(entity));
             for (VisionBaseAttribute visionBaseAttribute : baseAttributeValues) {
                 Attribute attribute = visionBaseAttribute.attribute();
                 Double value = visionBaseAttribute.value();
@@ -118,5 +95,7 @@ public class EntityJoinLevelEventHandler {
             }
 
         }
+
+         */
     }
 }

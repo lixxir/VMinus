@@ -2,25 +2,21 @@ package net.lixir.vminus.registry;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.capes.Cape;
-import net.lixir.vminus.capes.CapeHelper;
+import net.lixir.vminus.cape.Cape;
 import net.lixir.vminus.command.VMinusCommandSuggestionProviders;
+import net.lixir.vminus.network.SyncCapePacket;
 import net.lixir.vminus.network.VminusModVariables;
-import net.lixir.vminus.visions.ItemVision;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -31,7 +27,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -57,25 +52,6 @@ public class VMinusCommands {
                             .executes(VMinusCommands::teleportToDimension)
                     )
             );
-        dispatcher.register(Commands.literal("testvision")
-                .requires(cs -> cs.hasPermission(2))
-                .then(Commands.argument("item", ItemArgument.item(context))
-                        .executes(ctx -> {
-                            ItemStack itemStack = ItemArgument.getItem(ctx, "item").createItemStack(1, false);
-
-
-                            ItemVision vision = ItemVision.of(itemStack);
-
-
-                            JsonObject encoded = vision.serialize();
-                            String encodedString = GSON.toJson(encoded);
-
-                            VMinus.LOGGER.info("Test Output: {}", encodedString);
-
-                            return 1;
-                        })
-                )
-        );
         dispatcher.register(Commands.literal("fire").requires(s -> s.hasPermission(3)).then(Commands.argument("entities", EntityArgument.entities()).then(Commands.argument("seconds", DoubleArgumentType.doubleArg(0)).executes(arguments -> {
             for (Entity entity : EntityArgument.getEntities(arguments, "entities")) {
                 entity.setSecondsOnFire((int) DoubleArgumentType.getDouble(arguments, "seconds"));
@@ -121,18 +97,28 @@ public class VMinusCommands {
                             String capeId = StringArgumentType.getString(arguments, "capeId");
 
                             if (player != null) {
-                                if (CapeHelper.ownsCape(player, capeId) || capeId.equals("default")) {
+                                if (Cape.ownsCape(player, capeId) || capeId.equals("default")) {
                                     player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
                                         capability.cape_id = capeId;
                                         capability.syncPlayerVariables(player);
+
+                                        if (player instanceof ServerPlayer serverPlayer) {
+                                            SyncCapePacket.sendToAll(serverPlayer, capeId);
+                                        }
                                     });
-                                    player.sendSystemMessage(Component.literal("Cape set to " + capeId).withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+
+                                    player.sendSystemMessage(Component.literal("Cape set to " + capeId)
+                                            .withStyle(ChatFormatting.ITALIC)
+                                            .withStyle(ChatFormatting.GRAY));
                                 } else {
-                                    player.sendSystemMessage(Component.literal("You do not own this cape or it does not exist.").withStyle(ChatFormatting.ITALIC).withStyle(ChatFormatting.GRAY));
+                                    player.sendSystemMessage(Component.literal("You do not own this cape or it does not exist.")
+                                            .withStyle(ChatFormatting.ITALIC)
+                                            .withStyle(ChatFormatting.GRAY));
                                 }
                             }
                             return 0;
                         })));
+
     }
 
     public static int teleportToDimension(CommandContext<CommandSourceStack> context) {
@@ -169,7 +155,7 @@ public class VMinusCommands {
 
         if (entity != null) {
             String input = builder.getRemaining().toLowerCase();
-            List<Cape> availableCapes = CapeHelper.getAvailableCapes(entity);
+            List<Cape> availableCapes = Cape.getAvailableCapes(entity);
 
             for (Cape cape : availableCapes) {
                 if (cape.getId().toLowerCase().contains(input)) {

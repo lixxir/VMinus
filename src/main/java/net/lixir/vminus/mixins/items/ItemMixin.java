@@ -3,14 +3,19 @@ package net.lixir.vminus.mixins.items;
 import net.lixir.vminus.item.MaxDurationGetter;
 import net.lixir.vminus.registry.entry.ItemEntry;
 import net.lixir.vminus.registry.entry.ItemEntryAccessor;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionFoodProperties;
-import net.lixir.vminus.visions.accessors.ItemVisionAccessor;
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.util.VisionUtil;
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.util.VisionFoodProperties;
+import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.*;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraftforge.common.extensions.IForgeItem;
+import net.minecraftforge.common.extensions.IForgeItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,102 +24,114 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Item.class)
-public class ItemMixin implements ItemVisionAccessor, ItemEntryAccessor, MaxDurationGetter {
+public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDurationGetter, IForgeItem {
     @Unique
-    private final Item vminus$item = (Item) (Object) this;
-
-    @Unique
-    private ItemVision vminus$itemVision = null;
+    private final Item vMinus$self = (Item) (Object) this;
 
     @Unique
-    private ItemEntry vminus$itemEntry = null;
+    private ItemEntry vMinus$itemEntry = null;
 
-    @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)
-    public void getUseAnimation(ItemStack p_41452_, CallbackInfoReturnable<UseAnim> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().use_animation, new VisionConditionArguments(vminus$item));
-    }
+    @Unique
+    private int vMinus$visionIndex = 0;
 
-    @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
-    private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
-        VisionFoodProperties value = vminus$getVision().food_properties.value(new VisionConditionArguments(vminus$item));
-        if (value != null)
-            cir.setReturnValue(value.mergeFoodProperties(cir.getReturnValue()));
+    @Inject(method = "isFoil", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$isFoil(CallbackInfoReturnable<Boolean> cir) { // Foil is a stupid name so were ganna go with glint.
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.GLINT, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getMaxStackSize", at = @At("RETURN"), cancellable = true)
-    public final void getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().max_stack_size, new VisionConditionArguments(vminus$item));
+    public final void vMinus$getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.MAX_STACK_SIZE, new VisionContext(vMinus$self));
+    }
+
+    @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$getMaxDamage(CallbackInfoReturnable<Integer> cir) {
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
+    }
+
+    @Inject(method = "canBeDepleted", at = @At("RETURN"), cancellable = true)
+    public void vMinus$canBeDepleted(CallbackInfoReturnable<Boolean> cir) {
+        Integer maxDamage = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
+        if (maxDamage != null && maxDamage > 0)
+            cir.setReturnValue(true);
+    }
+
+    @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$getUseAnimation(ItemStack itemStack, CallbackInfoReturnable<UseAnim> cir) {
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.USE_ANIMATION, new VisionContext(itemStack));
+    }
+
+
+    @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
+    private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
+        VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
+        if (visionFoodProperties != null) {
+            cir.setReturnValue(visionFoodProperties.merge(cir.getReturnValue()));
+        }
     }
 
     @Inject(method = "isFireResistant", at = @At("RETURN"), cancellable = true)
     public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().fire_resistant, new VisionConditionArguments(vminus$item));
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.FIRE_RESISTANT, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
-    private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().use_duration, new VisionConditionArguments(vminus$item));
+    private void getUseDuration(ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.USE_TICKS, new VisionContext(itemStack));
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
-    private void isEdible(CallbackInfoReturnable<Boolean> cir) {
-        VisionFoodProperties value = vminus$getVision().food_properties.value(new VisionConditionArguments(vminus$item));
-        if (value != null)
+    private void isEdible(CallbackInfoReturnable<Boolean> cir) {  // Allow it to be edible if food properties exist. Can not be a value on its own as it will crash without FoodProperties.
+        VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
+        if (visionFoodProperties != null) {
             cir.setReturnValue(true);
+        }
     }
 
     @Inject(method = "getEnchantmentValue", at = @At("RETURN"), cancellable = true)
     private void getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().enchantability, new VisionConditionArguments(vminus$item));
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.ENCHANTABILITY, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getRarity", at = @At("RETURN"), cancellable = true)
     private void getRarity(ItemStack itemStack, CallbackInfoReturnable<Rarity> cir) {
-        VisionUtil.tryOverride(cir, vminus$getVision().rarity, new VisionConditionArguments(vminus$item));
+        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.RARITY, new VisionContext(itemStack));
     }
 
     @Override
-    public void vminus$mergeVision(ItemVision itemVision) {
-        if (this.vminus$itemVision == null)
-            this.vminus$itemVision = itemVision;
-        else
-            this.vminus$itemVision.merge(itemVision);
+    public int getBurnTime(ItemStack stack, @Nullable RecipeType<?> recipeType) {
+        Integer value = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FUEL_TICKS, new VisionContext(stack));
+        if (value != null)
+            return value;
+        return IForgeItem.super.getBurnTime(stack, recipeType);
     }
 
-    @Override
-    public @NotNull ItemVision vminus$getVision() {
-        if (vminus$itemVision == null)
-            return ItemVision.EMPTY;
-        return this.vminus$itemVision;
-    }
-
-    @Override
-    public void vminus$clearVision() {
-        if (vminus$itemVision != null)
-            this.vminus$itemVision = new ItemVision();
-    }
-
-    @Override
-    public void vminus$freezeVision() {
-        if (vminus$itemVision != null)
-            this.vminus$itemVision.freeze();
-    }
 
     @Override
     public void vminus$setEntry(ItemEntry itemEntry) {
-        this.vminus$itemEntry = itemEntry;
+        this.vMinus$itemEntry = itemEntry;
     }
 
     @Override
     public @Nullable ItemEntry vminus$getEntry() {
-        return vminus$itemEntry;
+        return vMinus$itemEntry;
     }
 
     @Override
     public int vminus$getMaxDuration() {
-        Integer value = vminus$getVision().max_duration.value(new VisionConditionArguments(vminus$item));
+        Integer value = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.MAX_USE_TICKS, new VisionContext(vMinus$self));
         if (value != null)
             return value;
         return 0;
+    }
+
+    @Override
+    public void vMinus$setVisionIndex(int index) {
+        vMinus$visionIndex = index;
+    }
+
+    @Override
+    public int vMinus$getVisionIndex() {
+        return vMinus$visionIndex;
     }
 }

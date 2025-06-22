@@ -39,13 +39,8 @@ public class SoundBufferLibraryMixin {
 
     @Inject(method = "getStream", at = @At("RETURN"), cancellable = true)
     private void detour$injectOpusSupport(ResourceLocation location, boolean looping, CallbackInfoReturnable<CompletableFuture<AudioStream>> cir) {
-        VMinus.LOGGER.info("[Opus Check] Stream requested: {}", location);
-        VMinus.LOGGER.info("[Opus Check] Stream Ends with .opus? {}", location.getPath().endsWith(".opus"));
-
         if (location.getPath().endsWith(".opus")) {
-            VMinus.LOGGER.info("Loading Opus stream: {}", location);
             ResourceProvider provider = ((SoundBufferLibraryAccessor) vminus$soundBufferLibrary).detour$getResourceProvider();
-
             cir.setReturnValue(CompletableFuture.supplyAsync(() -> {
                 try {
                     InputStream stream = provider.open(location);
@@ -61,31 +56,17 @@ public class SoundBufferLibraryMixin {
         }
     }
 
-
     @Inject(method = "getCompleteBuffer", at = @At("RETURN"), cancellable = true)
     public void supportOpus(ResourceLocation location, CallbackInfoReturnable<CompletableFuture<SoundBuffer>> cir) {
-        VMinus.LOGGER.info("[Opus Check] Buffer requested: {}", location);
-        VMinus.LOGGER.info("[Opus Check] Buffer Ends with .opus? {}", location.getPath().endsWith(".opus"));
-
         if (location.getPath().endsWith(".opus")) {
-            VMinus.LOGGER.info("Loading Opus Buffer: {}", location);
-            if (this.cache.containsKey(location)) {
-                this.cache.remove(location);
-                VMinus.LOGGER.info("[Opus Cache] Already cached: {}", location);
-            } else {
-                VMinus.LOGGER.info("[Opus Cache] Not cached, creating new stream: {}", location);
-            }
+            this.cache.remove(location);
             cir.setReturnValue(this.cache.computeIfAbsent(location, loc ->
                     CompletableFuture.supplyAsync(() -> {
-
-                        VMinus.LOGGER.info("[Opus Test] Inside supplyAsync");
                         try (
                                 InputStream input = resourceManager.open(loc);
                                 OggOpusAudioStream stream = new OggOpusAudioStream(input)
                         ) {
-                            VMinus.LOGGER.info("Opened Opus stream successfully: {}", loc);
                             ByteBuffer buffer = stream.readAll();
-                            VMinus.LOGGER.info("Read full Opus stream: {} bytes", buffer.limit());
                             return new SoundBuffer(buffer, stream.getFormat());
                         } catch (IOException e) {
                             VMinus.LOGGER.error("IO error while loading Opus stream {}: {}", loc, e.getMessage(), e);

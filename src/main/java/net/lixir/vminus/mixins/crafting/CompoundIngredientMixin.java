@@ -1,23 +1,10 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.crafting.CompoundIngredient;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Mixin(CompoundIngredient.class)
@@ -26,6 +13,7 @@ public abstract class CompoundIngredientMixin {
     private List<Ingredient> children;
 
 
+    /*
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
     private void detour$replaceVisionItems(CallbackInfoReturnable<ItemStack[]> cir) {
         List<ItemStack> replacedItems = new ArrayList<>();
@@ -33,12 +21,12 @@ public abstract class CompoundIngredientMixin {
 
         for (Ingredient child : children) {
             for (ItemStack stack : child.getItems()) {
-                VisionItemReplacement replacement = ItemVision.of(stack).replace.value(new VisionConditionArguments(stack));
+                VisionItemReplacement replacement = ItemVision.of(stack).replace.value(new VisionContext(stack));
                 if (replacement == null) continue;
 
                 TagKey<Item> tagKey = replacement.tag();
                 ItemStack replacementStack = replacement.itemStack();
-                Boolean banned = ItemVision.of(stack).ban.value(new VisionConditionArguments(stack));
+                Boolean banned = ItemVision.of(stack).ban.value(new VisionContext(stack));
 
                 if (tagKey != null) {
                     var tagCollection = ForgeRegistries.ITEMS.tags();
@@ -66,5 +54,7 @@ public abstract class CompoundIngredientMixin {
         }
     }
 
+
+     */
 
 }

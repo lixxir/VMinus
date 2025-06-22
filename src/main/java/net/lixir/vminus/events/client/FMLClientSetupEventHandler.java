@@ -29,7 +29,7 @@ public class FMLClientSetupEventHandler {
         }
     }
 
-    private static @NotNull RenderType getRenderType(BlockEntry blockEntry) {
+    private static @NotNull RenderType getRenderType(@NotNull BlockEntry blockEntry) {
         String rawRenderType = blockEntry.getRenderType().toLowerCase();
         return switch (rawRenderType) {
             case "cutout" -> RenderType.cutout();

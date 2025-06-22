@@ -1,6 +1,5 @@
 package net.lixir.vminus.mixins.client;
 
-import net.lixir.vminus.visions.CreativeTabVision;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.gui.CreativeTabsScreenPage;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +12,7 @@ import java.util.List;
 
 @Mixin(CreativeTabsScreenPage.class)
 public abstract class CreativeTabsScreenPageMixin {
+    /*
     @Inject(method = "getVisibleTabs", at = @At(value = "RETURN"), cancellable = true,  remap = false)
     private void getVisibleTabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
@@ -26,4 +26,6 @@ public abstract class CreativeTabsScreenPageMixin {
         }
         cir.setReturnValue(filteredTabs);
     }
+
+     */
 }

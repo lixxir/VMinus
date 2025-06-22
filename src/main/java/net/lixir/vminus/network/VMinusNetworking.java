@@ -1,8 +1,9 @@
 package net.lixir.vminus.network;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.network.vision.VisionControlPacket;
-import net.lixir.vminus.network.vision.VisionSyncPacket;
+import net.lixir.vminus.network.vision.ClientboundVisionListPacket;
+import net.lixir.vminus.network.vision.ClientboundVisionMappingPacket;
+import net.lixir.vminus.network.vision.ClientboundDataResetPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,21 +27,45 @@ public class VMinusNetworking {
             PROTOCOL_VERSION::equals
     );
 
-    private static int messageID = 0;
+    private static int MESSAGE_ID = 0;
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        addNetworkMessage(VariantSyncPacket.class, VariantSyncPacket::encode, VariantSyncPacket::new, VariantSyncPacket::handle);
-        addNetworkMessage(VisionSyncPacket.class, VisionSyncPacket::encode, VisionSyncPacket::decode, VisionSyncPacket::handle);
-        addNetworkMessage(VisionControlPacket.class, VisionControlPacket::encode, VisionControlPacket::decode, VisionControlPacket::handle);
+        addNetworkMessage(
+                VariantSyncPacket.class,
+                VariantSyncPacket::encode,
+                VariantSyncPacket::new,
+                VariantSyncPacket::handle);
+        addNetworkMessage(
+                SyncCapePacket.class,
+                SyncCapePacket::encode,
+                SyncCapePacket::decode,
+                SyncCapePacket::handle);
+        addNetworkMessage(ClientboundSightSyncPacket.class,
+                ClientboundSightSyncPacket::encode,
+                ClientboundSightSyncPacket::decode,
+                ClientboundSightSyncPacket::handle);
+        addNetworkMessage(ClientboundDataResetPacket.class,
+                ClientboundDataResetPacket::encode,
+                ClientboundDataResetPacket::decode,
+                ClientboundDataResetPacket::handle);
+        addNetworkMessage(ClientboundVisionListPacket.class,
+                ClientboundVisionListPacket::encode,
+                ClientboundVisionListPacket::decode,
+                ClientboundVisionListPacket::handle);
+        addNetworkMessage(ClientboundVisionMappingPacket.class,
+                ClientboundVisionMappingPacket::encode,
+                ClientboundVisionMappingPacket::decode,
+                ClientboundVisionMappingPacket::handle);
     }
+
 
     public static <T> void addNetworkMessage(Class<T> messageType,
                                              BiConsumer<T, FriendlyByteBuf> encoder,
                                              Function<FriendlyByteBuf, T> decoder,
                                              BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
-        CHANNEL.registerMessage(messageID, messageType, encoder, decoder, messageConsumer);
-        messageID++;
+        CHANNEL.registerMessage(MESSAGE_ID, messageType, encoder, decoder, messageConsumer);
+        MESSAGE_ID++;
     }
 
 }

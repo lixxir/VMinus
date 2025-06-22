@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.enchantments;
 
-import net.lixir.vminus.visions.util.EnchantmentVisionHelper;
+import net.lixir.vminus.vision.util.EnchantmentVisionHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.Enchantment;

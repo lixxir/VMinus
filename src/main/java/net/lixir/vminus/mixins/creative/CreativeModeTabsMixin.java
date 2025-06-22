@@ -1,6 +1,5 @@
 package net.lixir.vminus.mixins.creative;
 
-import net.lixir.vminus.visions.CreativeTabVision;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +13,7 @@ import java.util.stream.Stream;
 
 @Mixin(CreativeModeTabs.class)
 public class CreativeModeTabsMixin {
+    /*
     @Inject(method = "allTabs", at = @At(value = "RETURN"), cancellable = true)
     private static void allTabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
 
@@ -54,4 +54,6 @@ public class CreativeModeTabsMixin {
         cir.setReturnValue(newTabs.stream());
     }
 
+
+     */
 }

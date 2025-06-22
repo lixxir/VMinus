@@ -1,27 +1,12 @@
 package net.lixir.vminus.mixins.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionItemDecorator;
-import net.lixir.vminus.visions.ItemVision;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 @Mixin(GuiGraphics.class)
 public abstract class GuiGraphicsMixin {
@@ -34,6 +19,7 @@ public abstract class GuiGraphicsMixin {
     @Final
     private Minecraft minecraft;
 
+    /*
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
     public void renderItemDecorations(Font font, ItemStack itemstack, int x, int y, @Nullable String customText, CallbackInfo ci) {
         if (!itemstack.isEmpty() && vminus$isItemInSlot(itemstack)) {
@@ -62,7 +48,7 @@ public abstract class GuiGraphicsMixin {
         ItemVision itemVision = ItemVision.of(itemStack);
         if (itemStack.getTag() != null && itemStack.getTag().getBoolean("tab_item"))
             return;
-        List<VisionItemDecorator> visionItemDecoratorList = itemVision.decorator.values(new VisionConditionArguments(itemStack));
+        List<VisionItemDecorator> visionItemDecoratorList = itemVision.decorator.values(new VisionContext(itemStack));
         this.pose.pushPose();
         for (VisionItemDecorator visionItemDecorator : visionItemDecoratorList) {
             ResourceLocation texture = visionItemDecorator.texture();
@@ -72,4 +58,6 @@ public abstract class GuiGraphicsMixin {
         }
         this.pose.popPose();
     }
+
+     */
 }

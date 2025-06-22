@@ -9,6 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 public class VMinusTags {
     public static class Blocks {
@@ -37,8 +38,10 @@ public class VMinusTags {
         public static final TagKey<Block> DYED_STAINED_GLASS_PANE = tag("dyed/stained_glass_pane");
         public static final TagKey<Block> GRASSES = tag("grasses");
         public static final TagKey<Block> TALL_GRASSES = tag("tall_grasses");
+        public static final TagKey<Block> LEASHABLE = tag("leashable");
+        public static final TagKey<Block> COCAO_PLANTABLE_ON = tag("cocao_plantable_on");
 
-        private static TagKey<Block> tag(String name) {
+        private static @NotNull TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(VMinus.ID, name));
         }
     }
@@ -47,7 +50,7 @@ public class VMinusTags {
         public static final TagKey<EntityType<?>> ZOMBIES = create(new ResourceLocation(VMinus.ID, "zombies"));
         public static final TagKey<EntityType<?>> BANNED = create(new ResourceLocation(VMinus.ID, "banned"));
 
-        private static TagKey<EntityType<?>> create(ResourceLocation p_203849_) {
+        private static @NotNull TagKey<EntityType<?>> create(ResourceLocation p_203849_) {
             return TagKey.create(Registries.ENTITY_TYPE, p_203849_);
         }
     }
@@ -95,7 +98,7 @@ public class VMinusTags {
         public static final TagKey<Item> MOB_BUCKETS = tag("buckets/mob");
         public static final TagKey<Item> FOOD_BUCKETS = tag("buckets/food");
 
-        private static TagKey<Item> tag(String name) {
+        private static @NotNull TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinus.ID, name));
         }
     }

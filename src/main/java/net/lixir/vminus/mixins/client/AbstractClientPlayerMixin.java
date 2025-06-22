@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.client;
 
 import com.mojang.authlib.GameProfile;
-import net.lixir.vminus.capes.CapeHelper;
+import net.lixir.vminus.cape.Cape;
 import net.lixir.vminus.item.MaxDurationGetter;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -9,12 +9,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,8 +23,8 @@ import javax.annotation.Nullable;
 
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerMixin extends Player {
-    public AbstractClientPlayerMixin(Level p_250508_, BlockPos p_250289_, float p_251702_, GameProfile p_252153_) {
-        super(p_250508_, p_250289_, p_251702_, p_252153_);
+    public AbstractClientPlayerMixin(Level level, BlockPos blockPos, float p_251702_, GameProfile gameProfile) {
+        super(level, blockPos, p_251702_, gameProfile);
     }
 
     @Shadow
@@ -34,14 +32,19 @@ public abstract class AbstractClientPlayerMixin extends Player {
     protected abstract PlayerInfo getPlayerInfo();
 
     @Inject(method = "getElytraTextureLocation", at = @At("RETURN"), cancellable = true)
-    private void vminus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
-        PlayerInfo playerInfo = this.getPlayerInfo();
-        if (playerInfo != null) {
-            AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
-            ResourceLocation customCapeTexture = CapeHelper.getCapeTexture(player);
-            if (customCapeTexture != null) {
-                cir.setReturnValue(customCapeTexture);
-            }
+    public final void vMinus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+        vMinus$trySetCapeTexture(cir);
+    }
+
+    @Inject(method = "getCloakTextureLocation", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+        vMinus$trySetCapeTexture(cir);
+    }
+
+    @Inject(method = "isCapeLoaded", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$isCapeLoaded(CallbackInfoReturnable<Boolean> cir) {
+        if (vMinus$hasCustomCape()) {
+            cir.setReturnValue(true);
         }
     }
 
@@ -49,17 +52,26 @@ public abstract class AbstractClientPlayerMixin extends Player {
             method = "getFieldOfViewModifier",
             constant = @Constant(floatValue = 20.0F)
     )
-    private float modifyBowChargeTicks(float original) {
+    public final float vMinus$getFieldOfViewModifier(float original) {
         ItemStack itemstack = this.getUseItem();
         return ((MaxDurationGetter) itemstack.getItem()).vminus$getMaxDuration();
     }
 
-    @Inject(method = "getCloakTextureLocation", at = @At("RETURN"), cancellable = true)
-    private void vminus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+    @Unique
+    private boolean vMinus$hasCustomCape() {
         PlayerInfo playerInfo = this.getPlayerInfo();
         if (playerInfo != null) {
             AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
-            ResourceLocation customCapeTexture = CapeHelper.getCapeTexture(player);
+            return Cape.getCapeTexture(player) != null;
+        }
+        return false;
+    }
+
+    @Unique
+    private void vMinus$trySetCapeTexture(CallbackInfoReturnable<ResourceLocation> cir) {
+        if (vMinus$hasCustomCape()) {
+            AbstractClientPlayer player = (AbstractClientPlayer) (Object) this;
+            ResourceLocation customCapeTexture = Cape.getCapeTexture(player);
             if (customCapeTexture != null) {
                 cir.setReturnValue(customCapeTexture);
             }

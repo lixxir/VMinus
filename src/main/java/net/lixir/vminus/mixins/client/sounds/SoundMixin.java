@@ -24,7 +24,6 @@ public class SoundMixin {
             path = path.substring(0, path.indexOf(".opus"));
             String namespace = location.getNamespace();
             ResourceLocation opusLocation = new ResourceLocation(namespace, path);
-            VMinus.LOGGER.info("Opus locationL: {} ", opusLocation);
             cir.setReturnValue(OpusAudioResources.SOUND_LISTER_OPUS.idToFile(opusLocation));
         }
     }

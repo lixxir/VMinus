@@ -1,26 +1,11 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.crafting.CompoundIngredient;
 import net.minecraftforge.common.crafting.DifferenceIngredient;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITag;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 @Mixin(DifferenceIngredient.class)
@@ -31,6 +16,7 @@ public abstract class DifferenceIngredientMixin {
 
     @Shadow @Final private Ingredient subtracted;
 
+    /*
     @Inject(method = "getItems", at = @At("HEAD"), cancellable = true)
     private void detour$replaceAndFilterVisionItems(CallbackInfoReturnable<ItemStack[]> cir) {
         if (this.filteredMatchingStacks != null)
@@ -41,8 +27,8 @@ public abstract class DifferenceIngredientMixin {
             if (subtracted.test(original))
                 continue;
 
-            VisionItemReplacement replacement = ItemVision.of(original).replace.value(new VisionConditionArguments(original));
-            Boolean banned = ItemVision.of(original).ban.value(new VisionConditionArguments(original));
+            VisionItemReplacement replacement = ItemVision.of(original).replace.value(new VisionContext(original));
+            Boolean banned = ItemVision.of(original).ban.value(new VisionContext(original));
             TagKey<Item> tagKey = replacement != null ? replacement.tag() : null;
             ItemStack replacementStack = replacement != null ? replacement.itemStack() : null;
 
@@ -69,5 +55,7 @@ public abstract class DifferenceIngredientMixin {
         cir.setReturnValue(this.filteredMatchingStacks);
     }
 
+
+     */
 
 }

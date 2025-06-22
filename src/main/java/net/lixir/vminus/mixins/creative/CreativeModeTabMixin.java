@@ -1,42 +1,30 @@
 package net.lixir.vminus.mixins.creative;
 
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionCreativeOrder;
-import net.lixir.vminus.visions.util.VisionItemReplacement;
-import net.lixir.vminus.visions.CreativeTabVision;
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.accessors.CreativeTabVisionAccessor;
-import net.minecraft.tags.TagKey;
+import net.lixir.vminus.vision.VisionDuck;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
 @Mixin(value = CreativeModeTab.class, priority = 12000)
-public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
+public class CreativeModeTabMixin implements VisionDuck {
     @Unique
     private final CreativeModeTab vminus$creativeModeTab = (CreativeModeTab) (Object) this;
     @Unique
     private HashMap<Item, Item> WAITING_LIST = new HashMap<>();
     @Unique
     private HashMap<Item, Boolean> WAITING_LIST_ORDER = new HashMap<>();
-    @Unique
-    private CreativeTabVision vminus$creativeTabVision = new CreativeTabVision();
 
+    @Unique
+    private int vMinus$visionIndex = 0;
+
+    /*
     @Inject(method = "getIconItem", at = @At(value = "RETURN"), cancellable = true)
     public void getIconItem(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack itemStack;
-        ItemStack iconItemStack = vminus$getVision().icon.value();
+        ItemStack iconItemStack = vMinus$getVision().icon.value();
         if (iconItemStack != null) {
             itemStack = iconItemStack;
         } else {
@@ -49,12 +37,12 @@ public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
     @Inject(method = "buildContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;rebuildSearchTree()V"))
     private void vminus$buildContents(CreativeModeTab.ItemDisplayParameters displayContext, CallbackInfo ci) {
         CreativeTabModeAccessor accessor = (CreativeTabModeAccessor) vminus$creativeModeTab;
-        List<Item> itemsToRemove = new ArrayList<>(vminus$getVision().remove.values().stream()
+        List<Item> itemsToRemove = new ArrayList<>(vMinus$getVision().remove.values().stream()
                 .filter((VisionItemReplacement t) -> t.itemStack() != null)
                 .map((VisionItemReplacement t) -> t.itemStack().getItem())
                 .toList());
 
-        List<TagKey<Item>> itemTagsToRemove = new ArrayList<>(vminus$getVision().remove.values().stream()
+        List<TagKey<Item>> itemTagsToRemove = new ArrayList<>(vMinus$getVision().remove.values().stream()
                 .map(VisionItemReplacement::tag)
                 .filter(Objects::nonNull)
                 .toList());
@@ -64,7 +52,7 @@ public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
         vminus$processHiddenItems(accessor.getSearchItems(), itemsToRemove, itemTagsToRemove);
 
 
-        List<VisionCreativeOrder> orders = new ArrayList<>(vminus$getVision().order.values());
+        List<VisionCreativeOrder> orders = new ArrayList<>(vMinus$getVision().order.values());
         List<ItemStack> itemList = new ArrayList<>(accessor.getDisplayItems());
 
         orders.sort(Comparator.comparingInt(order -> {
@@ -129,8 +117,8 @@ public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
             Item item = itemStack.getItem();
             ItemVision itemVision = ItemVision.of(itemStack);
 
-            Boolean banned = itemVision.ban.value(new VisionConditionArguments(itemStack));
-            VisionItemReplacement visionItemReplacement = itemVision.replace.value(new VisionConditionArguments(itemStack));
+            Boolean banned = itemVision.ban.value(new VisionContext(itemStack));
+            VisionItemReplacement visionItemReplacement = itemVision.replace.value(new VisionContext(itemStack));
             boolean isTaggedForRemoval = itemTagsToRemove.stream().anyMatch(tagKey ->
                     tagCollection != null && tagCollection.getTag(tagKey).contains(item));
 
@@ -152,10 +140,10 @@ public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
 
     @Unique
     private void vminus$addItemsToTab(@Nullable Item targetItem, Item item, boolean before) {
-        Boolean banned = ItemVision.of(item).ban.value(new VisionConditionArguments(item));
+        Boolean banned = ItemVision.of(item).ban.value(new VisionContext(item));
         if (banned != null && banned)
             return;
-        Boolean targetBanned = ItemVision.of(targetItem).ban.value(new VisionConditionArguments(targetItem));
+        Boolean targetBanned = ItemVision.of(targetItem).ban.value(new VisionContext(targetItem));
         if (targetBanned != null && targetBanned)
             return;
 
@@ -217,25 +205,15 @@ public class CreativeModeTabMixin implements CreativeTabVisionAccessor {
         return false;
     }
 
+     */
+
     @Override
-    public @NotNull CreativeTabVision vminus$getVision() {
-        return vminus$creativeTabVision;
+    public void vMinus$setVisionIndex(int index) {
+        vMinus$visionIndex = index;
     }
 
     @Override
-    public void vminus$mergeVision(CreativeTabVision vision) {
-        this.vminus$creativeTabVision = vision;
-    }
-
-    @Override
-    public void vminus$clearVision() {
-        if (vminus$creativeTabVision != null)
-            this.vminus$creativeTabVision = new CreativeTabVision();
-    }
-
-    @Override
-    public void vminus$freezeVision() {
-        if (vminus$creativeTabVision != null)
-            this.vminus$creativeTabVision.freeze();
+    public int vMinus$getVisionIndex() {
+        return vMinus$visionIndex;
     }
 }

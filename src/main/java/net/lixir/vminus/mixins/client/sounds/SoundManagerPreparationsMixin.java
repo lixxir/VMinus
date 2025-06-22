@@ -22,14 +22,9 @@ public class SoundManagerPreparationsMixin {
     @Shadow
     private Map<ResourceLocation, Resource> soundCache;
 
-
     @Inject(method = "listResources", at = @At("TAIL"))
     private void detour$includeOpusFilesEarly(ResourceManager manager, CallbackInfo ci) {
         Map<ResourceLocation, Resource> opus = OpusAudioResources.SOUND_LISTER_OPUS.listMatchingResources(manager);
-
         soundCache.putAll(opus);
-        if (!opus.isEmpty()) {
-            net.lixir.vminus.VMinus.LOGGER.info("Loaded {} Opus sounds: {}", opus.size(), opus.keySet());
-        }
     }
 }

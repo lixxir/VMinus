@@ -1,11 +1,12 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.VBlockTagGenerator;
+import net.lixir.vminus.datagen.util.tag.VBlockTagGenerator;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -23,6 +24,12 @@ public class VMinusBlockTagGenerator extends VBlockTagGenerator {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         super.addTags(pProvider);
+
+        var leashable = tag(VMinusTags.Blocks.LEASHABLE);
+        leashable.addTag(BlockTags.FENCES);
+
+        var cocaoPlantableOn = tag(VMinusTags.Blocks.COCAO_PLANTABLE_ON);
+        cocaoPlantableOn.add(Blocks.JUNGLE_LOG);
 
         var froglights = tag(VMinusTags.Blocks.FROGLIGHTS);
         froglights.add(Blocks.OCHRE_FROGLIGHT);

@@ -4,14 +4,8 @@ import net.lixir.vminus.item.trait.ItemTraits;
 import net.lixir.vminus.attribute.VMinusAttributes;
 import net.lixir.vminus.util.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
-import net.lixir.vminus.visions.EffectVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
@@ -22,12 +16,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements VariantEntity {
@@ -161,6 +151,8 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
         }
     }
 
+    /*
+
     @Redirect(
             method = "tickEffects",
             at = @At(
@@ -178,7 +170,7 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
             EffectVision vision = EffectVision.of(effect);
 
             if (vision.particle != null) {
-                ParticleType<?> particleType = vision.particle.value(new VisionConditionArguments(effect));
+                ParticleType<?> particleType = vision.particle.value(new VisionContext(effect));
 
                 if (particleType != null) {
                     for (int i = 0; i < 1; i++) {
@@ -204,7 +196,7 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
         if (VisionProperties.searchElement(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity) != null)
             cir.setReturnValue(VisionProperties.getBoolean(VisionProperties.Names.UNDERWATER_BREATHING, vminus$entity, cir.getReturnValue()));
 
-           */
+
     }
 
     @Inject(method = "getSoundVolume", at = @At("RETURN"), cancellable = true)
@@ -213,7 +205,7 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
         if (VisionProperties.searchElement(VisionProperties.Names.VOLUME, vminus$entity) != null)
             cir.setReturnValue(Math.max(0f, VisionProperties.getNumber(VisionProperties.Names.VOLUME, vminus$entity, cir.getReturnValue()).floatValue()));
 
-           */
+
     }
 
     @Inject(method = "getExperienceReward", at = @At("HEAD"), cancellable = true)
@@ -222,8 +214,8 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
         if (VisionProperties.searchElement(VisionProperties.Names.XP, vminus$entity) != null)
             cir.setReturnValue(Math.max(0, VisionProperties.getNumber(VisionProperties.Names.XP, vminus$entity, cir.getReturnValue()).intValue()));
 
-           */
-    }
 
+    }
+    */
 
 }

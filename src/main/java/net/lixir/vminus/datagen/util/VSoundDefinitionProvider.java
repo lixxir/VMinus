@@ -47,10 +47,14 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
 
     protected SoundDefinition generateSoundDefinition(@NotNull SoundDefinitionInfo info) {
         String eventPath = ForgeRegistries.SOUND_EVENTS.getKey(info.getSoundEvent()).getPath();
-        String subtitle = info.getSubtitle() != null ? (info.getSubtitle().equals("default") ? "subtitles." + eventPath : info.getSubtitle()) : null;
+        String subtitle = info.getSubtitle() != null
+                ? (info.getSubtitle().equals("default") ? "subtitles." + eventPath : info.getSubtitle())
+                : null;
+
         String soundPath = info.getPath();
         SoundDefinition soundDefinition;
         List<String> paths = info.getPaths();
+
         if (paths != null && !paths.isEmpty()) {
             SoundDefinition.Sound[] sounds = new SoundDefinition.Sound[paths.size()];
             for (int i = 0; i < paths.size(); i++) {
@@ -63,17 +67,22 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
                 soundDefinition = definition().with(sound(new ResourceLocation(modId, soundPath)));
             } else {
                 SoundDefinition.Sound[] sounds = new SoundDefinition.Sound[count];
+                boolean isOpus = soundPath.endsWith(".opus");
+                String basePath = isOpus ? soundPath.substring(0, soundPath.length() - 5) : soundPath;
+
                 for (int i = 0; i < count; i++) {
-                    sounds[i] = sound(new ResourceLocation(modId, soundPath + (i + 1)));
+                    String numberedPath = basePath + (i + 1) + (isOpus ? ".opus" : "");
+                    sounds[i] = sound(new ResourceLocation(modId, numberedPath));
                 }
                 soundDefinition = definition().with(sounds);
             }
         }
+
         if (subtitle != null)
             soundDefinition.subtitle(subtitle);
+
         return soundDefinition;
     }
-
 
     protected SoundDefinition multiVariantSound(String eventPath, String basePath, int variantCount) {
         return multiVariantSound(eventPath, "subtitles." + eventPath, basePath, variantCount);

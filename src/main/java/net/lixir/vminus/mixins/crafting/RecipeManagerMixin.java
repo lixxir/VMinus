@@ -1,26 +1,12 @@
 package net.lixir.vminus.mixins.crafting;
 
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import javax.annotation.Nullable;
-import java.util.*;
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
 
+    /*
     @Inject(method = "createCheck", at = @At("RETURN"), cancellable = true)
     private static <C extends Container, T extends Recipe<C>> void vminus$filterBannedRecipes(RecipeType<T> p_220268_, CallbackInfoReturnable<RecipeManager.CachedCheck<C, T>> cir) {
         RecipeManager.CachedCheck<C, T> originalCheck = cir.getReturnValue();
@@ -34,7 +20,7 @@ public class RecipeManagerMixin {
 
                 return recipeOpt.filter(recipe -> {
                     ItemStack result = recipe.getResultItem(p_220279_.registryAccess());
-                    Boolean banned = ItemVision.of(result).ban.value(new VisionConditionArguments(result));
+                    Boolean banned = ItemVision.of(result).ban.value(new VisionContext(result));
                     return banned == null || !banned;
                 });
             }
@@ -48,7 +34,7 @@ public class RecipeManagerMixin {
 
         recipeOpt.ifPresent(recipe -> {
             ItemStack result = recipe.getResultItem(level.registryAccess());
-            Boolean banned = ItemVision.of(result).ban.value(new VisionConditionArguments(result));
+            Boolean banned = ItemVision.of(result).ban.value(new VisionContext(result));
 
             if (banned != null && banned) {
                 cir.setReturnValue(Optional.empty());
@@ -63,7 +49,7 @@ public class RecipeManagerMixin {
         List<T> filtered = original.stream()
                 .filter(recipe -> {
                     ItemStack result = recipe.getResultItem(level.registryAccess());
-                    Boolean banned = ItemVision.of(result).ban.value(new VisionConditionArguments(result));
+                    Boolean banned = ItemVision.of(result).ban.value(new VisionContext(result));
                     return banned == null || !banned;
                 })
                 .toList();
@@ -71,6 +57,8 @@ public class RecipeManagerMixin {
         cir.setReturnValue(new ArrayList<>(filtered));
     }
 
+
+     */
 
 
 }

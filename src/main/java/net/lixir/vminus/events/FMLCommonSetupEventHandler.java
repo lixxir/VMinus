@@ -1,6 +1,7 @@
 package net.lixir.vminus.events;
 
-import net.lixir.vminus.visions.util.VisionType;
+import net.lixir.vminus.vision.VisionType;
+import net.lixir.vminus.vision.VisionTypes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,18 +12,28 @@ import java.io.File;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class FMLCommonSetupEventHandler {
-
     @SubscribeEvent
     public static void vminus$FMLClientSetupEvent(FMLCommonSetupEvent event) {
-        File configDir = new File(FMLPaths.CONFIGDIR.get().toFile(), "visions");
-        if (!configDir.exists()) {
-            configDir.mkdirs();
+        createConfigDirectories();
+    }
+
+    // Creates directories for the config Visions if they do not already exist.
+    private static void createConfigDirectories() {
+        File visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), "visions");
+        if (!visionConfigDirectory.exists()) {
+            visionConfigDirectory.mkdirs();
         }
 
-        for (VisionType value : VisionType.values()) {
-            configDir = new File(FMLPaths.CONFIGDIR.get().toFile(),  value.getDirectoryName());
-            if (!configDir.exists()) {
-                configDir.mkdirs();
+        File sightConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), "sights");
+        if (!sightConfigDirectory.exists()) {
+            sightConfigDirectory.mkdirs();
+        }
+
+        for (VisionType visionType : VisionTypes.getAll()) {
+            visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), visionType.directory());
+            if (!visionConfigDirectory.exists()) {
+
+                visionConfigDirectory.mkdirs();
             }
         }
     }

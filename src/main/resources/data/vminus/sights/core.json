@@ -1,0 +1,9 @@
+{
+  "mining_attributes": false,
+  "mining_attributes/priority": -1,
+  "mining_attributes/comment": "Replaces traditional hardcoded mining speed with modifiable attributes.",
+
+  "variant_breeding": false,
+  "variant_breeding/priority": -1,
+  "variant_breeding/comment": "If variants birth a child, the child will randomly take a variant from either parent."
+}

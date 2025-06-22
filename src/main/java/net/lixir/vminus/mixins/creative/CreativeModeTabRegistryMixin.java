@@ -1,6 +1,5 @@
 package net.lixir.vminus.mixins.creative;
 
-import net.lixir.vminus.visions.CreativeTabVision;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,6 +13,7 @@ import java.util.List;
 @Mixin(CreativeModeTabRegistry.class)
 public abstract class CreativeModeTabRegistryMixin {
 
+    /*
     @Inject(method = "getSortedCreativeModeTabs", at = @At(value = "RETURN"), cancellable = true,  remap = false)
     private static void getSortedCreativeModeTabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
@@ -26,4 +26,6 @@ public abstract class CreativeModeTabRegistryMixin {
         }
         cir.setReturnValue(new ArrayList<>(newTabs));
     }
+
+     */
 }

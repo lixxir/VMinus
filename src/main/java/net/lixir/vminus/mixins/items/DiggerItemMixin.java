@@ -2,13 +2,13 @@ package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Multimap;
 import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.sight.resource.SightManager;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.ModList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,11 +20,13 @@ import java.util.Collection;
 @Mixin(DiggerItem.class)
 public abstract class DiggerItemMixin {
     @Unique
-    private final DiggerItem vminus$diggerItem = (DiggerItem) (Object) this;
+    private final DiggerItem vMinus$self = (DiggerItem) (Object) this;
 
     @Inject(method = "getDestroySpeed", at = @At("HEAD"), cancellable = true)
-    public void getDestroySpeed(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> ci) {
-        DiggerItemAccessor accessor = (DiggerItemAccessor) vminus$diggerItem;
+    public final void vMinus$getDestroySpeed(ItemStack stack, BlockState state, CallbackInfoReturnable<Float> ci) {
+        if (!SightManager.get("mining_attributes"))
+            return;
+        DiggerItemAccessor accessor = (DiggerItemAccessor) vMinus$self;
         float newSpeed = 0;
         EquipmentSlot slot = EquipmentSlot.MAINHAND;
         Multimap<Attribute, AttributeModifier> modifiers = stack.getAttributeModifiers(slot);
@@ -36,7 +38,7 @@ public abstract class DiggerItemMixin {
                 }
             }
         }
-        if (state.is(accessor.getBlocks()) || ModList.get().isLoaded("detour")) {
+        if (state.is(accessor.getBlocks())) {
             ci.setReturnValue(newSpeed != 0 ? newSpeed : accessor.getSpeed());
         } else {
             ci.setReturnValue(1.0F);

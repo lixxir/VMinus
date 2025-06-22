@@ -1,7 +1,7 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.VItemTagGenerator;
+import net.lixir.vminus.datagen.util.tag.VItemTagGenerator;
 import net.lixir.vminus.mixins.items.BoatItemAccessor;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;

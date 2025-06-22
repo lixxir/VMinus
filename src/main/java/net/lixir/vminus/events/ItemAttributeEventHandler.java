@@ -1,13 +1,13 @@
 package net.lixir.vminus.events;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.item.trait.ItemTraits;
 import net.lixir.vminus.attribute.VMinusAttributes;
-import net.lixir.vminus.visions.ItemVision;
-import net.lixir.vminus.visions.conditions.VisionConditionArguments;
-import net.lixir.vminus.visions.util.VisionAttribute;
-import net.lixir.vminus.visions.util.VisionTrait;
-import net.lixir.vminus.item.trait.ItemTrait;
+import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.util.VisionAttribute;
+import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,6 +21,7 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,16 +29,17 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber
 public class ItemAttributeEventHandler {
+
     @SubscribeEvent
-    public static void addAttributeModifier(ItemAttributeModifierEvent event) {
+    public static void addAttributeModifier(@NotNull ItemAttributeModifierEvent event) {
         ItemStack itemStack = event.getItemStack();
         Item item = itemStack.getItem();
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
 
-        ItemVision itemVision = ItemVision.of(item);
-        List<VisionAttribute> visionAttributes = itemVision.attribute.values(new VisionConditionArguments(itemStack));
-        List<VisionTrait> visionTraits = itemVision.trait.values(new VisionConditionArguments(itemStack));
+        Vision vision = Vision.getVision((VisionDuck) item);
+        List<VisionAttribute> visionAttributes = vision.getValues(VisionPropertyTypes.Items.ATTRIBUTE, new VisionContext(itemStack));
+        //List<VisionTrait> visionTraits = vision.trait.values(new VisionContext(itemStack));
         for (VisionAttribute visionAttribute : visionAttributes) {
             boolean replace = visionAttribute.replace();
             boolean remove = visionAttribute.remove();
@@ -69,15 +71,14 @@ public class ItemAttributeEventHandler {
                 }
             }
             if (eventSlot == equipmentSlot ) {
-
-                    if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED))
+                if (visionAttribute.attribute().equals(VMinusAttributes.MINING_SPEED))
                         miningFlag = true;
-                    event.removeModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
-                    event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
-
+                event.removeModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
+                event.addModifier(visionAttribute.attribute(), visionAttribute.attributeModifier());
             }
         }
 
+        /*
         for (VisionTrait visionTrait : visionTraits) {
             ItemTrait itemTrait = visionTrait.itemTrait();
             boolean value = visionTrait.value();
@@ -85,13 +86,12 @@ public class ItemAttributeEventHandler {
                 ItemTraits.setTrait(itemStack, itemTrait, value);
         }
 
+         */
 
-        if (eventSlot == EquipmentSlot.MAINHAND) {
 
+        if (eventSlot == EquipmentSlot.MAINHAND && SightManager.get("mining_attributes")) {
             handleMiningAttributes(event, itemStack, miningFlag);
         }
-
-
     }
 
     private static void handleMiningAttributes(ItemAttributeModifierEvent event, ItemStack itemStack, boolean miningFlag) {
