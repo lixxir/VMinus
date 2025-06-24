@@ -7,6 +7,7 @@ import com.google.gson.JsonParseException;
 import net.lixir.vminus.registry.VMinusRarities;
 import net.lixir.vminus.vision.values.VisionProperty;
 import net.minecraft.world.item.Rarity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class VisionRarityCodec extends VisionEnumCodec<Rarity> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<Rarity>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public @Nullable List<VisionProperty<Rarity>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<Rarity>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
 

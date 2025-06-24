@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 @Mixin(Animal.class)
 public class AnimalMixin {
     @Inject(method = "finalizeSpawnChildFromBreeding", at = @At("HEAD"))
-    private void onFinalizeSpawn(ServerLevel level, Animal otherParent, @Nullable AgeableMob child, CallbackInfo ci) {
+    private void vMinus$finalizeSpawnChildFromBreeding(ServerLevel level, Animal otherParent, @Nullable AgeableMob child, CallbackInfo ci) {
         if (!SightManager.get("variant_breeding"))
             return;
         if (child != null) {

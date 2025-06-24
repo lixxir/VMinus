@@ -17,6 +17,12 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class VisionSoundTypeCodec extends VisionCodec<SoundType> {
     @Override
+    public Class<SoundType> getClassType() {
+        return SoundType.class;
+    }
+
+
+    @Override
     public @Nullable List<VisionProperty<SoundType>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<SoundType>> visionProperties = new ArrayList<>();
 
@@ -51,8 +57,10 @@ public class VisionSoundTypeCodec extends VisionCodec<SoundType> {
     public @Nullable JsonObject encode(@NotNull SoundType value) {
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.addProperty("pitch", value.getPitch());
-        jsonObject.addProperty("level", value.getVolume());
+        if (value.getPitch() != 1.0f)
+            jsonObject.addProperty("pitch", value.getPitch());
+        if (value.getVolume() != 1.0f)
+            jsonObject.addProperty("level", value.getVolume());
 
         jsonObject.addProperty("break", getSoundId(value.getBreakSound()));
         jsonObject.addProperty("step", getSoundId(value.getStepSound()));

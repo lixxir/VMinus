@@ -1,7 +1,11 @@
 package net.lixir.vminus.mixins.creative;
 
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.util.VisionUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,47 +17,45 @@ import java.util.stream.Stream;
 
 @Mixin(CreativeModeTabs.class)
 public class CreativeModeTabsMixin {
-    /*
     @Inject(method = "allTabs", at = @At(value = "RETURN"), cancellable = true)
-    private static void allTabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
-
+    private static void allTabs(@NotNull CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.of(tab).hide.value();
+            Boolean hide = VisionUtil.getOverrideValue(((VisionDuck) tab), VisionPropertyTypes.Tabs.HIDE, null);
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
         }
-        cir.setReturnValue(new ArrayList<>(newTabs));
+        if (!newTabs.equals(cir.getReturnValue()))
+            cir.setReturnValue(new ArrayList<>(newTabs));
     }
 
     @Inject(method = "tabs", at = @At(value = "RETURN"), cancellable = true)
-    private static void tabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
+    private static void tabs(@NotNull CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.of(tab).hide.value();
+            Boolean hide = VisionUtil.getOverrideValue(((VisionDuck) tab), VisionPropertyTypes.Tabs.HIDE, null);
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
         }
-        cir.setReturnValue(new ArrayList<>(newTabs));
+        if (!newTabs.equals(cir.getReturnValue()))
+            cir.setReturnValue(new ArrayList<>(newTabs));
     }
 
     @Inject(method = "streamAllTabs", at = @At(value = "RETURN"), cancellable = true)
-    private static void streamAllTabs(CallbackInfoReturnable<Stream<CreativeModeTab>> cir) {
+    private static void streamAllTabs(@NotNull CallbackInfoReturnable<Stream<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue().toList();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.of(tab).hide.value();
+            Boolean hide = VisionUtil.getOverrideValue(((VisionDuck) tab), VisionPropertyTypes.Tabs.HIDE, null);
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
         }
-        cir.setReturnValue(newTabs.stream());
+        if (!newTabs.equals(cir.getReturnValue()))
+            cir.setReturnValue(newTabs.stream());
     }
-
-
-     */
 }

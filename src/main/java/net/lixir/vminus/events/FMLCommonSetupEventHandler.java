@@ -30,7 +30,7 @@ public class FMLCommonSetupEventHandler {
         }
 
         for (VisionType visionType : VisionTypes.getAll()) {
-            visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), visionType.directory());
+            visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), visionType.getDirectory());
             if (!visionConfigDirectory.exists()) {
 
                 visionConfigDirectory.mkdirs();

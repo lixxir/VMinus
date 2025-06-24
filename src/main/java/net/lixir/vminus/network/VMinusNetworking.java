@@ -2,7 +2,6 @@ package net.lixir.vminus.network;
 
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.network.vision.ClientboundVisionListPacket;
-import net.lixir.vminus.network.vision.ClientboundVisionMappingPacket;
 import net.lixir.vminus.network.vision.ClientboundDataResetPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -53,10 +52,6 @@ public class VMinusNetworking {
                 ClientboundVisionListPacket::encode,
                 ClientboundVisionListPacket::decode,
                 ClientboundVisionListPacket::handle);
-        addNetworkMessage(ClientboundVisionMappingPacket.class,
-                ClientboundVisionMappingPacket::encode,
-                ClientboundVisionMappingPacket::decode,
-                ClientboundVisionMappingPacket::handle);
     }
 
 

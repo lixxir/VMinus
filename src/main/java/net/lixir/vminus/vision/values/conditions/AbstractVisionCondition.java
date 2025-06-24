@@ -5,7 +5,6 @@ import net.lixir.vminus.registry.VMinusRarities;
 import net.minecraft.world.item.Rarity;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

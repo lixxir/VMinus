@@ -3,72 +3,61 @@ package net.lixir.vminus.vision;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.util.NbtConversionUtil;
 import net.lixir.vminus.vision.resource.codec.VisionCodec;
+import net.lixir.vminus.vision.resource.manager.VisionManager;
 import net.lixir.vminus.vision.values.VisionProperty;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
 public class Vision {
     public static final Vision EMPTY = new Vision(ImmutableMap.of());
-    private static final List<Vision> VISIONS = new ArrayList<>();
+    private static final Set<Vision> UNIQUE_VISION_POOL = new HashSet<>();
     private final ImmutableMap<String, VisionProperty<?>[]> properties;
 
     private Vision(ImmutableMap<String, VisionProperty<?>[]> properties) {
         this.properties = properties;
     }
 
-    public static List<Vision> getAllVisions() {
-        return VISIONS;
+    public static @NotNull Vision getVision(@NotNull VisionType<?> visionType, ResourceLocation id) {
+        return visionType.getVisions().getOrDefault(id, EMPTY);
     }
 
-    public static Vision getVision(int index) {
-        if (index == 0)
-            return EMPTY;
-        return VISIONS.get(index);
-    }
-
-    public static Vision getOrAddVision(Vision vision) {
-        if (VISIONS.contains(vision)) {
-            for (Vision existing : VISIONS) {
-                if (existing.equals(vision)) {
-                    return existing;
-                }
+    public static @NotNull Vision getOrAddVision(@NotNull VisionType<?> visionType, ResourceLocation id, Vision vision) {
+        for (Vision existing : UNIQUE_VISION_POOL) {
+            if (existing.equals(vision)) {
+                visionType.putVision(id, existing);
+                return existing;
             }
         }
 
-        VISIONS.add(vision);
+        UNIQUE_VISION_POOL.add(vision);
+        visionType.putVision(id, vision);
         return vision;
     }
 
-    public static Vision getVision(@NotNull VisionDuck visionDuck) {
-        int index = visionDuck.vMinus$getVisionIndex();
-        return Vision.getVision(index);
-    }
-
-    public static int getOrAddVisionIndex(Vision vision) {
-        int index = VISIONS.indexOf(vision);
-        if (index != -1) {
-            return index;
-        }
-
-        index = VISIONS.size();
-        VISIONS.add(vision);
-        return index;
+    public static @NotNull Vision getVision(@NotNull VisionDuck visionDuck) {
+        ResourceLocation id = visionDuck.vMinus$getVisionId();
+        VisionType<?> visionType = visionDuck.vMinus$getVisionType();
+        return Vision.getVision(visionType, id);
     }
 
     public static void resetVisions() {
-        VISIONS.clear();
-        Vision.getOrAddVision(Vision.EMPTY);
+        VisionManager.clearVisionManagers();
+        VisionType.resetAllVisionTypes();
+        UNIQUE_VISION_POOL.clear();
     }
 
-    @Contract("_ -> new")
-    public static <T> @NotNull Vision fromEntry(@NotNull VisionEntry<T> visionEntry) {
+    public static <T> @NotNull Vision fromEntry(ResourceLocation visionId, @NotNull VisionEntry<T> visionEntry, @NotNull VisionType<?> visionType) {
         ImmutableMap.Builder<String, VisionProperty<?>[]> builder = ImmutableMap.builder();
         for (var entry : visionEntry.getValues().entrySet()) {
             String id = entry.getKey();
@@ -103,7 +92,7 @@ public class Vision {
         }
 
         Vision newVision = new Vision(builder.build());
-        return getOrAddVision(newVision);
+        return getOrAddVision(visionType, visionId, newVision);
     }
 
     public <T> T getValue(String id) {
@@ -132,6 +121,11 @@ public class Vision {
         return getValue(id, null);
     }
 
+
+    public <T> List<T> getValues(@NotNull VisionPropertyType<T> visionPropertyType) {
+        return getValues(visionPropertyType.getId(), null);
+    }
+
     public <T> List<T> getValues(@NotNull VisionPropertyType<T> visionPropertyType, @Nullable VisionContext visionContext) {
         return getValues(visionPropertyType.getId(), visionContext);
     }
@@ -152,13 +146,13 @@ public class Vision {
         return valueList;
     }
 
-
-
-    public static @NotNull Vision fromNbt(@NotNull CompoundTag compoundTag, @NotNull VisionType visionType) {
+    public static @NotNull Vision fromNbt(ResourceLocation id, @NotNull CompoundTag originalTag, @NotNull VisionType<?> visionType) {
+        CompoundTag compoundTag = originalTag.copy();
         JsonObject jsonObject = NbtConversionUtil.compoundToJson(compoundTag);
+        VMinus.LOGGER.info("Id={}, Parsed JsonObject={}", id, jsonObject);
 
        // jsonObject = VisionProcessor.processJson(visionType.id(), visionType.multiList(), jsonObject);  Probably not needed
-        List<VisionPropertyType<?>> propertyTypes = VisionPropertyTypes.fromClass(visionType.classType());
+        List<VisionPropertyType<?>> propertyTypes = VisionPropertyTypes.fromVisionType(visionType);
         VisionEntry<?> visionEntry = new VisionEntry<>();
 
         for (VisionPropertyType<?> property : propertyTypes) {
@@ -170,12 +164,11 @@ public class Vision {
             }
         }
 
-        return fromEntry(visionEntry);
+        return fromEntry(id, visionEntry, visionType);
     }
 
-    public @Nullable CompoundTag toNbt() {
+    public @NotNull CompoundTag toNbt() {
         JsonObject root = new JsonObject();
-
         for (Map.Entry<String, VisionProperty<?>[]> entry : properties.entrySet()) {
             String id = entry.getKey();
             VisionProperty<?>[] visionProperties = entry.getValue();
@@ -184,7 +177,8 @@ public class Vision {
             VisionPropertyType<Object> propertyType = VisionPropertyTypes.fromId(id);
             if (propertyType == null)
                 throw new RuntimeException("Could not find property type: " + id);
-
+            if (!propertyType.shouldSyncToClient())
+                continue;
             for (VisionProperty<?> visionProperty : visionProperties) {
                 encodeProperty(propertyType, visionProperty, jsonArray);
             }
@@ -199,17 +193,20 @@ public class Vision {
 
     private static <T> void encodeProperty(
             @NotNull VisionPropertyType<T> propertyType,
-            VisionProperty<?> visionProperty,
+            @NotNull VisionProperty<?> visionProperty,
             JsonArray jsonArray
     ) {
-        @SuppressWarnings("unchecked")
-        VisionProperty<T> typedProperty = (VisionProperty<T>) visionProperty;
+        Object value = visionProperty.getValue();
 
-        JsonObject propertyObject = propertyType.getCodec().encode(typedProperty.getValue());
-        if (propertyObject != null) {
-            jsonArray.add(propertyObject);
+        if (propertyType.getCodec().getClassType().isInstance(value)) {
+            T castedValue = propertyType.getCodec().getClassType().cast(value);
+            JsonObject propertyObject = propertyType.getCodec().encode(castedValue);
+            if (propertyObject != null) {
+                jsonArray.add(propertyObject);
+            }
         }
     }
+
 
 
 

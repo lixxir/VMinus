@@ -1,6 +1,6 @@
 package net.lixir.vminus.network;
 
-import net.lixir.vminus.util.VariantEntity;
+import net.lixir.vminus.entity.VariantEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;
@@ -40,7 +40,7 @@ public class VariantSyncPacket {
             if (world != null) {
                 Entity entity = world.getEntity(entityId);
                 if (entity instanceof VariantEntity variantEntity) {
-                    variantEntity.vminus$setVariant(variantName, variantTexture);
+                    variantEntity.vMinus$setVariant(variantName, variantTexture);
                 }
             }
         });

@@ -6,6 +6,7 @@ import org.concentus.OpusDecoder;
 import org.concentus.OpusException;
 import org.gagravarr.ogg.OggPacket;
 import org.gagravarr.ogg.OggPacketReader;
+import org.jetbrains.annotations.NotNull;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class OggOpusAudioStream implements AudioStream {
     }
 
     @Override
-    public AudioFormat getFormat() {
+    public @NotNull AudioFormat getFormat() {
         return format;
     }
 
@@ -65,12 +66,11 @@ public class OggOpusAudioStream implements AudioStream {
     }
 
     @Override
-    public ByteBuffer read(int size) throws IOException {
-        if (closed) throw
-                new IOException("Stream closed");
+    public @NotNull ByteBuffer read(int size) throws IOException {
+        if (closed)
+            throw new IOException("Stream closed");
 
         ByteBuffer result = ByteBuffer.allocateDirect(size);
-
         while (result.position() < size) {
             if (!outputBuffer.hasRemaining()) {
                 if (!decodeNextPacket())
@@ -98,8 +98,7 @@ public class OggOpusAudioStream implements AudioStream {
 
             if (data.length >= 8) {
                 String header = new String(data, 0, 8, java.nio.charset.StandardCharsets.US_ASCII);
-                if (header.equals("OpusHead") || header.equals("OpusTags")) {
-                    VMinus.LOGGER.debug("Skipping Opus header/tag packet");
+                if (header.equals("OpusHead") || header.equals("OpusTags")) { // Skip header packets.
                     continue;
                 }
             }

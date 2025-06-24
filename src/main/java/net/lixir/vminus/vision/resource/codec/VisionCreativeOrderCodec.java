@@ -3,10 +3,13 @@ package net.lixir.vminus.vision.resource.codec;
 import com.google.gson.*;
 import net.lixir.vminus.vision.util.VisionCreativeOrder;
 import net.lixir.vminus.vision.values.VisionProperty;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -14,7 +17,12 @@ import java.util.List;
 
 public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
     @Override
-    public @Nullable List<VisionProperty<VisionCreativeOrder>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public Class<VisionCreativeOrder> getClassType() {
+        return VisionCreativeOrder.class;
+    }
+
+    @Override
+    public @Nullable List<VisionProperty<VisionCreativeOrder>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<VisionCreativeOrder>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
 
@@ -22,7 +30,7 @@ public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
             String itemValue;
             String targetValue;
-            Boolean before;
+            boolean before;
 
             if (arrayObject.has("value")) {
                 String value = arrayObject.getAsJsonPrimitive("value").getAsString();
@@ -60,66 +68,51 @@ public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
                 targetItemStack = targetItem.getDefaultInstance();
             }
 
-            /*
+            VisionCreativeOrder order;
             if (itemValue.startsWith("#")) {
                 ResourceLocation tagLoc = new ResourceLocation(itemValue.substring(1));
                 TagKey<Item> itemTag = TagKey.create(Registries.ITEM, tagLoc);
-                Collection<Holder<Item>> tagItems = context.getTag(itemTag);
-
-                if (tagItems.isEmpty())
-                    throw new JsonParseException(tagLoc + " is not a valid tag or contains no items for " + key + ".");
-
-                for (Holder<Item> tagItemHolder : tagItems) {
-                    Item tagItem = tagItemHolder.value();
-                    ItemStack tagItemStack = tagItem.getDefaultInstance();
-                    VisionCreativeOrder order = new VisionCreativeOrder(tagItemStack, targetItemStack, before);
-                    visionProperties.add(VisionProperty.create(order, arrayObject, jsonObject, key));
-                }
+                order = new VisionCreativeOrder(null, targetItemStack, before, itemTag);
             } else {
-
-             */
                 ResourceLocation itemLoc = new ResourceLocation(itemValue);
                 Item item = ForgeRegistries.ITEMS.getValue(itemLoc);
                 if (item == null)
                     throw new JsonParseException(itemLoc + " is not a valid item for " + key + ".");
                 ItemStack itemStack = item.getDefaultInstance();
 
-                VisionCreativeOrder order = new VisionCreativeOrder(itemStack, targetItemStack, before);
-                visionProperties.add(VisionProperty.create(order, arrayObject, jsonObject, key));
-            //}
+
+                order = new VisionCreativeOrder(itemStack, targetItemStack, before, null);
+            }
+            visionProperties.add(VisionProperty.create(order, arrayObject, jsonObject, key));
         }
 
         return visionProperties;
     }
 
     @Override
-    public @Nullable JsonObject encode(VisionCreativeOrder value) {
+    public @Nullable JsonObject encode(@NotNull VisionCreativeOrder value) {
         JsonObject jsonObject = new JsonObject();
 
-        if (value.getItemStack() != null) {
-            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(value.getItemStack().getItem());
-            assert value.getTargetItemStack() != null;
-            ResourceLocation targetId = ForgeRegistries.ITEMS.getKey(value.getTargetItemStack().getItem());
+        ResourceLocation itemId = value.getItemStack() != null ? ForgeRegistries.ITEMS.getKey(value.getItemStack().getItem()) : null;
+        ResourceLocation targetId = value.getTargetItemStack() != null ? ForgeRegistries.ITEMS.getKey(value.getTargetItemStack().getItem()) : null;
 
-            if (itemId != null && targetId != null) {
-                String arrow = value.isBefore() ? "<" : ">";
-                jsonObject.addProperty("value", itemId + arrow + targetId);
-                return jsonObject;
-            }
+        if (itemId != null && targetId != null) {
+            String arrow = value.isBefore() ? "<" : ">";
+            jsonObject.addProperty("value", itemId + arrow + targetId);
+            return jsonObject;
         }
 
-        if (value.getItemStack() != null) {
-            ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(value.getItemStack().getItem());
-            if (itemId != null)
-                jsonObject.addProperty("item", itemId.toString());
+        if (value.getTagKey() != null) {
+            jsonObject.addProperty("item", "#" + value.getTagKey().location().toString());
+        } else if (itemId != null) {
+            jsonObject.addProperty("item", itemId.toString());
         }
-        if (value.getTargetItemStack() != null) {
-            ResourceLocation targetId = ForgeRegistries.ITEMS.getKey(value.getTargetItemStack().getItem());
-            if (targetId != null)
-                jsonObject.addProperty("target", targetId.toString());
+
+        if (targetId != null) {
+            jsonObject.addProperty("target", targetId.toString());
         }
+
         jsonObject.addProperty("before", value.isBefore());
-
         return jsonObject;
     }
 }

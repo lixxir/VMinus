@@ -1,5 +1,7 @@
 package net.lixir.vminus.vision.util;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,11 +11,13 @@ public class VisionCreativeOrder {
     private @Nullable ItemStack itemStack;
     private final ItemStack targetItemStack;
     private final @NotNull Boolean before;
+    private final TagKey<Item> tagKey;
 
-    public VisionCreativeOrder(@Nullable ItemStack itemStack, ItemStack targetItemStack, @NotNull Boolean before) {
+    public VisionCreativeOrder(@Nullable ItemStack itemStack, @Nullable ItemStack targetItemStack, @NotNull Boolean before, TagKey<Item> tagKey) {
         this.itemStack = itemStack;
         this.targetItemStack = targetItemStack;
         this.before = before;
+        this.tagKey = tagKey;
     }
 
     public @Nullable ItemStack getItemStack() {
@@ -30,5 +34,9 @@ public class VisionCreativeOrder {
 
     public @NotNull Boolean isBefore() {
         return before;
+    }
+
+    public TagKey<Item> getTagKey() {
+        return tagKey;
     }
 }

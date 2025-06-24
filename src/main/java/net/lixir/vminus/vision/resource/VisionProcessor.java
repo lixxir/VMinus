@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class VisionProcessor {
-    public static JsonObject processJson(String singleListName, String multiListName, JsonElement jsonFile) throws JsonParseException {
+    public static @NotNull JsonObject processJson(String singleListName, String multiListName, @NotNull JsonElement jsonFile) throws JsonParseException {
         JsonObject jsonFileObject = jsonFile.getAsJsonObject();
 
         if (!jsonFileObject.has(multiListName))
@@ -57,7 +57,7 @@ public class VisionProcessor {
         return processedJsonObject;
     }
 
-    private static @NotNull JsonArray wrapObjectInArray(JsonElement jsonElement, JsonArray mergedConditions) {
+    private static @NotNull JsonArray wrapObjectInArray(@NotNull JsonElement jsonElement, JsonArray mergedConditions) {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonArray newArray = new JsonArray();
         JsonObject newObject = new JsonObject();

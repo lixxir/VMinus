@@ -5,12 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.nbt.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
 public class NbtConversionUtil {
 
-    public static JsonObject compoundToJson(CompoundTag tag) {
+    public static @NotNull JsonObject compoundToJson(@NotNull CompoundTag tag) {
         JsonObject json = new JsonObject();
         for (String key : tag.getAllKeys()) {
             Tag nbt = tag.get(key);
@@ -29,7 +30,12 @@ public class NbtConversionUtil {
             } else if (nbt instanceof IntTag i) {
                 json.addProperty(key, i.getAsInt());
             } else if (nbt instanceof ByteTag b) {
-                json.addProperty(key, b.getAsByte());
+                byte val = b.getAsByte();
+                if (val == 0 || val == 1) {
+                    json.addProperty(key, val == 1);
+                } else {
+                    json.addProperty(key, val);
+                }
             } else if (nbt instanceof ShortTag s) {
                 json.addProperty(key, s.getAsShort());
             } else if (nbt instanceof LongTag l) {
@@ -47,7 +53,7 @@ public class NbtConversionUtil {
         return json;
     }
 
-    public static CompoundTag jsonToCompound(JsonObject json) {
+    public static @NotNull CompoundTag jsonToCompound(@NotNull JsonObject json) {
         CompoundTag tag = new CompoundTag();
         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
             String key = entry.getKey();
@@ -59,17 +65,19 @@ public class NbtConversionUtil {
                     tag.putBoolean(key, primitive.getAsBoolean());
                 } else if (primitive.isNumber()) {
                     Number num = primitive.getAsNumber();
-                    if (num instanceof Byte)
+                    if (primitive.getAsString().endsWith("b")) {
                         tag.putByte(key, num.byteValue());
-                    else if (num instanceof Short)
+                    } else if (primitive.getAsString().endsWith("s")) {
                         tag.putShort(key, num.shortValue());
-                    else if (num instanceof Integer)
-                        tag.putInt(key, num.intValue());
-                    else if (num instanceof Long)
-                        tag.putLong(key, num.longValue());
-                    else if (num instanceof Float)
+                    } else if (primitive.getAsString().endsWith("f")) {
                         tag.putFloat(key, num.floatValue());
-                    else tag.putDouble(key, num.doubleValue());
+                    } else if (primitive.getAsString().endsWith("L") || primitive.getAsString().endsWith("l")) {
+                        tag.putLong(key, num.longValue());
+                    } else if (num.doubleValue() == num.intValue()) {
+                        tag.putInt(key, num.intValue());
+                    } else {
+                        tag.putDouble(key, num.doubleValue());
+                    }
                 } else {
                     tag.putString(key, primitive.getAsString());
                 }

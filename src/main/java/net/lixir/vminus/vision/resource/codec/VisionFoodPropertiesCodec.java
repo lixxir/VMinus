@@ -13,12 +13,18 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VisionFoodPropertiesCodec extends VisionCodec<VisionFoodProperties> {
+    @Override
+    public Class<VisionFoodProperties> getClassType() {
+        return VisionFoodProperties.class;
+    }
+
     @Override
     public @Nullable List<VisionProperty<VisionFoodProperties>> decode(JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<VisionFoodProperties>> visionProperties = new ArrayList<>();
@@ -60,7 +66,7 @@ public class VisionFoodPropertiesCodec extends VisionCodec<VisionFoodProperties>
     }
 
     @Override
-    public @Nullable JsonObject encode(VisionFoodProperties value) {
+    public @Nullable JsonObject encode(@NotNull VisionFoodProperties value) {
         return null;
     }
 

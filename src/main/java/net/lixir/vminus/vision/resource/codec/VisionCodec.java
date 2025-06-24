@@ -13,7 +13,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class VisionCodec<V> {
-    protected VisionCodec() {}
+    protected VisionCodec() {
+    }
+
+    public abstract Class<V> getClassType();
 
     protected static ResourceLocation parseResourceLocation(String key, JsonObject jsonObject) throws JsonParseException {
         return parseResourceLocation("value", key, jsonObject);
@@ -63,7 +66,5 @@ public abstract class VisionCodec<V> {
 
     public abstract @Nullable List<VisionProperty<V>> decode(JsonObject jsonObject, String key) throws JsonParseException;
 
-    public @Nullable JsonObject encode(V value) {
-        return null;
-    }
+    public abstract @Nullable JsonObject encode(@NotNull V value);
 }

@@ -7,6 +7,7 @@ import net.lixir.vminus.item.trait.ItemTraits;
 import net.lixir.vminus.registry.UnifiedRegistry;
 import net.lixir.vminus.registry.VMinusRegistryEntryDefaults;
 import net.lixir.vminus.registry.VMinusSounds;
+import net.lixir.vminus.vision.VisionPropertyTypes;
 import net.lixir.vminus.vision.VisionTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -32,6 +33,7 @@ public class VMinus {
     public static final String ID = "vminus";
     public static final UnifiedRegistry REGISTRY = UnifiedRegistry.create(ID, reg -> {
         VisionTypes.init();
+        VisionPropertyTypes.init();
         VMinusRegistryEntryDefaults.init();
         VMinusBlocks.init();
         VMinusItems.init();

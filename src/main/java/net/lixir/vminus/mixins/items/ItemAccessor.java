@@ -1,6 +1,5 @@
 package net.lixir.vminus.mixins.items;
 
-import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import org.spongepowered.asm.mixin.Mixin;

@@ -32,6 +32,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,7 +42,7 @@ public class VMinusCommands {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @SubscribeEvent
-    public static void registerCommand(RegisterCommandsEvent event) {
+    public static void registerCommand(@NotNull RegisterCommandsEvent event) {
         var dispatcher = event.getDispatcher();
         var context = event.getBuildContext();
 

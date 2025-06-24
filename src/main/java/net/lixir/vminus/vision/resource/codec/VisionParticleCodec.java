@@ -8,14 +8,21 @@ import net.lixir.vminus.vision.values.VisionProperty;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VisionParticleCodec extends VisionCodec<ParticleType<?>> {
+    @SuppressWarnings("unchecked")
     @Override
-    public @Nullable List<VisionProperty<ParticleType<?>>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public Class<ParticleType<?>> getClassType() {
+        return (Class<ParticleType<?>>) (Class<?>) ParticleType.class;
+    }
+
+    @Override
+    public @Nullable List<VisionProperty<ParticleType<?>>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<ParticleType<?>>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
@@ -27,5 +34,17 @@ public class VisionParticleCodec extends VisionCodec<ParticleType<?>> {
             visionProperties.add(VisionProperty.create(particleType, arrayObject, jsonObject, key));
         }
         return visionProperties;
+    }
+
+    @Override
+    public @Nullable JsonObject encode(@NotNull ParticleType<?> value) {
+        JsonObject jsonObject = new JsonObject();
+        ResourceLocation id = ForgeRegistries.PARTICLE_TYPES.getKey(value);
+        if (id != null) {
+            jsonObject.addProperty("id", id.toString());
+        } else {
+            throw new IllegalArgumentException("Unknown particle type: " + value);
+        }
+        return jsonObject;
     }
 }

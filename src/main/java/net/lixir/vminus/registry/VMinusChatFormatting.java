@@ -16,6 +16,4 @@ public class VMinusChatFormatting {
     public static final ChatFormatting BROWN = ChatFormatting.valueOf("BROWN");
     public static final ChatFormatting DARK_BROWN = ChatFormatting.valueOf("DARK_BROWN");
     public static final ChatFormatting NEON_RED = ChatFormatting.valueOf("NEON_RED");
-    public static final ChatFormatting COBALT = ChatFormatting.valueOf("COBALT");
-
 }

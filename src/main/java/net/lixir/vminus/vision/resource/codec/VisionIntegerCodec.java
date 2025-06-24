@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VisionIntegerCodec extends VisionCodec<Integer> {
+    @Override
+    public Class<Integer> getClassType() {
+        return Integer.class;
+    }
 
     @Override
     public @Nullable List<VisionProperty<Integer>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
@@ -32,7 +36,7 @@ public class VisionIntegerCodec extends VisionCodec<Integer> {
     }
 
     @Override
-    public @Nullable JsonObject encode(Integer value) {
+    public @Nullable JsonObject encode(@NotNull Integer value) {
         return encodeInteger(value);
     }
 }

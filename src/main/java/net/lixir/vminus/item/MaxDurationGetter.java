@@ -1,5 +1,7 @@
 package net.lixir.vminus.item;
 
 public interface MaxDurationGetter {
-    int vminus$getMaxDuration();
+    default int vminus$getMaxDuration(){
+        return 0;
+    }
 }

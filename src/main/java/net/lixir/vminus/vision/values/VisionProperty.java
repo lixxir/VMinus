@@ -61,11 +61,11 @@ public class VisionProperty<T> {
         return priority;
     }
 
-    public boolean testConditions(@Nullable VisionContext args) {
-        if (args == null || conditions.isEmpty())
+    public boolean testConditions(@Nullable VisionContext visionContext) {
+        if (visionContext == null || conditions.isEmpty())
             return true;
         for (List<AbstractVisionCondition> visionConditionList : conditions) {
-            if (visionConditionList.stream().allMatch(c -> c.test(args) != c.isInverted())) {
+            if (visionConditionList.stream().allMatch(c -> c.test(visionContext) != c.isInverted())) {
                 return true;
             }
         }

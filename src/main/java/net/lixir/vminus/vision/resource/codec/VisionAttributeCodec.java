@@ -11,6 +11,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -19,7 +20,12 @@ import java.util.UUID;
 
 public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
     @Override
-    public @Nullable List<VisionProperty<VisionAttribute>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public Class<VisionAttribute> getClassType() {
+        return VisionAttribute.class;
+    }
+
+    @Override
+    public @Nullable List<VisionProperty<VisionAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<VisionAttribute>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
@@ -86,6 +92,8 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
                 if (name != null)
                     name = name.replaceAll("_", " ");
             }
+            if (name == null)
+                throw new JsonParseException("Name is null.");
 
             AttributeModifier attributeModifier = new AttributeModifier(uuid, name, value, operation);
             VisionAttribute visionAttribute = new VisionAttribute(remove, replace, attributeModifier, attribute, equipmentSlot, id);
@@ -93,5 +101,27 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
             visionProperties.add(VisionProperty.create(visionAttribute, arrayObject, jsonObject, key));
         }
         return visionProperties;
+    }
+
+    @Override
+    public @Nullable JsonObject encode(@NotNull VisionAttribute visionAttribute) {
+        JsonObject jsonObject = new JsonObject();
+
+        AttributeModifier modifier = visionAttribute.attributeModifier();
+        jsonObject.addProperty("uuid", modifier.getId().toString());
+        jsonObject.addProperty("id", visionAttribute.id());
+        jsonObject.addProperty("value", modifier.getAmount());
+        jsonObject.addProperty("operation", modifier.getOperation().name().toLowerCase());
+        if (visionAttribute.replace())
+            jsonObject.addProperty("replace", true);
+        if (visionAttribute.remove())
+            jsonObject.addProperty("remove", true);
+
+        EquipmentSlot slot = visionAttribute.equipmentSlot();
+        if (slot != null) {
+            jsonObject.addProperty("slot", slot.name().toLowerCase());
+        }
+
+        return jsonObject;
     }
 }

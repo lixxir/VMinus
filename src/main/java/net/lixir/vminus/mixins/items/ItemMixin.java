@@ -5,9 +5,14 @@ import net.lixir.vminus.registry.entry.ItemEntry;
 import net.lixir.vminus.registry.entry.ItemEntryAccessor;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionType;
+import net.lixir.vminus.vision.VisionTypes;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
 import net.lixir.vminus.vision.util.VisionUtil;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +21,7 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.extensions.IForgeItem;
 import net.minecraftforge.common.extensions.IForgeItemStack;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,38 +38,37 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDur
     private ItemEntry vMinus$itemEntry = null;
 
     @Unique
-    private int vMinus$visionIndex = 0;
+    private ResourceLocation vMinus$visionId = null;
 
     @Inject(method = "isFoil", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$isFoil(CallbackInfoReturnable<Boolean> cir) { // Foil is a stupid name so were ganna go with glint.
+    private void vMinus$isFoil(CallbackInfoReturnable<Boolean> cir) { // Foil is a stupid name so were ganna go with glint.
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.GLINT, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getMaxStackSize", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
+    private void vMinus$getMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.MAX_STACK_SIZE, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getMaxDamage", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getMaxDamage(CallbackInfoReturnable<Integer> cir) {
+    private void vMinus$getMaxDamage(CallbackInfoReturnable<Integer> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "canBeDepleted", at = @At("RETURN"), cancellable = true)
-    public void vMinus$canBeDepleted(CallbackInfoReturnable<Boolean> cir) {
+    private void vMinus$canBeDepleted(CallbackInfoReturnable<Boolean> cir) {
         Integer maxDamage = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
         if (maxDamage != null && maxDamage > 0)
             cir.setReturnValue(true);
     }
 
     @Inject(method = "getUseAnimation", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getUseAnimation(ItemStack itemStack, CallbackInfoReturnable<UseAnim> cir) {
+    private void vMinus$getUseAnimation(ItemStack itemStack, CallbackInfoReturnable<UseAnim> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.USE_ANIMATION, new VisionContext(itemStack));
     }
 
-
     @Inject(method = "getFoodProperties", at = @At("RETURN"), cancellable = true)
-    private void getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
+    private void vMinus$getFoodProperties(CallbackInfoReturnable<FoodProperties> cir) {
         VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
         if (visionFoodProperties != null) {
             cir.setReturnValue(visionFoodProperties.merge(cir.getReturnValue()));
@@ -71,17 +76,19 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDur
     }
 
     @Inject(method = "isFireResistant", at = @At("RETURN"), cancellable = true)
-    public final void isFireResistant(CallbackInfoReturnable<Boolean> cir) {
+    private void vMinus$isFireResistant(CallbackInfoReturnable<Boolean> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.FIRE_RESISTANT, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
-    private void getUseDuration(ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
+    private void vMinus$getUseDuration(ItemStack itemStack, CallbackInfoReturnable<Integer> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.USE_TICKS, new VisionContext(itemStack));
     }
 
     @Inject(method = "isEdible", at = @At("RETURN"), cancellable = true)
-    private void isEdible(CallbackInfoReturnable<Boolean> cir) {  // Allow it to be edible if food properties exist. Can not be a value on its own as it will crash without FoodProperties.
+    private void vMinus$isEdible(CallbackInfoReturnable<Boolean> cir) {
+        // Allow it to be edible if food properties exist.
+        // Can not be a value on its own as it will crash without a set FoodProperties.
         VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
         if (visionFoodProperties != null) {
             cir.setReturnValue(true);
@@ -89,12 +96,12 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDur
     }
 
     @Inject(method = "getEnchantmentValue", at = @At("RETURN"), cancellable = true)
-    private void getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
+    private void vMinus$getEnchantmentValue(CallbackInfoReturnable<Integer> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.ENCHANTABILITY, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getRarity", at = @At("RETURN"), cancellable = true)
-    private void getRarity(ItemStack itemStack, CallbackInfoReturnable<Rarity> cir) {
+    private void vMinus$getRarity(ItemStack itemStack, CallbackInfoReturnable<Rarity> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.RARITY, new VisionContext(itemStack));
     }
 
@@ -103,8 +110,10 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDur
         Integer value = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FUEL_TICKS, new VisionContext(stack));
         if (value != null)
             return value;
+
         return IForgeItem.super.getBurnTime(stack, recipeType);
     }
+
 
 
     @Override
@@ -126,12 +135,37 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, MaxDur
     }
 
     @Override
-    public void vMinus$setVisionIndex(int index) {
-        vMinus$visionIndex = index;
+    public EquipmentSlot getEquipmentSlot(ItemStack self) {
+        EquipmentSlot equipmentSlot = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.EQUIP_SLOT, new VisionContext(self));
+        if (equipmentSlot != null)
+            return equipmentSlot;
+        return IForgeItem.super.getEquipmentSlot(self);
     }
 
     @Override
-    public int vMinus$getVisionIndex() {
-        return vMinus$visionIndex;
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        Boolean canEquip = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.CAN_EQUIP, new VisionContext(stack));
+        if (canEquip != null)
+            return canEquip;
+        EquipmentSlot equipmentSlot = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.EQUIP_SLOT, new VisionContext(stack));
+        if (equipmentSlot != null)
+            return true;
+        return IForgeItem.super.canEquip(stack, armorType, entity);
+    }
+
+
+    @Override
+    public @NonNull VisionType<?> vMinus$getVisionType() {
+        return VisionTypes.ITEM;
+    }
+
+    @Override
+    public void vMinus$setVisionId(ResourceLocation id) {
+        vMinus$visionId = id;
+    }
+
+    @Override
+    public @Nullable ResourceLocation vMinus$getVisionId() {
+        return vMinus$visionId;
     }
 }

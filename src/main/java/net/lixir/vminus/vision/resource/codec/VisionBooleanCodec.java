@@ -2,6 +2,7 @@ package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
 import net.lixir.vminus.vision.values.VisionProperty;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -9,7 +10,13 @@ import java.util.List;
 
 public class VisionBooleanCodec extends VisionCodec<Boolean> {
     @Override
-    public @Nullable List<VisionProperty<Boolean>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public Class<Boolean> getClassType() {
+        return Boolean.class;
+    }
+
+
+    @Override
+    public @Nullable List<VisionProperty<Boolean>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<Boolean>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
@@ -23,7 +30,7 @@ public class VisionBooleanCodec extends VisionCodec<Boolean> {
     }
 
     @Override
-    public @Nullable JsonObject encode(Boolean value) {
+    public @Nullable JsonObject encode(@NotNull Boolean value) {
         JsonPrimitive jsonPrimitive = new JsonPrimitive(value);
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("value", jsonPrimitive);

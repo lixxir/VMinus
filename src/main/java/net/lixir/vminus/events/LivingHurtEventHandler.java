@@ -12,12 +12,13 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @Mod.EventBusSubscriber
 public class LivingHurtEventHandler {
-    private List<ProtectionConfig> protectionTypes = List.of(
+    private static final List<ProtectionConfig> PROTECTION_CONFIGS = List.of(
             new ProtectionConfig(VMinusAttributes.FIRE_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fire")),
             new ProtectionConfig(VMinusAttributes.MAGIC_PROTECTION, new ResourceLocation(VMinus.ID, "protection/magic")),
             new ProtectionConfig(VMinusAttributes.FALL_PROTECTION, new ResourceLocation(VMinus.ID, "protection/fall")),
@@ -25,7 +26,7 @@ public class LivingHurtEventHandler {
     );
     
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onLivingHurt(LivingHurtEvent event) {
+    public static void onLivingHurt(@NotNull LivingHurtEvent event) {
         Entity entity = event.getEntity();
         if (!(entity instanceof LivingEntity livingEntity))
             return;
@@ -33,13 +34,12 @@ public class LivingHurtEventHandler {
         DamageSource damageSource = event.getSource();
         float damage = event.getAmount();
 
-        for (ProtectionConfig protectionConfig : this.protectionTypes) {
+        for (ProtectionConfig protectionConfig : PROTECTION_CONFIGS) {
             damage = AttributeHelper.applyProtection(damage, livingEntity, damageSource, protectionConfig.attribute(), protectionConfig.damageTag());
         }
 
         event.setAmount(damage);
     }
-
 
     private record ProtectionConfig(Attribute attribute, ResourceLocation damageTag) {}
 }

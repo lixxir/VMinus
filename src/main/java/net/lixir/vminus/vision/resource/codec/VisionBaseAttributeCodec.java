@@ -9,6 +9,7 @@ import net.lixir.vminus.vision.values.VisionProperty;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -16,29 +17,51 @@ import java.util.List;
 
 public class VisionBaseAttributeCodec extends VisionCodec<VisionBaseAttribute> {
     @Override
-    public @Nullable List<VisionProperty<VisionBaseAttribute>> decode(JsonObject jsonObject, String key) throws JsonParseException {
+    public Class<VisionBaseAttribute> getClassType() {
+        return VisionBaseAttribute.class;
+    }
+
+    @Override
+    public @Nullable List<VisionProperty<VisionBaseAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<VisionBaseAttribute>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
+        if (jsonArray == null)
+            throw new JsonParseException("Expected a JSON array for key: " + key);
         for (JsonElement jsonArrayElement : jsonArray) {
+            if (!jsonArrayElement.isJsonObject())
+                throw new JsonParseException("Expected a JSON object inside array for key: " + key);
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
+
             double value;
             try {
                 value = arrayObject.getAsJsonPrimitive("value").getAsDouble();
             } catch (Exception e) {
-                throw new JsonParseException(key + " does not have a value.");
+                throw new JsonParseException("Missing or invalid 'value' for key: " + key, e);
             }
-            ResourceLocation resourceLocation = parseResourceLocation("id", key, arrayObject);
-            Attribute attribute;
-            try {
-                attribute = ForgeRegistries.ATTRIBUTES.getValue(resourceLocation);
-            } catch (Exception e) {
-                throw new JsonParseException(key + " does not have an name.");
-            }
-            VisionBaseAttribute visionBaseAttribute = new VisionBaseAttribute(value, attribute);
 
+            ResourceLocation resourceLocation = parseResourceLocation("id", key, arrayObject);
+            Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(resourceLocation);
+            if (attribute == null) {
+                throw new JsonParseException("Invalid attribute id for key '" + key + "': " + resourceLocation);
+            }
+
+            VisionBaseAttribute visionBaseAttribute = new VisionBaseAttribute(value, attribute);
             visionProperties.add(VisionProperty.create(visionBaseAttribute, arrayObject, jsonObject, key));
         }
         return visionProperties;
+    }
+
+    @Override
+    public @Nullable JsonObject encode(@NotNull VisionBaseAttribute value) {
+        JsonObject jsonObject = new JsonObject();
+
+        ResourceLocation key = ForgeRegistries.ATTRIBUTES.getKey(value.attribute());
+        if (key == null)
+            throw new IllegalArgumentException("Cannot encode VisionBaseAttribute with unknown attribute registry key");
+        jsonObject.addProperty("id", key.toString());
+        jsonObject.addProperty("value", value.value());
+
+        return jsonObject;
     }
 }

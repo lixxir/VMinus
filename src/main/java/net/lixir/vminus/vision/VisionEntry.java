@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -23,7 +24,7 @@ public class VisionEntry<T> {
         return this.entries.isEmpty() || this.values.isEmpty();
     }
 
-    public static boolean visionApplies(@Nullable Object object, String id, List<String> applicantList, @Nullable ICondition.IContext context) {
+    public static boolean visionApplies(@Nullable Object object, @NotNull String id, @NotNull List<String> applicantList, @Nullable ICondition.IContext context) {
         boolean invalidMatch = false;
         boolean validMatchFound = false;
 
@@ -98,7 +99,7 @@ public class VisionEntry<T> {
         return tags.stream().anyMatch(holder -> Objects.equals(registry.getKey(holder.value()), objectKey));
     }
 
-    private static boolean wildcardMatches(String value, String pattern) {
+    private static boolean wildcardMatches(String value, @NotNull String pattern) {
         if (pattern.equals("*"))
             return true;
 
@@ -134,7 +135,7 @@ public class VisionEntry<T> {
         this.entries.addAll(newEntries);
     }
 
-    public void merge(VisionEntry<T> visionEntry) {
+    public void merge(@NotNull VisionEntry<T> visionEntry) {
         this.entries.addAll(visionEntry.getEntries());
 
 

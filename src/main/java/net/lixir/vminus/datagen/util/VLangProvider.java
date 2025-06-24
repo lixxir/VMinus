@@ -1,6 +1,6 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.mixins.LanguageProviderAccessor;
+import net.lixir.vminus.mixins.data.language.LanguageProviderAccessor;
 import net.lixir.vminus.registry.UnifiedRegistry;
 import net.lixir.vminus.registry.entry.*;
 import net.minecraft.core.registries.BuiltInRegistries;

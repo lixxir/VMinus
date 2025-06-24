@@ -10,6 +10,11 @@ import java.util.List;
 
 public class VisionDoubleCodec extends VisionCodec<Double> {
     @Override
+    public Class<Double> getClassType() {
+        return Double.class;
+    }
+
+    @Override
     public @Nullable List<VisionProperty<Double>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
         List<VisionProperty<Double>> visionProperties = new ArrayList<>();
 
@@ -24,7 +29,7 @@ public class VisionDoubleCodec extends VisionCodec<Double> {
     }
 
     @Override
-    public @Nullable JsonObject encode(Double value) {
+    public @Nullable JsonObject encode(@NotNull Double value) {
         JsonPrimitive jsonPrimitive = new JsonPrimitive(value);
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("value", jsonPrimitive);

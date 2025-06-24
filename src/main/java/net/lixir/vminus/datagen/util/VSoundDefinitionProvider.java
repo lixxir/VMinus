@@ -1,13 +1,12 @@
 package net.lixir.vminus.datagen.util;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.mixins.SoundDefinitionAccessor;
-import net.lixir.vminus.mixins.SoundDefinitionSoundAccessor;
-import net.lixir.vminus.mixins.SoundDefinitionsProviderAccessor;
+import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionAccessor;
+import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionSoundAccessor;
+import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionsProviderAccessor;
 import net.lixir.vminus.registry.SoundDefinitionInfo;
 import net.lixir.vminus.registry.UnifiedRegistry;
 import net.minecraft.data.CachedOutput;
-import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;

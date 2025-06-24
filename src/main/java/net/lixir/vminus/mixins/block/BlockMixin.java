@@ -4,13 +4,17 @@ import net.lixir.vminus.registry.entry.BlockEntry;
 import net.lixir.vminus.registry.entry.BlockEntryAccessor;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionType;
+import net.lixir.vminus.vision.VisionTypes;
 import net.lixir.vminus.vision.util.VisionUtil;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,31 +30,31 @@ public class BlockMixin implements VisionDuck, BlockEntryAccessor {
     private BlockEntry vMinus$blockEntry = null;
 
     @Unique
-    private int vMinus$visionIndex = 0;
+    private ResourceLocation vMinus$visionId = null;
 
     @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getSpeedFactor(CallbackInfoReturnable<Float> cir) {
+    private void vMinus$getSpeedFactor(CallbackInfoReturnable<Float> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Blocks.SPEED_FACTOR, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getFriction", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getFriction(CallbackInfoReturnable<Float> cir) {
+    private void vMinus$getFriction(CallbackInfoReturnable<Float> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Blocks.FRICTION, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getJumpFactor(CallbackInfoReturnable<Float> cir) {
+    private void vMinus$getJumpFactor(CallbackInfoReturnable<Float> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Blocks.JUMP_FACTOR, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getExplosionResistance(CallbackInfoReturnable<Float> cir) {
+    private void vMinus$getExplosionResistance(CallbackInfoReturnable<Float> cir) {
         VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Blocks.BLAST_RESISTANCE, new VisionContext(vMinus$self));
     }
 
     @SuppressWarnings("deprecation")
     @Inject(method = "getSoundType", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getSoundType(BlockState state, @NotNull CallbackInfoReturnable<SoundType> cir) {
+    private void vMinus$getSoundType(BlockState state, @NotNull CallbackInfoReturnable<SoundType> cir) {
         SoundType original = cir.getReturnValue();
         SoundType override = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Blocks.SOUND, new VisionContext(vMinus$self));
 
@@ -73,12 +77,17 @@ public class BlockMixin implements VisionDuck, BlockEntryAccessor {
     }
 
     @Override
-    public void vMinus$setVisionIndex(int index) {
-        vMinus$visionIndex = index;
+    public void vMinus$setVisionId(ResourceLocation id) {
+        this.vMinus$visionId = id;
     }
 
     @Override
-    public int vMinus$getVisionIndex() {
-        return vMinus$visionIndex;
+    public @Nullable ResourceLocation vMinus$getVisionId() {
+        return vMinus$visionId;
+    }
+
+    @Override
+    public @NonNull VisionType<?> vMinus$getVisionType() {
+        return VisionTypes.BLOCK;
     }
 }

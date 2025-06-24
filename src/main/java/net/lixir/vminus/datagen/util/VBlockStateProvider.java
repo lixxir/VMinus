@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 public class VBlockStateProvider extends BlockStateProvider {
@@ -330,5 +331,9 @@ public class VBlockStateProvider extends BlockStateProvider {
 
     public ResourceLocation key(Block block) {
         return ForgeRegistries.BLOCKS.getKey(block);
+    }
+
+    public <T> Optional<T> as(@NotNull Class<T> clazz) {
+        return clazz.isInstance(this) ? Optional.of(clazz.cast(this)) : Optional.empty();
     }
 }

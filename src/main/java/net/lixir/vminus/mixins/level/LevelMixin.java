@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,7 +20,7 @@ public abstract class LevelMixin {
 
     @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z", at = @At(value = "TAIL",
             target = "Lnet/minecraft/world/level/chunk/LevelChunk;setBlockState(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)Lnet/minecraft/world/level/block/state/BlockState;"))
-    public void detour$setBlock(BlockPos blockPos, BlockState blockState, int p_46607_, int p_46608_, CallbackInfoReturnable<Boolean> cir) {
+    private void detour$setBlock(BlockPos blockPos, BlockState blockState, int p_46607_, int p_46608_, @NotNull CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValue())
             return;
         if (vminus$level.isClientSide() || !(vminus$level instanceof ServerLevel serverLevel))

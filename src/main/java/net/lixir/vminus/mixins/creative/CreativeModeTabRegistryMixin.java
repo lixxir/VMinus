@@ -1,5 +1,8 @@
 package net.lixir.vminus.mixins.creative;
 
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.util.VisionUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,20 +15,17 @@ import java.util.List;
 
 @Mixin(CreativeModeTabRegistry.class)
 public abstract class CreativeModeTabRegistryMixin {
-
-    /*
     @Inject(method = "getSortedCreativeModeTabs", at = @At(value = "RETURN"), cancellable = true,  remap = false)
     private static void getSortedCreativeModeTabs(CallbackInfoReturnable<List<CreativeModeTab>> cir) {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = CreativeTabVision.of(tab).hide.value();
+            Boolean hide = VisionUtil.getOverrideValue(((VisionDuck) tab), VisionPropertyTypes.Tabs.HIDE, null);
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);
         }
-        cir.setReturnValue(new ArrayList<>(newTabs));
+        if (!newTabs.equals(cir.getReturnValue()))
+            cir.setReturnValue(new ArrayList<>(newTabs));
     }
-
-     */
 }

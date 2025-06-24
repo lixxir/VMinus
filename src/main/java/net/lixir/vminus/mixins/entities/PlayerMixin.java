@@ -1,14 +1,16 @@
 package net.lixir.vminus.mixins.entities;
 
-import com.google.gson.JsonObject;
+import net.lixir.vminus.sight.resource.SightManager;
 import net.lixir.vminus.util.SizeAttributeUtil;
-import net.minecraft.resources.ResourceLocation;
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.util.VisionFoodProperties;
+import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,12 +18,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Objects;
-
 @Mixin(Player.class)
-public abstract class PlayerMixin {
+public abstract class PlayerMixin implements VisionDuck {
     @Unique
-    private final Player vminus$player = (Player) (Object) this;
+    private final Player vMinus$self = (Player) (Object) this;
 
     @ModifyArg(
             method = "eat",
@@ -31,31 +31,26 @@ public abstract class PlayerMixin {
             ),
             index = 4
     )
-    private SoundEvent changeBurpSound(SoundEvent originalSound) {
-        /*
-        ItemStack itemstack = vminus$player.getUseItem();
-        JsonObject visionData = Visions.getData(itemstack);
-        vminus$player.getFoodData().eat(itemstack.getItem(), itemstack);
-
-        String burpSound = VisionProperties.getString(VisionProperties.Names.FOOD_PROPERTIES, visionData, VisionProperties.Names.BURP_SOUND, itemstack);
-        if (burpSound != null && !burpSound.isEmpty()) {
-            ResourceLocation resourceLocation = new ResourceLocation(burpSound);
-            return Objects.requireNonNull(ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation));
+    private SoundEvent vMinus$replaceBurpSound(SoundEvent originalSound) {
+        VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
+        if (visionFoodProperties != null) {
+            SoundEvent burpSound = visionFoodProperties.getBurpSound();
+            if (burpSound != null) {
+                return burpSound;
+            }
         }
-
-         */
         return originalSound;
     }
 
     @Inject(method = "getDimensions", at = @At(value = "RETURN"), cancellable = true)
     public void getDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
+        if (!SightManager.get("size_attributes"))
+            return;
         float defaultHeight = cir.getReturnValue().height;
         float defaultWidth = cir.getReturnValue().width;
-        float width = defaultWidth * SizeAttributeUtil.getWidth(vminus$player);
-        float height = defaultHeight * SizeAttributeUtil.getHeight(vminus$player);
+        float width = defaultWidth * SizeAttributeUtil.getWidth(vMinus$self);
+        float height = defaultHeight * SizeAttributeUtil.getHeight(vMinus$self);
         if (width != defaultWidth && height != defaultHeight)
             cir.setReturnValue(EntityDimensions.scalable(width, height));
     }
-
-
 }

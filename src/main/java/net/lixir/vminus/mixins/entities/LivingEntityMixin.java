@@ -2,8 +2,12 @@ package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.item.trait.ItemTraits;
 import net.lixir.vminus.attribute.VMinusAttributes;
-import net.lixir.vminus.util.VariantEntity;
+import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.entity.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionType;
+import net.lixir.vminus.vision.VisionTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.*;
@@ -11,6 +15,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,52 +26,51 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity implements VariantEntity {
-    public LivingEntityMixin(EntityType<?> p_19870_, Level p_19871_) {
-        super(p_19870_, p_19871_);
+public abstract class LivingEntityMixin extends Entity implements VariantEntity, VisionDuck {
+    public LivingEntityMixin(EntityType<?> entityType, Level level) {
+        super(entityType, level);
     }
 
     @Unique
-    private ResourceLocation vminus$variantTexture = null;
+    private ResourceLocation vMinus$variantTexture = null;
 
     @Unique
-    private ResourceLocation vminus$variantName = null;
+    private ResourceLocation vMinus$variantName = null;
 
     @Override
-    public void vminus$setVariant(@Nullable ResourceLocation name, @Nullable ResourceLocation texture) {
+    public void vMinus$setVariant(@Nullable ResourceLocation name, @Nullable ResourceLocation texture) {
         if (name != null && name.getPath().isEmpty()) {
-            vminus$variantName = null;
+            vMinus$variantName = null;
         } else {
-            vminus$variantName = name;
+            vMinus$variantName = name;
         }
         if (texture != null && texture.getPath().isEmpty()) {
-            vminus$variantTexture = null;
+            vMinus$variantTexture = null;
         } else {
-            vminus$variantTexture = texture;
+            vMinus$variantTexture = texture;
         }
     }
 
     @Override
-    public @Nullable ResourceLocation vminus$getVariantTexture() {
-        return vminus$variantTexture;
+    public @Nullable ResourceLocation vMinus$getVariantTexture() {
+        return vMinus$variantTexture;
     }
 
     @Override
-    public @Nullable ResourceLocation vminus$getVariantName() {
-        return vminus$variantName;
+    public @Nullable ResourceLocation vMinus$getVariantName() {
+        return vMinus$variantName;
     }
 
     @Unique
-    private final LivingEntity vminus$entity = (LivingEntity) (Object) this;
-
+    private final LivingEntity vMinus$self = (LivingEntity) (Object) this;
 
     // Automatic custom loot tables for variants
-    @Inject(method = "getLootTable", at = @At("HEAD"), cancellable = true)
-    public void getLootTable(CallbackInfoReturnable<ResourceLocation> cir) {
-        vminus$entity.getPersistentData();
-        if (vminus$entity.getPersistentData().contains("variant")) {
-            String variant = vminus$entity.getPersistentData().getString("variant");
-            String entityName = ForgeRegistries.ENTITY_TYPES.getKey(vminus$entity.getType()).getPath();
+    @Inject(method = "getLootTable", at = @At("RETURN"), cancellable = true)
+    public final void vMinus$getLootTable(CallbackInfoReturnable<ResourceLocation> cir) {
+        vMinus$self.getPersistentData();
+        if (vMinus$self.getPersistentData().contains("variant")) {
+            String variant = vMinus$self.getPersistentData().getString("variant");
+            String entityName = ForgeRegistries.ENTITY_TYPES.getKey(vMinus$self.getType()).getPath();
             if (!variant.equals("normal")) {
                 ResourceLocation customLoot = new ResourceLocation("vminus:entities/variant/" + entityName + "/" + variant);
                 cir.setReturnValue(customLoot);
@@ -73,60 +78,98 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
         }
     }
 
+    @Override
+    public @NonNull VisionType<?> vMinus$getVisionType() {
+        return VisionTypes.ENTITY;
+    }
+
+    @Override
+    public @Nullable ResourceLocation vMinus$getVisionId() {
+        return ((VisionDuck) getType()).vMinus$getVisionId();
+    }
+
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    public void vminus$addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
-        compoundTag.putString("VariantTexture",  vminus$variantTexture == null ? "null" : vminus$variantTexture.toString());
-        compoundTag.putString("VariantName", vminus$variantName == null ? "null" : vminus$variantName.toString());
+    public final void vMinus$addAdditionalSaveData(@NotNull CompoundTag compoundTag, CallbackInfo ci) {
+        compoundTag.putString("VariantTexture",  vMinus$variantTexture == null ? "null" : vMinus$variantTexture.toString());
+        compoundTag.putString("VariantName", vMinus$variantName == null ? "null" : vMinus$variantName.toString());
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    public void vminus$readAdditionalSaveDataCompoundTag(CompoundTag compoundTag, CallbackInfo ci) {
+    public final void vMinus$readAdditionalSaveDataCompoundTag(@NotNull CompoundTag compoundTag, CallbackInfo ci) {
         if (compoundTag.contains("VariantName"))
-            vminus$variantName = compoundTag.getString("VariantName").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantName"));
+            vMinus$variantName = compoundTag.getString("VariantName").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantName"));
         if (compoundTag.contains("VariantTexture"))
-            vminus$variantTexture = compoundTag.getString("VariantTexture").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantTexture"));
+            vMinus$variantTexture = compoundTag.getString("VariantTexture").equals("null") ? null : ResourceLocation.parse(compoundTag.getString("VariantTexture"));
     }
 
     @Inject(method = "getJumpBoostPower", at = @At("RETURN"), cancellable = true)
     public void getJumpBoostPower(CallbackInfoReturnable<Float> cir) {
         float increase = 0;
-        if (vminus$entity.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST))
-            increase += (float) vminus$entity.getAttributeValue(VMinusAttributes.JUMP_BOOST) * 0.15f;
+        if (vMinus$self.getAttributes().hasAttribute(VMinusAttributes.JUMP_BOOST))
+            increase += (float) vMinus$self.getAttributeValue(VMinusAttributes.JUMP_BOOST) * 0.15f;
         if (increase != 0)
-            cir.setReturnValue((cir.getReturnValue() * increase) * SizeAttributeUtil.getHeight(vminus$entity) * 0.2f);
+            cir.setReturnValue((cir.getReturnValue() * increase) * SizeAttributeUtil.getHeight(vMinus$self) * 0.2f);
     }
 
     @Inject(method = "getEyeHeight", at = @At("RETURN"), cancellable = true)
     public void getEyeHeight(CallbackInfoReturnable<Float> callbackInfo) {
-        if (vminus$entity == null)
+        if (!SightManager.get("size_attributes"))
             return;
-        if (vminus$entity.tickCount > 0) {
-            float height = SizeAttributeUtil.getHeight(vminus$entity);
+        if (vMinus$self == null)
+            return;
+        if (vMinus$self.tickCount > 0) {
+            float height = SizeAttributeUtil.getHeight(vMinus$self);
             if (height != 1) {
                 callbackInfo.setReturnValue(callbackInfo.getReturnValue() * height);
             }
         }
     }
+    @Unique
+    private float vMinus$lastWidthScale = 1.0f;
+    @Unique
+    private float vMinus$lastHeightScale = 1.0f;
 
     @Inject(method = "getDimensions", at = @At(value = "RETURN"), cancellable = true)
-    public void getDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
+    public final void vMinus$getDimensions(Pose pose, @NotNull CallbackInfoReturnable<EntityDimensions> cir) {
+        if (!SightManager.get("size_attributes"))
+            return;
         float defaultHeight = cir.getReturnValue().height;
         float defaultWidth = cir.getReturnValue().width;
-        float width = defaultWidth * SizeAttributeUtil.getWidth(vminus$entity);
-        float height = defaultHeight * SizeAttributeUtil.getHeight(vminus$entity);
-        if (width != defaultWidth && height != defaultHeight)
+
+        float widthScale = SizeAttributeUtil.getWidth(vMinus$self);
+        float heightScale = SizeAttributeUtil.getHeight(vMinus$self);
+
+        float width = defaultWidth * widthScale;
+        float height = defaultHeight * heightScale;
+
+        if (width != defaultWidth || height != defaultHeight) {
             cir.setReturnValue(EntityDimensions.scalable(width, height));
+        }
+
+        vMinus$lastWidthScale = widthScale;
+        vMinus$lastHeightScale = heightScale;
     }
 
     @Inject(method = "baseTick", at = @At(value = "TAIL"))
-    public void baseTick(CallbackInfo ci) {
-        if (vminus$entity == null)
+    public final void vMinus$baseTick(CallbackInfo ci) {
+        if (!SightManager.get("size_attributes"))
             return;
-        vminus$entity.refreshDimensions();
+        if (vMinus$self == null)
+            return;
+
+        float widthScale = SizeAttributeUtil.getWidth(vMinus$self);
+        float heightScale = SizeAttributeUtil.getHeight(vMinus$self);
+
+        if (widthScale != vMinus$lastWidthScale || heightScale != vMinus$lastHeightScale) {
+            vMinus$self.refreshDimensions();
+
+            vMinus$lastWidthScale = widthScale;
+            vMinus$lastHeightScale = heightScale;
+        }
     }
 
     @Inject(method = "createLivingAttributes", at = @At("RETURN"))
-    private static void createLivingAttributes(CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
+    private static void createLivingAttributes(@NotNull CallbackInfoReturnable<AttributeSupplier.Builder> cir) {
         cir.getReturnValue().add(VMinusAttributes.WIDTH);
         cir.getReturnValue().add(VMinusAttributes.HEIGHT);
         cir.getReturnValue().add(VMinusAttributes.PROTECTION);
@@ -142,7 +185,7 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity 
     public void canFreeze(CallbackInfoReturnable<Boolean> cir) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                ItemStack armorPiece = vminus$entity.getItemBySlot(slot);
+                ItemStack armorPiece = vMinus$self.getItemBySlot(slot);
                 if (ItemTraits.hasTrait(armorPiece, ItemTraits.INSULATED.get())) {
                     cir.setReturnValue(ItemTraits.getTrait(armorPiece, ItemTraits.INSULATED.get()));
                     return;

@@ -3,6 +3,7 @@ package net.lixir.vminus.mixins.level;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
