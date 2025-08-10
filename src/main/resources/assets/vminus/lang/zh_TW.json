@@ -6,7 +6,9 @@
   "attribute.vminus.name.magic_protection": "Magic Protection",
   "attribute.vminus.name.mining_speed": "Mining Speed",
   "attribute.vminus.name.protection": "General Protection",
-  "block.vminus.test": "Test",
+  "itemTrait.vminus.insulated": "Insulated",
+  "itemTrait.vminus.lightfooted": "Lightfooted",
+  "itemTrait.vminus.piglin_charm": "Piglin Charm",
   "rarity.common": "Common",
   "rarity.delicacy": "Delicacy",
   "rarity.epic": "Epic",
@@ -14,8 +16,5 @@
   "rarity.legendary": "Legendary",
   "rarity.rare": "Rare",
   "rarity.uncommon": "Uncommon",
-  "rarity.unobtainable": "Unobtainable",
-  "trait.vminus.insulated": "Insulated",
-  "trait.vminus.lightfooted": "Lightfooted",
-  "trait.vminus.piglin_charm": "Piglin Charm"
+  "rarity.unobtainable": "Unobtainable"
 }
