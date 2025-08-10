@@ -1,6 +1,6 @@
 package net.lixir.vminus.vision;
 
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 
 public class VisionEntry<T> {
     private final List<String> entries = new ArrayList<>();
-    private final HashMap<String, List<? extends VisionProperty<?>>> values = new HashMap<>();
+    private final HashMap<String, List<? extends VisionValue<?>>> values = new HashMap<>();
 
     public boolean isEmpty() {
         return this.entries.isEmpty() || this.values.isEmpty();
@@ -65,6 +65,8 @@ public class VisionEntry<T> {
 
         return !invalidMatch && validMatchFound;
     }
+
+
 
     private static boolean isItemTagged(Item item, ResourceLocation matchKey, @Nullable ICondition.IContext context) {
         return isTagged(item, matchKey, context, ForgeRegistries.ITEMS,
@@ -115,7 +117,7 @@ public class VisionEntry<T> {
         return value.equals(pattern);
     }
 
-    public HashMap<String, List<? extends VisionProperty<?>>> getValues() {
+    public HashMap<String, List<? extends VisionValue<?>>> getValues() {
         return values;
     }
 
@@ -123,9 +125,9 @@ public class VisionEntry<T> {
         return entries;
     }
 
-    public void addValues(String key, List<? extends VisionProperty<?>> values) {
+    public void addValues(String key, List<? extends VisionValue<?>> values) {
         this.values.merge(key, new ArrayList<>(values), (existingList, newList) -> {
-            ArrayList<VisionProperty<?>> combined = new ArrayList<>(existingList);
+            ArrayList<VisionValue<?>> combined = new ArrayList<>(existingList);
             combined.addAll(newList);
             return combined;
         });
@@ -141,10 +143,10 @@ public class VisionEntry<T> {
 
         for (var entry : visionEntry.values.entrySet()) {
             String key = entry.getKey();
-            List<? extends VisionProperty<?>> incomingValues = entry.getValue();
+            List<? extends VisionValue<?>> incomingValues = entry.getValue();
 
             this.values.merge(key, new ArrayList<>(incomingValues), (existingList, newList) -> {
-                ArrayList<VisionProperty<?>> combined = new ArrayList<>(existingList);
+                ArrayList<VisionValue<?>> combined = new ArrayList<>(existingList);
                 combined.addAll(newList);
                 return combined;
             });

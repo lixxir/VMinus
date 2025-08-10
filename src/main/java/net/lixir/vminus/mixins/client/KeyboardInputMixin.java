@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.client;
 
-import net.lixir.vminus.block.VBlock;
+import net.lixir.vminus.block.IVBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.KeyboardInput;
@@ -25,18 +25,18 @@ public class KeyboardInputMixin {
         if (player != null && !player.isSpectator() && !player.getAbilities().flying) {
             Level level = player.level();
             BlockPos blockPos = player.blockPosition();
-            VBlock vBlock;
+            IVBlock IVBlock;
             Block blockInside = level.getBlockState(blockPos).getBlock();
             Block blockInsideAbove = level.getBlockState(blockPos.above()).getBlock();
-            if (blockInside instanceof VBlock) {
-                vBlock = (VBlock) blockInside;
-            } else if (blockInsideAbove instanceof VBlock) {
-                vBlock = (VBlock) blockInsideAbove;
+            if (blockInside instanceof IVBlock) {
+                IVBlock = (IVBlock) blockInside;
+            } else if (blockInsideAbove instanceof IVBlock) {
+                IVBlock = (IVBlock) blockInsideAbove;
             } else {
-                vBlock = null;
+                IVBlock = null;
             }
-            if (vBlock != null) {
-                Input blockInput = vBlock.onPlayerInput(level, player, vMinus$input);
+            if (IVBlock != null) {
+                Input blockInput = IVBlock.onPlayerInput(level, player, vMinus$input);
                 if (blockInput == null)
                     return;
                 vMinus$input.leftImpulse = blockInput.leftImpulse;

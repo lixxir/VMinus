@@ -9,12 +9,17 @@ import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionEntry;
 import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.resource.VisionDeserializer;
-import net.lixir.vminus.vision.resource.VisionProcessor;
+import net.lixir.vminus.vision.resource.VisionFormatter;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
@@ -25,9 +30,9 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.*;
 
+@SuppressWarnings("deprecated")
 public class VisionManager<T> extends SimpleJsonResourceReloadListener {
-    private static final List<VisionManager<?>> VISION_MANAGERS = new ArrayList<>();
-
+    private static final Set<VisionManager<?>> VISION_MANAGERS = new HashSet<>();
     private final ICondition.IContext context;
     private final String directory;
     private final String singleListName;
@@ -35,9 +40,7 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
     private final Gson gson;
     private final VisionType<T> visionType;
     private final Registry<T> registry;
-
     protected final Map<ResourceLocation, Vision> idToVisionMap = new HashMap<>();
-    protected final Map<Vision, ResourceLocation> visionToIdMap = new HashMap<>();
 
     public VisionManager(@NotNull VisionType<T> visionType, Registry<T> registry, ICondition.IContext context) {
         super(new GsonBuilder()
@@ -66,6 +69,9 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
         for (Map.Entry<ResourceLocation, JsonElement> entry : resourceLocationJsonElementMap.entrySet()) {
             loadVisionEntry(entry.getKey().toString(), entry.getValue(), visionEntries);
         }
+        int datapackSize = visionEntries.size();
+        if (datapackSize > 0)
+            VMinus.LOGGER.info("Loaded {} {} visions from data", datapackSize, visionType.getId());
 
         // Load from config
         File configDir = new File(FMLPaths.CONFIGDIR.get().toFile(), directory);
@@ -83,31 +89,40 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
             }
         }
 
+        int configSize = visionEntries.size() - datapackSize;
+        if (configSize > 0)
+            VMinus.LOGGER.info("Loaded {} {} visions from config", configSize, visionType.getId());
+
         for (T value : registry) {
             ResourceLocation id = registry.getKey(value);
             if (id == null)
                 continue;
-            VisionEntry<T> mergedEntry = new VisionEntry<>();
-            for (VisionEntry<T> visionEntry : visionEntries) {
-                if (VisionEntry.visionApplies(value, id.toString(), visionEntry.getEntries(), context)) {
-                    mergedEntry.merge(visionEntry);
-                }
-            }
 
             ((VisionDuck)value).vMinus$setVisionId(id);
+            VisionEntry<T> mergedEntry = buildMergedEntry(value, id.toString(), visionEntries);
+
             if (!mergedEntry.isEmpty()) {
                 Vision vision = Vision.fromEntry(id, mergedEntry, visionType);
                 idToVisionMap.put(id, vision);
-                visionToIdMap.put(vision, id);
-                this.visionType.applyVision(value, id);
+                visionType.putVision(id, vision);
+                visionType.applyVision(value, id);
             }
         }
+    }
 
+    private @NotNull VisionEntry<T> buildMergedEntry(T value, String id, @NotNull List<VisionEntry<T>> visionEntries) {
+        VisionEntry<T> mergedEntry = new VisionEntry<>();
+        for (VisionEntry<T> visionEntry : visionEntries) {
+            if (VisionEntry.visionApplies(value, id, visionEntry.getEntries(), context)) {
+                mergedEntry.merge(visionEntry);
+            }
+        }
+        return mergedEntry;
     }
 
     private void loadVisionEntry(String source, JsonElement element, List<VisionEntry<T>> outputList) {
         try {
-            JsonObject processed = VisionProcessor.processJson(singleListName, multiListName, element);
+            JsonObject processed = VisionFormatter.processJson(singleListName, multiListName, element);
             VisionEntry<T> entry = gson.fromJson(processed, new TypeToken<VisionEntry<T>>() {}.getType());
             outputList.add(entry);
         } catch (Exception e) {
@@ -119,7 +134,7 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
         VISION_MANAGERS.clear();
     }
 
-    public static @NotNull @UnmodifiableView List<VisionManager<?>> getVisionManagers() {
+    public static @NotNull @UnmodifiableView Set<VisionManager<?>> getVisionManagers() {
         return VISION_MANAGERS;
     }
 
@@ -127,12 +142,13 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
         return idToVisionMap.entrySet();
     }
 
-    public ResourceLocation idFromVision(Vision vision) {
-        return visionToIdMap.get(vision);
-    }
-
     public VisionType<T> getVisionType() {
         return visionType;
+    }
+
+    @Override
+    public int hashCode() {
+        return visionType.hashCode();
     }
 
     @Override

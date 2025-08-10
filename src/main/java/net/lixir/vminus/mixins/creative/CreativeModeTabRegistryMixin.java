@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.creative;
 
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public abstract class CreativeModeTabRegistryMixin {
         List<CreativeModeTab> originalTabs = cir.getReturnValue();
         ArrayList<CreativeModeTab> newTabs = new ArrayList<>();
         for (CreativeModeTab tab : originalTabs) {
-            Boolean hide = VisionUtil.getOverrideValue(((VisionDuck) tab), VisionPropertyTypes.Tabs.HIDE, null);
+            Boolean hide = VisionUtils.getOverrideValue(((VisionDuck) tab), VisionProperties.Tabs.HIDE, null);
             if (hide != null && hide)
                 continue;
             newTabs.add(tab);

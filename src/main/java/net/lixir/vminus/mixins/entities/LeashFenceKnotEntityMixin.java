@@ -1,13 +1,6 @@
 package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.registry.util.VMinusTags;
-import net.lixir.vminus.util.ISpeedGetter;
-import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
-import net.lixir.vminus.vision.util.VisionUtil;
-import net.lixir.vminus.vision.values.conditions.VisionContext;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.LeashFenceKnotEntity;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;

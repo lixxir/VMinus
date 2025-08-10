@@ -1,0 +1,5 @@
+{
+  "item": "minecraft:stick",
+  "replace": "#minecraft:planks",
+  "max_stack_size": 15
+}

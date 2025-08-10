@@ -19,11 +19,11 @@ public class VMinusEntityTypeTagGenerator extends EntityTypeTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
-        var banned = tag(VMinusTags.Entities.BANNED);
+        tag(VMinusTags.Entities.BANNED);
 
-        var zombies = tag(VMinusTags.Entities.ZOMBIES);
-        zombies.add(EntityType.ZOMBIE);
-        zombies.add(EntityType.HUSK);
-        zombies.add(EntityType.DROWNED);
+        tag(VMinusTags.Entities.ZOMBIES)
+                .add(EntityType.ZOMBIE)
+                .add(EntityType.HUSK)
+                .add(EntityType.DROWNED);
     }
 }

@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.client;
 
 import com.mojang.authlib.GameProfile;
 import net.lixir.vminus.cape.Cape;
-import net.lixir.vminus.item.MaxDurationGetter;
+import net.lixir.vminus.item.IMaxDurationGetter;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
@@ -32,29 +32,30 @@ public abstract class AbstractClientPlayerMixin extends Player {
     protected abstract PlayerInfo getPlayerInfo();
 
     @Inject(method = "getElytraTextureLocation", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void vMinus$getElytraTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         vMinus$trySetCapeTexture(cir);
     }
 
     @Inject(method = "getCloakTextureLocation", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
+    private void vMinus$getCloakTextureLocation(CallbackInfoReturnable<ResourceLocation> cir) {
         vMinus$trySetCapeTexture(cir);
     }
 
     @Inject(method = "isCapeLoaded", at = @At("RETURN"), cancellable = true)
-    public final void vMinus$isCapeLoaded(CallbackInfoReturnable<Boolean> cir) {
+    private void vMinus$isCapeLoaded(CallbackInfoReturnable<Boolean> cir) {
         if (vMinus$hasCustomCape()) {
             cir.setReturnValue(true);
         }
     }
 
+
     @ModifyConstant(
             method = "getFieldOfViewModifier",
             constant = @Constant(floatValue = 20.0F)
     )
-    public final float vMinus$getFieldOfViewModifier(float original) {
+    private float vMinus$getFieldOfViewModifier(float original) {
         ItemStack itemstack = this.getUseItem();
-        return ((MaxDurationGetter) itemstack.getItem()).vminus$getMaxDuration();
+        return ((IMaxDurationGetter) itemstack.getItem()).vminus$getMaxDuration();
     }
 
     @Unique

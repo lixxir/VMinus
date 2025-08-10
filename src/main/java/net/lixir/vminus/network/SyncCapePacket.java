@@ -30,8 +30,13 @@ public record SyncCapePacket(UUID playerUUID, String capeId) {
         ctx.get().setPacketHandled(true);
     }
 
+    public static void sendToTracking(@NotNull ServerPlayer sourcePlayer, String capeId) {
+        SyncCapePacket packet = new SyncCapePacket(sourcePlayer.getUUID(), capeId);
+        VMinusNetwork.CHANNEL.send(PacketDistributor.TRACKING_ENTITY.noArg(), packet);
+    }
+
     public static void sendToAll(@NotNull ServerPlayer sourcePlayer, String capeId) {
         SyncCapePacket packet = new SyncCapePacket(sourcePlayer.getUUID(), capeId);
-        VMinusNetworking.CHANNEL.send(PacketDistributor.ALL.noArg(), packet);
+        VMinusNetwork.CHANNEL.send(PacketDistributor.ALL.noArg(), packet);
     }
 }

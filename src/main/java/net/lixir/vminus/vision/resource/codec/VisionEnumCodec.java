@@ -2,8 +2,7 @@ package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.util.VisionCreativeOrder;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +22,8 @@ public class VisionEnumCodec<E extends Enum<E>> extends VisionCodec<E> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<E>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<E>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<E>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<E>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
 
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -39,8 +38,8 @@ public class VisionEnumCodec<E extends Enum<E>> extends VisionCodec<E> {
                 throw new JsonParseException(valueString + " is not a valid value for enum " + enumType.getSimpleName());
             }
 
-            VisionProperty<E> visionProperty = VisionProperty.create(enumValue, arrayObject, jsonObject, key);
-            visionProperties.add(visionProperty);
+            VisionValue<E> visionValue = VisionValue.create(enumValue, arrayObject, jsonObject, key);
+            visionProperties.add(visionValue);
         }
 
         return visionProperties;

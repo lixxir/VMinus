@@ -2,12 +2,14 @@ package net.lixir.vminus.events.client;
 
 
 import net.lixir.vminus.registry.TintType;
-import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.registry.VRegistry;
 import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.BlockEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
 import net.lixir.vminus.registry.entry.ItemEntry;
-import net.lixir.vminus.registry.entry.ItemEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.ItemEntryAccessor;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.FoliageColor;
 import net.minecraft.world.level.GrassColor;
@@ -16,32 +18,64 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class RegisterColorEventHandler {
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        for (UnifiedRegistry unifiedRegistry : UnifiedRegistry.getRegistries()) {
-            for (Item item : UnifiedRegistry.fromId(unifiedRegistry.getModId()).getItems()) {
+        for (VRegistry vRegistry : VRegistry.getRegistries()) {
+            /*
+            for (Block block : vRegistry.getBlocks()) {
+                BlockEntryAccessor accessor = (BlockEntryAccessor) block;
+                BlockEntry blockEntry = accessor.vminus$getEntry();
+                if (blockEntry == null)
+                    continue;
+                TintType tint = blockEntry.getItemEntry().getTint();
+                if (tint.equals(TintType.UNSET) || tint.equals(TintType.NONE))
+                    continue;
+
+                BlockItem blockItem = null;
+                for (Item item : ForgeRegistries.ITEMS.getValues()) {
+                    if (item instanceof BlockItem _blockItem && _blockItem.getBlock() == block) {
+                        blockItem = _blockItem;
+                        break;
+                    }
+                }
+                if (blockItem == null)
+                    continue;
+
+                switch (tint) {
+                    case FOLIAGE -> event.register((stack, index) -> index == 0 ? FoliageColor.getDefaultColor() : -1, blockItem);
+                    case GRASS -> event.register((stack, index) -> index == 0 ? GrassColor.getDefaultColor() : -1, blockItem);
+                }
+            }
+
+             */
+            for (Item item : vRegistry.getItems()) {
+                if (item instanceof BlockItem)
+                    continue;
                 ItemEntryAccessor accessor = (ItemEntryAccessor) item;
                 ItemEntry itemEntry = accessor.vminus$getEntry();
                 if (itemEntry == null)
                     continue;
-                TintType tintType = itemEntry.getTintType();
-                if (tintType == null || tintType == TintType.UNSET)
+                TintType tintType = itemEntry.getTint();
+                if (tintType == TintType.UNSET || tintType == TintType.NONE)
                     continue;
                 switch (tintType) {
                     case FOLIAGE -> event.register((stack, tintIndex) -> tintIndex == 0 ? FoliageColor.getDefaultColor() : -1, item);
                     case GRASS ->  event.register((stack, tintIndex) -> tintIndex == 0 ? GrassColor.getDefaultColor() : -1, item);
                 }
             }
+
         }
+
     }
 
     @SubscribeEvent
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
-        for (UnifiedRegistry unifiedRegistry : UnifiedRegistry.getRegistries()) {
-            for (Block block : UnifiedRegistry.fromId(unifiedRegistry.getModId()).getBlocks()) {
+        for (VRegistry vRegistry : VRegistry.getRegistries()) {
+            for (Block block : vRegistry.getBlocks()) {
                 BlockEntryAccessor accessor = (BlockEntryAccessor) block;
                 BlockEntry blockEntry = accessor.vminus$getEntry();
                 if (blockEntry == null)

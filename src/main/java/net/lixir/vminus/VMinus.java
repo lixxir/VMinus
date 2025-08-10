@@ -1,17 +1,16 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.entity.attribute.VMinusAttributes;
 import net.lixir.vminus.block.VMinusBlocks;
+import net.lixir.vminus.fluid.VMinusFluids;
 import net.lixir.vminus.item.VMinusItems;
-import net.lixir.vminus.item.trait.ItemTraits;
-import net.lixir.vminus.registry.UnifiedRegistry;
-import net.lixir.vminus.registry.VMinusRegistryEntryDefaults;
+import net.lixir.vminus.registry.VRegistry;
+import net.lixir.vminus.registry.VMinusRegistryEntryGroupsProvider;
 import net.lixir.vminus.registry.VMinusSounds;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionTypes;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -31,23 +30,23 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class VMinus {
     public static final Logger LOGGER = LogManager.getLogger(VMinus.class);
     public static final String ID = "vminus";
-    public static final UnifiedRegistry REGISTRY = UnifiedRegistry.create(ID, reg -> {
-        VisionTypes.init();
-        VisionPropertyTypes.init();
-        VMinusRegistryEntryDefaults.init();
-        VMinusBlocks.init();
-        VMinusItems.init();
-        VMinusSounds.init();
-        VMinusAttributes.init();
-    });
+    public static final VRegistry REGISTRY = VRegistry.create(ID, new VMinusRegistryEntryGroupsProvider());
 
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
 
     public VMinus(@NotNull FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.register(this);
-        IEventBus bus = context.getModEventBus();
-        ItemTraits.TRAITS.register(bus);
         context.registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
+    }
+
+    public static void init() {
+        VisionTypes.init();
+        VisionProperties.init();
+        VMinusBlocks.init();
+        VMinusItems.init();
+        VMinusSounds.init();
+        VMinusAttributes.init();
+        VMinusFluids.init();
     }
 
     public static void queueServerWork(int tick, Runnable action) {

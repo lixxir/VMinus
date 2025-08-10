@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.entity.attribute.VMinusAttributes;
 import net.lixir.vminus.sight.resource.SightManager;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -38,7 +38,7 @@ public abstract class DiggerItemMixin {
                 }
             }
         }
-        if (state.is(accessor.getBlocks())) {
+        if (state.is(accessor.getBlocks()) || SightManager.get("tool_mine_all")) {
             ci.setReturnValue(newSpeed != 0 ? newSpeed : accessor.getSpeed());
         } else {
             ci.setReturnValue(1.0F);

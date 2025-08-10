@@ -1,8 +1,8 @@
 package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
-import net.lixir.vminus.vision.util.VisionCreativeOrder;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.util.CreativeOrder;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -15,15 +15,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
+public class VisionCreativeOrderCodec extends VisionCodec<CreativeOrder> {
     @Override
-    public Class<VisionCreativeOrder> getClassType() {
-        return VisionCreativeOrder.class;
+    public Class<CreativeOrder> getClassType() {
+        return CreativeOrder.class;
     }
 
     @Override
-    public @Nullable List<VisionProperty<VisionCreativeOrder>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<VisionCreativeOrder>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<CreativeOrder>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<CreativeOrder>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
 
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -68,11 +68,11 @@ public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
                 targetItemStack = targetItem.getDefaultInstance();
             }
 
-            VisionCreativeOrder order;
+            CreativeOrder order;
             if (itemValue.startsWith("#")) {
                 ResourceLocation tagLoc = new ResourceLocation(itemValue.substring(1));
                 TagKey<Item> itemTag = TagKey.create(Registries.ITEM, tagLoc);
-                order = new VisionCreativeOrder(null, targetItemStack, before, itemTag);
+                order = new CreativeOrder(null, targetItemStack, before, itemTag);
             } else {
                 ResourceLocation itemLoc = new ResourceLocation(itemValue);
                 Item item = ForgeRegistries.ITEMS.getValue(itemLoc);
@@ -81,16 +81,16 @@ public class VisionCreativeOrderCodec extends VisionCodec<VisionCreativeOrder> {
                 ItemStack itemStack = item.getDefaultInstance();
 
 
-                order = new VisionCreativeOrder(itemStack, targetItemStack, before, null);
+                order = new CreativeOrder(itemStack, targetItemStack, before, null);
             }
-            visionProperties.add(VisionProperty.create(order, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(order, arrayObject, jsonObject, key));
         }
 
         return visionProperties;
     }
 
     @Override
-    public @Nullable JsonObject encode(@NotNull VisionCreativeOrder value) {
+    public @Nullable JsonObject encode(@NotNull CreativeOrder value) {
         JsonObject jsonObject = new JsonObject();
 
         ResourceLocation itemId = value.getItemStack() != null ? ForgeRegistries.ITEMS.getKey(value.getItemStack().getItem()) : null;

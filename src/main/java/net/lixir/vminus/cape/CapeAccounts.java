@@ -11,7 +11,6 @@ import java.util.UUID;
 public class CapeAccounts {
     public static final UUID DEV_UUID = UUID.fromString("2bb68269-0733-442d-b746-6565060c1226");
     public static final Map<UUID, Flags> ACCOUNTS = ImmutableMap.<UUID, Flags>builder()
-
             // ----- DEV -----
             .put(uuid("2bb68269-0733-442d-b746-6565060c1226"), Flags.of().setAll()) // DEV
             .put(uuid("9b186dc0-30e9-4ba0-b068-acaf83d975aa"), Flags.of().setAll()) // lixir_dev
@@ -45,6 +44,9 @@ public class CapeAccounts {
             .put(uuid("92b41f1a-d307-45ce-b1b2-1e5eac990295"), Flags.of().setBooster()) // PHSYCAL_MAN
             .put(uuid("034381ae-e0d2-4a31-b409-bfa4292a10ac"), Flags.of().setBooster()) // ZACHTOPLASM
             .put(uuid("e5f583c3-c3ea-4131-86b8-da100024c035"), Flags.of().setBooster()) // SIMEEOW
+            .put(uuid("e4c2e370-63b1-4aa9-b236-6f2cc240d0d8"), Flags.of().setBooster()) // Rilyproductions
+            .put(uuid("a7727c38-0417-4314-8d31-95b4354a3ced"), Flags.of().setBooster()) // LEM0N4643
+            .put(uuid("51cfd3c2-7495-472f-b782-8667e63cae1e"), Flags.of().setBooster()) // Punyoverr
 
             // ----- PATRONS -----
             .put(uuid("b582223b-ff29-4277-ab55-0d3e9586163c"), Flags.of().setPatreon()) // SWEETYGAMER_2
@@ -94,6 +96,12 @@ public class CapeAccounts {
             .put(uuid("bf515b70-104c-4135-82c7-e30877cc9006"), Flags.of().setPatreon()) // friedfische
             .put(uuid("6fe111d7-7037-4acb-bb53-c9ecb5a7743b"), Flags.of().setPatreon()) // OcenEverence
             .put(uuid("619376ed-867c-487a-bc3f-389069d8a53e"), Flags.of().setPatreon()) // MrSyntherman64
+            .put(uuid("1fb0ecbd-2000-4f00-aa65-002c1ccedef7"), Flags.of().setPatreon()) // StarlitStelle
+            .put(uuid("dd0eac61-e631-416f-9954-a2205e3fe5dc"), Flags.of().setPatreon()) // Timofork
+
+            // Supporters
+            .put(uuid("d5995802-5752-4010-9907-f3444a561503"), Flags.of().setPatreon()) // pexuls_
+
 
             // ----- COMBINED -----
             .put(uuid("b9b106ae-7c16-4426-950f-ea48ca7acc0b"), Flags.of().setBooster().setContributor()) // _VECTOR_V_

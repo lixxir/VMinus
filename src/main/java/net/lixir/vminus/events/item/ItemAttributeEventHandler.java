@@ -1,11 +1,11 @@
 package net.lixir.vminus.events.item;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.entity.attribute.VMinusAttributes;
 import net.lixir.vminus.sight.resource.SightManager;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.VisionAttribute;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -37,8 +37,8 @@ public class ItemAttributeEventHandler {
         EquipmentSlot eventSlot = event.getSlotType();
         boolean miningFlag = false;
 
-        Vision vision = Vision.getVision((VisionDuck) item);
-        List<VisionAttribute> visionAttributes = vision.getValues(VisionPropertyTypes.Items.ATTRIBUTE, new VisionContext(itemStack));
+        Vision vision = Vision.get((VisionDuck) item);
+        List<VisionAttribute> visionAttributes = vision.getValues(VisionProperties.Items.ATTRIBUTE, new VisionContext(itemStack));
         //List<VisionTrait> visionTraits = vision.trait.values(new VisionContext(itemStack));
         for (VisionAttribute visionAttribute : visionAttributes) {
             boolean replace = visionAttribute.replace();

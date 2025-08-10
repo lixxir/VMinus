@@ -1,12 +1,8 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.VItemModelProvider;
-import net.lixir.vminus.datagen.util.VSoundDefinitionProvider;
-import net.lixir.vminus.datagen.util.loottable.VBlockLootTables;
-import net.lixir.vminus.datagen.util.loottable.VLootTableProvider;
-import net.lixir.vminus.datagen.util.VBlockStateProvider;
-import net.lixir.vminus.datagen.util.VRecipeProvider;
+import net.lixir.vminus.datagen.util.*;
+import net.lixir.vminus.datagen.util.tag.VFluidTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -16,13 +12,14 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
 
 @Mod.EventBusSubscriber(modid = VMinus.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class VMinusDataGenerators {
     @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
+    public static void gatherData(@NotNull GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         PackOutput packOutput = generator.getPackOutput();
 
@@ -32,10 +29,6 @@ public class VMinusDataGenerators {
                 event.includeServer(),
                 new VMinusBlockTagGenerator(packOutput, lookupProvider, existingFileHelper)
         ).contentsGetter();
-        generator.addProvider(event.includeClient(), new VSoundDefinitionProvider(packOutput, existingFileHelper, VMinus.ID));
-        generator.addProvider(event.includeClient(), new VBlockStateProvider(packOutput, existingFileHelper, VMinus.ID));
-        generator.addProvider(event.includeClient(), new VItemModelProvider(packOutput, existingFileHelper, VMinus.ID));
-     //   generator.addProvider(event.includeServer(), VLootTableProvider.create(packOutput, () -> new VBlockLootTables(VMinus.ID)));
         generator.addProvider(
                 event.includeServer(),
                 new VMinusEntityTypeTagGenerator(packOutput, lookupProvider, existingFileHelper)
@@ -43,10 +36,6 @@ public class VMinusDataGenerators {
         generator.addProvider(
                 event.includeServer(),
                 new VMinusItemTagGenerator(packOutput, lookupProvider, blockTagLookup, existingFileHelper)
-        );
-        generator.addProvider(
-                event.includeServer(),
-                new VRecipeProvider(packOutput, VMinus.ID)
         );
         generator.addProvider(event.includeClient(), new VMinusLangProvider(packOutput, "en_us"));
     }

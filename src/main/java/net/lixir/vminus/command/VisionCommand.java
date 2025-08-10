@@ -3,6 +3,7 @@ package net.lixir.vminus.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionType;
@@ -57,10 +58,12 @@ public class VisionCommand {
         }
 
         VisionDuck duck = (VisionDuck) feature;
-        Vision vision = Vision.getVision(visionType, duck.vMinus$getVisionId());
-        CompoundTag nbt = vision.toNbt();
+        Vision vision = Vision.get(visionType, duck.vMinus$getVisionId());
+        CompoundTag nbt = vision.encode(visionType);
         Component component = NbtUtils.toPrettyComponent(nbt);
+
         ctx.getSource().sendSuccess(() -> Component.literal("Vision[" + featureId + "]=").append(component), false);
+        VMinus.LOGGER.debug(vision);
         return 1;
     }
 

@@ -12,38 +12,34 @@ import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class OggOpusAudioStream implements AudioStream {
     private static final int SAMPLE_RATE = 48000;
-    private static final int CHANNELS = 2;
-    private static final int FRAME_SIZE = 960;
+    private static final int FRAME_SIZE = 960; // 20ms at 48kHz
 
-    private final AudioFormat format;
-    private final OpusDecoder decoder;
-    private final short[] decodeBuffer;
+    private AudioFormat format;
+    private OpusDecoder decoder;
+    private short[] decodeBuffer;
     private final ByteBuffer outputBuffer;
     private final OggPacketReader reader;
 
     private boolean closed = false;
     private final InputStream sourceStream;
+    private boolean initialized = false;
+    private int channels = 1;
 
     public OggOpusAudioStream(InputStream stream) throws IOException {
         this.sourceStream = stream;
-        this.format = new AudioFormat(SAMPLE_RATE, 16, CHANNELS, true, false);
-        try {
-            this.decoder = new OpusDecoder(SAMPLE_RATE, CHANNELS);
-        } catch (OpusException e) {
-            throw new IOException("Failed to init Opus decoder", e);
-        }
-
         this.reader = new OggPacketReader(stream);
-        this.decodeBuffer = new short[FRAME_SIZE * CHANNELS];
         this.outputBuffer = ByteBuffer.allocateDirect(16384);
         this.outputBuffer.flip();
     }
 
     @Override
     public @NotNull AudioFormat getFormat() {
+        if (format == null)
+            return new AudioFormat(SAMPLE_RATE, 16, 1, true, false);
         return format;
     }
 
@@ -96,12 +92,26 @@ public class OggOpusAudioStream implements AudioStream {
 
             byte[] data = packet.getData();
 
-            if (data.length >= 8) {
-                String header = new String(data, 0, 8, java.nio.charset.StandardCharsets.US_ASCII);
-                if (header.equals("OpusHead") || header.equals("OpusTags")) { // Skip header packets.
-                    continue;
+            // Parse OpusHead to get channel count
+            if (data.length >= 19 && new String(data, 0, 8, StandardCharsets.US_ASCII).equals("OpusHead")) {
+                channels = data[9] & 0xFF; // unsigned byte
+                format = new AudioFormat(SAMPLE_RATE, 16, channels, true, false);
+                try {
+                    decoder = new OpusDecoder(SAMPLE_RATE, channels);
+                } catch (OpusException e) {
+                    throw new IOException("Failed to init Opus decoder", e);
                 }
+                decodeBuffer = new short[FRAME_SIZE * channels];
+                initialized = true;
+                continue;
             }
+
+            if (data.length >= 8 && new String(data, 0, 8, StandardCharsets.US_ASCII).equals("OpusTags"))
+                continue;
+
+
+            if (!initialized)
+                continue;
 
             int samples;
             try {
@@ -111,7 +121,7 @@ public class OggOpusAudioStream implements AudioStream {
             }
 
             outputBuffer.clear();
-            for (int i = 0; i < samples * CHANNELS; i++) {
+            for (int i = 0; i < samples * channels; i++) {
                 short sample = decodeBuffer[i];
                 outputBuffer.put((byte) (sample & 0xFF));
                 outputBuffer.put((byte) ((sample >> 8) & 0xFF));

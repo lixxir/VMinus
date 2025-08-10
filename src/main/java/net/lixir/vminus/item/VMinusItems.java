@@ -8,5 +8,5 @@ import static net.lixir.vminus.VMinus.REGISTRY;
 
 public class VMinusItems {
     public static void init() {}
-    public static final Item TEST = REGISTRY.blockItem(VMinusBlocks.TEST);
+    //public static final Item TEST = REGISTRY.blockItem(VMinusBlocks.TEST);
 }

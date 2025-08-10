@@ -2,7 +2,7 @@ package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -20,8 +20,8 @@ public class VisionSoundEventCodec extends VisionCodec<SoundEvent> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<SoundEvent>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<SoundEvent>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<SoundEvent>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<SoundEvent>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
 
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -40,7 +40,7 @@ public class VisionSoundEventCodec extends VisionCodec<SoundEvent> {
                 throw new JsonParseException(e);
             }
 
-            visionProperties.add(VisionProperty.create(value, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(value, arrayObject, jsonObject, key));
         }
 
         return visionProperties;

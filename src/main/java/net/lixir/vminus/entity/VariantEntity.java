@@ -1,7 +1,12 @@
 package net.lixir.vminus.entity;
 
+import net.lixir.vminus.vision.Vision;
+import net.lixir.vminus.vision.VisionDuck;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.VisionEntityVariant;
+import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,22 +23,21 @@ public interface VariantEntity {
    @Nullable ResourceLocation vMinus$getVariantName();
 
    static @Nullable VisionEntityVariant setFromWeightedList(LivingEntity entity) {
-      /*
       if (entity instanceof VariantEntity variantEntity) {
-         List<VisionEntityVariant> entityVariants = EntityVision.of(entity).variant.values(new VisionContext(entity));
+         List<VisionEntityVariant> entityVariants = Vision.get((VisionDuck)entity).getValues(VisionProperties.Entities.VARIANT, new VisionContext(entity));
          ArrayList<VisionEntityVariant> weightedEntityVariants = getWeightedVisionEntityVariants(entityVariants);
 
          VisionEntityVariant selectedVariant = !weightedEntityVariants.isEmpty()
-                 ? weightedEntityVariants.get(Mth.nextInt(RandomSource.create(), 0, weightedEntityVariants.size() - 1))
+                 ? weightedEntityVariants.get(Mth.nextInt(entity.getRandom(), 0, weightedEntityVariants.size() - 1))
                  : null;
 
          if (selectedVariant == null)
             return null;
-         variantEntity.vminus$setVariant(selectedVariant.name(), selectedVariant.texture());
+         variantEntity.vMinus$setVariant(selectedVariant.name(), selectedVariant.texture());
          return selectedVariant;
       }
 
-       */
+
       return null;
    }
 

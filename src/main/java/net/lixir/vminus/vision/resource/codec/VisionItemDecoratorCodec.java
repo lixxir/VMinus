@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.lixir.vminus.vision.util.VisionItemDecorator;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +21,8 @@ public class VisionItemDecoratorCodec extends VisionCodec<VisionItemDecorator> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<VisionItemDecorator>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<VisionItemDecorator>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<VisionItemDecorator>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<VisionItemDecorator>> visionProperties = new ArrayList<>();
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
@@ -31,7 +31,7 @@ public class VisionItemDecoratorCodec extends VisionCodec<VisionItemDecorator> {
             ResourceLocation resourceLocation = parseResourceLocation("texture", key, arrayObject);
             VisionItemDecorator visionItemDecorator = new VisionItemDecorator(resourceLocation, order);
 
-            visionProperties.add(VisionProperty.create(visionItemDecorator, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(visionItemDecorator, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

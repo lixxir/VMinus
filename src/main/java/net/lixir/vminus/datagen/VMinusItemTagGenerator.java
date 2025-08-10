@@ -30,43 +30,57 @@ public class VMinusItemTagGenerator extends VItemTagGenerator {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         super.addTags(pProvider);
-        this.tag(VMinusTags.Items.BANNED);
-        this.tag(VMinusTags.Items.UNCOMMON);
-        this.tag(VMinusTags.Items.RARE);
-        this.tag(VMinusTags.Items.EPIC);
-        this.tag(VMinusTags.Items.LEGENDARY);
-        this.tag(VMinusTags.Items.DELICACY);
-        this.tag(VMinusTags.Items.INVERTED);
-        this.tag(VMinusTags.Items.UNOBTAINABLE);
-
-        var woodenTools = tag(VMinusTags.Items.WOODEN_TOOLS);
-        woodenTools.add(Items.WOODEN_SWORD);
-        woodenTools.add(Items.WOODEN_PICKAXE);
-        woodenTools.add(Items.WOODEN_AXE);
-        woodenTools.add(Items.WOODEN_SHOVEL);
-        woodenTools.add(Items.WOODEN_HOE);
-
-        var stoneTools = tag(VMinusTags.Items.STONE_TOOLS);
-        stoneTools.add(Items.STONE_SWORD);
-        stoneTools.add(Items.STONE_PICKAXE);
-        stoneTools.add(Items.STONE_AXE);
-        stoneTools.add(Items.STONE_SHOVEL);
-        stoneTools.add(Items.STONE_HOE);
-
-        var goldenTools = tag(VMinusTags.Items.GOLDEN_TOOLS);
-        goldenTools.add(Items.GOLDEN_SWORD);
-        goldenTools.add(Items.GOLDEN_PICKAXE);
-        goldenTools.add(Items.GOLDEN_AXE);
-        goldenTools.add(Items.GOLDEN_SHOVEL);
-        goldenTools.add(Items.GOLDEN_HOE);
-
-        var ironTools = tag(VMinusTags.Items.IRON_TOOLS);
-        ironTools.add(Items.IRON_SWORD);
-        ironTools.add(Items.IRON_PICKAXE);
-        ironTools.add(Items.IRON_AXE);
-        ironTools.add(Items.IRON_SHOVEL);
-        ironTools.add(Items.IRON_HOE);
-
+        tag(VMinusTags.Items.DEAD_CORAL_BLOCKS)
+                .add(Items.DEAD_TUBE_CORAL_BLOCK)
+                .add(Items.DEAD_BRAIN_CORAL_BLOCK)
+                .add(Items.DEAD_BUBBLE_CORAL_BLOCK)
+                .add(Items.DEAD_FIRE_CORAL_BLOCK)
+                .add(Items.DEAD_HORN_CORAL_BLOCK);
+        tag(VMinusTags.Items.DEAD_CORALS)
+                .add(Items.DEAD_TUBE_CORAL)
+                .add(Items.DEAD_BRAIN_CORAL)
+                .add(Items.DEAD_BUBBLE_CORAL)
+                .add(Items.DEAD_FIRE_CORAL)
+                .add(Items.DEAD_HORN_CORAL);
+        tag(VMinusTags.Items.DEAD_CORAL_FANS)
+                .add(Items.DEAD_TUBE_CORAL_FAN)
+                .add(Items.DEAD_BRAIN_CORAL_FAN)
+                .add(Items.DEAD_BUBBLE_CORAL_FAN)
+                .add(Items.DEAD_FIRE_CORAL_FAN)
+                .add(Items.DEAD_HORN_CORAL_FAN);
+        tag(VMinusTags.Items.BANNED);
+        tag(VMinusTags.Items.UNCOMMON);
+        tag(VMinusTags.Items.RARE);
+        tag(VMinusTags.Items.EPIC);
+        tag(VMinusTags.Items.LEGENDARY);
+        tag(VMinusTags.Items.DELICACY);
+        tag(VMinusTags.Items.INVERTED);
+        tag(VMinusTags.Items.UNOBTAINABLE);
+        tag(VMinusTags.Items.WOODEN_FENCE_GATES);
+        tag(VMinusTags.Items.WOODEN_TOOLS)
+                .add(Items.WOODEN_SWORD)
+                .add(Items.WOODEN_PICKAXE)
+                .add(Items.WOODEN_AXE)
+                .add(Items.WOODEN_SHOVEL)
+                .add(Items.WOODEN_HOE);
+        tag(VMinusTags.Items.STONE_TOOLS)
+                .add(Items.STONE_SWORD)
+                .add(Items.STONE_PICKAXE)
+                .add(Items.STONE_AXE)
+                .add(Items.STONE_SHOVEL)
+                .add(Items.STONE_HOE);
+        tag(VMinusTags.Items.GOLDEN_TOOLS)
+                .add(Items.GOLDEN_SWORD)
+                .add(Items.GOLDEN_PICKAXE)
+                .add(Items.GOLDEN_AXE)
+                .add(Items.GOLDEN_SHOVEL)
+                .add(Items.GOLDEN_HOE);
+        tag(VMinusTags.Items.IRON_TOOLS)
+                .add(Items.IRON_SWORD)
+                .add(Items.IRON_PICKAXE)
+                .add(Items.IRON_AXE)
+                .add(Items.IRON_SHOVEL)
+                .add(Items.IRON_HOE);
         var diamondTools = tag(VMinusTags.Items.DIAMOND_TOOLS);
         diamondTools.add(Items.DIAMOND_SWORD);
         diamondTools.add(Items.DIAMOND_PICKAXE);

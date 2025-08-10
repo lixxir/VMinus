@@ -26,7 +26,6 @@ public class ClientboundDataResetPacket {
         ctx.get().enqueueWork(() -> {
             try {
                 Vision.resetVisions();
-                SightManager.clearSights();
             } catch (Exception e) {
                 VMinus.LOGGER.error("Failed to handle VisionControlPacket: {}", msg, e);
             }

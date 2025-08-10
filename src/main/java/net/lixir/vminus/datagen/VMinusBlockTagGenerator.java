@@ -24,25 +24,51 @@ public class VMinusBlockTagGenerator extends VBlockTagGenerator {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         super.addTags(pProvider);
+        tag(VMinusTags.Blocks.DEAD_CORAL_BLOCKS)
+                .add(Blocks.DEAD_TUBE_CORAL_BLOCK)
+                .add(Blocks.DEAD_BRAIN_CORAL_BLOCK)
+                .add(Blocks.DEAD_BUBBLE_CORAL_BLOCK)
+                .add(Blocks.DEAD_FIRE_CORAL_BLOCK)
+                .add(Blocks.DEAD_HORN_CORAL_BLOCK);
 
-        var leashable = tag(VMinusTags.Blocks.LEASHABLE);
-        leashable.addTag(BlockTags.FENCES);
+        tag(VMinusTags.Blocks.DEAD_CORALS)
+                .add(Blocks.DEAD_TUBE_CORAL)
+                .add(Blocks.DEAD_BRAIN_CORAL)
+                .add(Blocks.DEAD_BUBBLE_CORAL)
+                .add(Blocks.DEAD_FIRE_CORAL)
+                .add(Blocks.DEAD_HORN_CORAL);
 
-        var cocaoPlantableOn = tag(VMinusTags.Blocks.COCAO_PLANTABLE_ON);
-        cocaoPlantableOn.add(Blocks.JUNGLE_LOG);
+        tag(VMinusTags.Blocks.DEAD_CORAL_FANS)
+                .add(Blocks.DEAD_TUBE_CORAL_FAN)
+                .add(Blocks.DEAD_BRAIN_CORAL_FAN)
+                .add(Blocks.DEAD_BUBBLE_CORAL_FAN)
+                .add(Blocks.DEAD_FIRE_CORAL_FAN)
+                .add(Blocks.DEAD_HORN_CORAL_FAN);
 
-        var froglights = tag(VMinusTags.Blocks.FROGLIGHTS);
-        froglights.add(Blocks.OCHRE_FROGLIGHT);
-        froglights.add(Blocks.VERDANT_FROGLIGHT);
-        froglights.add(Blocks.PEARLESCENT_FROGLIGHT);
+        tag(VMinusTags.Blocks.WOODEN_FENCE_GATES);
+        tag(VMinusTags.Blocks.LEASHABLE)
+                .addTag(BlockTags.FENCES);
 
-        var allTorches = tag(VMinusTags.Blocks.ALL_TORCHES);
-        allTorches.addTag(VMinusTags.Blocks.TORCHES);
-        allTorches.addTag(VMinusTags.Blocks.SOUL_TORCHES);
+        tag(VMinusTags.Blocks.COCAO_PLANTABLE_ON)
+                .add(Blocks.JUNGLE_LOG);
 
-        var torches = tag(VMinusTags.Blocks.TORCHES);
-        torches.add(Blocks.TORCH);
-        torches.add(Blocks.WALL_TORCH);
+        tag(VMinusTags.Blocks.FROGLIGHTS)
+                .add(Blocks.OCHRE_FROGLIGHT)
+                .add(Blocks.VERDANT_FROGLIGHT)
+                .add(Blocks.PEARLESCENT_FROGLIGHT);
+
+        tag(VMinusTags.Blocks.ALL_TORCHES)
+                .addTag(VMinusTags.Blocks.TORCHES)
+                .addTag(VMinusTags.Blocks.SOUL_TORCHES)
+                .addTag(VMinusTags.Blocks.REDSTONE_TORCHES);
+
+        tag(VMinusTags.Blocks.TORCHES)
+                .add(Blocks.TORCH)
+                .add(Blocks.WALL_TORCH);
+
+        tag(VMinusTags.Blocks.REDSTONE_TORCHES)
+                .add(Blocks.REDSTONE_TORCH)
+                .add(Blocks.REDSTONE_WALL_TORCH);
 
         var soulTorches = tag(VMinusTags.Blocks.SOUL_TORCHES);
         soulTorches.add(Blocks.SOUL_TORCH);

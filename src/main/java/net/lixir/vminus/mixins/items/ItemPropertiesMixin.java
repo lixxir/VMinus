@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.item.MaxDurationGetter;
+import net.lixir.vminus.item.IMaxDurationGetter;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -16,7 +16,7 @@ public class ItemPropertiesMixin {
         ItemProperties.register(Items.BOW, new ResourceLocation("pull"), (stack, level, entity, seed) -> {
             if (entity == null) return 0.0F;
             return stack != entity.getUseItem() ? 0.0F :
-                    (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / ((MaxDurationGetter) stack.getItem()).vminus$getMaxDuration();
+                    (float) (stack.getUseDuration() - entity.getUseItemRemainingTicks()) / ((IMaxDurationGetter) stack.getItem()).vminus$getMaxDuration();
         });
 
     }

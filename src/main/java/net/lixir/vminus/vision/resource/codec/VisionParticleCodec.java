@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -22,8 +22,8 @@ public class VisionParticleCodec extends VisionCodec<ParticleType<?>> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<ParticleType<?>>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<ParticleType<?>>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<ParticleType<?>>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<ParticleType<?>>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -31,7 +31,7 @@ public class VisionParticleCodec extends VisionCodec<ParticleType<?>> {
             ResourceLocation resourceLocation = parseResourceLocation(key, arrayObject);
             ParticleType<?> particleType =ForgeRegistries.PARTICLE_TYPES.getValue(resourceLocation);
 
-            visionProperties.add(VisionProperty.create(particleType, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(particleType, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

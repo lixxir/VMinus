@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
-public class VRecipeProvider extends RecipeProvider implements IConditionBuilder {
+public abstract class VRecipeProvider extends RecipeProvider implements IConditionBuilder {
     public String getModId() {
         return modId;
     }

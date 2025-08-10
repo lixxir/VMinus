@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.lixir.vminus.vision.util.VisionAttribute;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -25,8 +25,8 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<VisionAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<VisionAttribute>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<VisionAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<VisionAttribute>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -98,7 +98,7 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
             AttributeModifier attributeModifier = new AttributeModifier(uuid, name, value, operation);
             VisionAttribute visionAttribute = new VisionAttribute(remove, replace, attributeModifier, attribute, equipmentSlot, id);
 
-            visionProperties.add(VisionProperty.create(visionAttribute, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(visionAttribute, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

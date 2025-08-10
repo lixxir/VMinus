@@ -4,8 +4,8 @@ import net.lixir.vminus.VMinus;
 import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionAccessor;
 import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionSoundAccessor;
 import net.lixir.vminus.mixins.data.sounddefinition.SoundDefinitionsProviderAccessor;
-import net.lixir.vminus.registry.SoundDefinitionInfo;
-import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.datagen.SoundDefinitionInfo;
+import net.lixir.vminus.registry.VRegistry;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -16,11 +16,12 @@ import net.minecraftforge.common.data.SoundDefinitionsProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
+public abstract class VSoundDefinitionProvider extends SoundDefinitionsProvider {
     protected final PackOutput output;
     protected final String modId;
     protected final ExistingFileHelper helper;
@@ -39,7 +40,7 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
 
     @Override
     public void registerSounds() {
-        for (SoundDefinitionInfo info : UnifiedRegistry.fromId(modId).getSoundDefinitionInfo()) {
+        for (SoundDefinitionInfo info : VRegistry.fromId(modId).getSoundDefinitionInfo()) {
             add(info.getSoundEvent(), generateSoundDefinition(info));
         }
     }
@@ -53,6 +54,7 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
         String soundPath = info.getPath();
         SoundDefinition soundDefinition;
         List<String> paths = info.getPaths();
+        Map<String, SoundDefinition.Sound> soundMap = new HashMap<>();
 
         if (paths != null && !paths.isEmpty()) {
             SoundDefinition.Sound[] sounds = new SoundDefinition.Sound[paths.size()];
@@ -70,9 +72,29 @@ public class VSoundDefinitionProvider extends SoundDefinitionsProvider {
                 String basePath = isOpus ? soundPath.substring(0, soundPath.length() - 5) : soundPath;
 
                 for (int i = 0; i < count; i++) {
-                    String numberedPath = basePath + (i + 1) + (isOpus ? ".opus" : "");
-                    sounds[i] = sound(new ResourceLocation(modId, numberedPath));
+                    String suffix = String.valueOf(i + 1);
+                    String fullPath = basePath + suffix;
+                    String fullFilePath = fullPath + (isOpus ? ".opus" : "");
+                    SoundDefinition.Sound s = sound(new ResourceLocation(modId, fullFilePath));
+                    sounds[i] = s;
+                    soundMap.put(fullPath, s);
                 }
+
+                if (info.getDefaultWeight() != 1) {
+                    for (SoundDefinition.Sound sound : soundMap.values()) {
+                        sound.weight(info.getDefaultWeight());
+                    }
+                }
+
+                for (SoundDefinitionInfo.Weight weight : info.getWeights()) {
+                    String suffix = weight.path();
+                    String fullPath = basePath + suffix;
+                    SoundDefinition.Sound sound = soundMap.get(fullPath);
+                    if (sound != null)
+                        sound.weight(weight.weight());
+                }
+
+
                 soundDefinition = definition().with(sounds);
             }
         }

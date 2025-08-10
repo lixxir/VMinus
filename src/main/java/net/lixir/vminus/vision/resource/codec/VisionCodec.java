@@ -3,7 +3,7 @@ package net.lixir.vminus.vision.resource.codec;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -64,7 +64,7 @@ public abstract class VisionCodec<V> {
         return fallback;
     }
 
-    public abstract @Nullable List<VisionProperty<V>> decode(JsonObject jsonObject, String key) throws JsonParseException;
+    public abstract @Nullable List<VisionValue<V>> decode(JsonObject jsonObject, String key) throws JsonParseException;
 
     public abstract @Nullable JsonObject encode(@NotNull V value);
 }

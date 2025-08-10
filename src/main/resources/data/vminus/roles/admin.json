@@ -1,0 +1,4 @@
+{
+  "name": "admin",
+  "allowed_commands": ["give", "kill", "tp"]
+}

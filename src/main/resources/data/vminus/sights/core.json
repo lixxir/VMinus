@@ -9,5 +9,8 @@
   "variant_breeding/priority": -1,
 
   "adjust_spawn_health": false,
-  "adjust_spawn_health/priority": -1
+  "adjust_spawn_health/priority": -1,
+
+  "tool_mine_all": false,
+  "tool_mine_all/priority": -1
 }

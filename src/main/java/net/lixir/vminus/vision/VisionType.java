@@ -4,7 +4,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -34,8 +36,8 @@ public final class VisionType<T> {
 
     private final Map<ResourceLocation, Vision> visions = new HashMap<>();
 
-    public Map<ResourceLocation, Vision> getVisions() {
-        return visions;
+    public @NotNull @UnmodifiableView Map<ResourceLocation, Vision> getVisions() {
+        return Collections.unmodifiableMap(visions);
     }
 
     public <E> void applyVision(E target, ResourceLocation id) {

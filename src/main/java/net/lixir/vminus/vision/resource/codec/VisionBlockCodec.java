@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -24,8 +24,8 @@ public class VisionBlockCodec extends VisionCodec<Block> {
 
 
     @Override
-    public @Nullable List<VisionProperty<Block>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<Block>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<Block>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<Block>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -34,7 +34,7 @@ public class VisionBlockCodec extends VisionCodec<Block> {
             Block block = ForgeRegistries.BLOCKS.getValue(resourceLocation);
             if (block == null)
                 throw new JsonParseException(resourceLocation + " is not a valid block.");
-            visionProperties.add(VisionProperty.create(block, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(block, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

@@ -1,6 +1,6 @@
 package net.lixir.vminus.util;
 
-import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.entity.attribute.VMinusAttributes;
 import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nullable;

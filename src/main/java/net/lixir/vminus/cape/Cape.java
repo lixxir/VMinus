@@ -1,7 +1,7 @@
 package net.lixir.vminus.cape;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.network.VMinusSavedData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -71,7 +71,7 @@ public enum Cape {
     }
 
     public static @Nullable ResourceLocation getCapeTexture(@NotNull Player player) {
-        String capeId = player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null)
+        String capeId = player.getCapability(VMinusSavedData.PLAYER_VARIABLES_CAPABILITY, null)
                 .map(capability -> capability.cape_id)
                 .orElse("");
 
@@ -82,6 +82,10 @@ public enum Cape {
             }
         }
         return null;
+    }
+
+    public static void setCape(Player player, String id){
+        player.getCapability(VMinusSavedData.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> capability.cape_id = id);
     }
 
     public static @Nullable Cape fromId(String capeId) {

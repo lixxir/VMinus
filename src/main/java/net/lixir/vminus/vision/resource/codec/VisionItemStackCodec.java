@@ -1,7 +1,8 @@
 package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.util.ItemStackWrapper;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -12,15 +13,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisionItemStackCodec extends VisionCodec<ItemStack> {
+public class VisionItemStackCodec extends VisionCodec<ItemStackWrapper> {
     @Override
-    public Class<ItemStack> getClassType() {
-        return ItemStack.class;
+    public Class<ItemStackWrapper> getClassType() {
+        return ItemStackWrapper.class;
     }
 
     @Override
-    public @Nullable List<VisionProperty<ItemStack>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<ItemStack>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<ItemStackWrapper>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<ItemStackWrapper>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -30,16 +31,16 @@ public class VisionItemStackCodec extends VisionCodec<ItemStack> {
             if (item == null)
                 throw new JsonParseException(resourceLocation + " is not a valid item.");
             ItemStack itemStack = item.getDefaultInstance();
-
-            visionProperties.add(VisionProperty.create(itemStack, arrayObject, jsonObject, key));
+            ItemStackWrapper itemStackWrapper = new ItemStackWrapper(itemStack);
+            visionProperties.add(VisionValue.create(itemStackWrapper, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }
 
     @Override
-    public @Nullable JsonObject encode(@NotNull ItemStack value) {
+    public @Nullable JsonObject encode(@NotNull ItemStackWrapper value) {
         JsonObject jsonObject = new JsonObject();
-        ResourceLocation id = ForgeRegistries.ITEMS.getKey(value.getItem());
+        ResourceLocation id = ForgeRegistries.ITEMS.getKey(value.itemStack().getItem());
         if (id == null)
             throw new JsonParseException("Cannot encode ItemStack with unregistered item: " + value);
         JsonPrimitive idPrimitive = new JsonPrimitive(id.toString());

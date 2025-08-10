@@ -4,9 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.util.VisionCreativeOrder;
 import net.lixir.vminus.vision.util.VisionEntityVariant;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,8 +20,8 @@ public class VisionEntityVariantCodec extends VisionCodec<VisionEntityVariant> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<VisionEntityVariant>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<VisionEntityVariant>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<VisionEntityVariant>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<VisionEntityVariant>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -37,7 +36,7 @@ public class VisionEntityVariantCodec extends VisionCodec<VisionEntityVariant> {
             boolean replace = arrayObject.has("replace") && arrayObject.getAsJsonPrimitive("replace").getAsBoolean();
             VisionEntityVariant visionEntityVariant = new VisionEntityVariant(variantName, variantTexture, weight, replace);
 
-            visionProperties.add(VisionProperty.create(visionEntityVariant, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(visionEntityVariant, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

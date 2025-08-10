@@ -1,21 +1,26 @@
 package net.lixir.vminus.datagen.util;
 
 import net.lixir.vminus.mixins.data.language.LanguageProviderAccessor;
-import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.registry.VRegistry;
 import net.lixir.vminus.registry.entry.*;
+import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.EntityEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.ItemEntryAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.LanguageProvider;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
 
 @SuppressWarnings("deprecation")
-public class VLangProvider extends LanguageProvider {
+public abstract class VLangProvider extends LanguageProvider {
     private final String modId;
 
     public VLangProvider(PackOutput output, String modId, String locale) {
@@ -25,21 +30,21 @@ public class VLangProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
-        for (Block block : UnifiedRegistry.fromId(modId).getBlocks()) {
+        for (Block block : VRegistry.fromId(modId).getBlocks()) {
             BlockEntry entry = ((BlockEntryAccessor) block).vminus$getEntry();
             if (entry != null) {
                 handleEntry(block, BuiltInRegistries.BLOCK.getKey(block).getPath(), entry);
             }
         }
 
-        for (Item item : UnifiedRegistry.fromId(modId).getItems()) {
+        for (Item item : VRegistry.fromId(modId).getItems()) {
             ItemEntry entry = ((ItemEntryAccessor) item).vminus$getEntry();
             if (entry != null) {
                 handleEntry(item, BuiltInRegistries.ITEM.getKey(item).getPath(), entry);
             }
         }
 
-        for (EntityType<?> entityType : UnifiedRegistry.fromId(modId).getEntityTypes()) {
+        for (EntityType<?> entityType : VRegistry.fromId(modId).getEntityTypes()) {
             EntityEntry entry = ((EntityEntryAccessor) entityType).vminus$getEntry();
             if (entry != null) {
                 handleEntry(entityType, BuiltInRegistries.ENTITY_TYPE.getKey(entityType).getPath(), entry);
@@ -47,8 +52,20 @@ public class VLangProvider extends LanguageProvider {
         }
     }
 
-    private <E extends RegistryEntry<E,T>,T> void handleEntry(Object object, String idPath, RegistryEntry<E, T> entry) {
-        String langKey = entry.getLangValue();
+    protected void gamerule(GameRules.@NotNull Key<?> rule, String name) {
+        gamerule(rule, name, null);
+    }
+
+    protected void gamerule(GameRules.@NotNull Key<?> rule, String name, @Nullable String description) {
+        String id = rule.getId();
+        add("gamerule." + id, name);
+        if (description != null)
+            add("gamerule." + id + ".description", description);
+    }
+
+
+    private <E extends RegistryEntry<E,T>,T> void handleEntry(Object object, String idPath, @NotNull RegistryEntry<E, T> entry) {
+        String langKey = entry.getLang();
         if (langKey == null || has(langKey))
             return;
 

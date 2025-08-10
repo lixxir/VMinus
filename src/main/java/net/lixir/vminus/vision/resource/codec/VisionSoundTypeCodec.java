@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;
@@ -23,8 +23,8 @@ public class VisionSoundTypeCodec extends VisionCodec<SoundType> {
 
 
     @Override
-    public @Nullable List<VisionProperty<SoundType>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<SoundType>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<SoundType>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<SoundType>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
@@ -48,7 +48,7 @@ public class VisionSoundTypeCodec extends VisionCodec<SoundType> {
 
             SoundType soundType = new SoundType(level, pitch, breakSound, stepSound, placeSound, hitSound, fallSound);
 
-            visionProperties.add(VisionProperty.create(soundType, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(soundType, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

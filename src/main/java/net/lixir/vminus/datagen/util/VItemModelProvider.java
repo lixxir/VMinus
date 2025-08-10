@@ -1,22 +1,25 @@
 package net.lixir.vminus.datagen.util;
 
-import net.lixir.vminus.registry.ItemModel;
-import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.datagen.ItemModel;
+import net.lixir.vminus.registry.VRegistry;
 import net.lixir.vminus.registry.entry.ItemEntry;
-import net.lixir.vminus.registry.entry.ItemEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.ItemEntryAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
-public class VItemModelProvider extends ItemModelProvider {
+public abstract class VItemModelProvider extends ItemModelProvider {
     final private String modId;
 
     public VItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper, String modId) {
@@ -26,15 +29,17 @@ public class VItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        for (Item item : UnifiedRegistry.fromId(modId).getItems()) {
+        for (Item item : VRegistry.fromId(modId).getItems()) {
             ItemEntryAccessor accessor = (ItemEntryAccessor) item;
             ItemEntry itemEntry = accessor.vminus$getEntry();
             if (itemEntry == null)
                 continue;
             ItemModel model = itemEntry.getModel();
-            if (model == null || model.equals(ItemModel.UNSET))
+
+            if (model.equals(ItemModel.UNSET) || model.equals(ItemModel.NONE))
                 continue;
             ItemModel.Data itemModelData = new ItemModel.Data(item, itemEntry);
+            VMinus.LOGGER.debug("Generating {} for {}", model, item);
             model.apply(itemModelData, this);
         }
     }
@@ -45,10 +50,8 @@ public class VItemModelProvider extends ItemModelProvider {
             ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(block);
             ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(blockItem);
 
-            if (blockId == null || itemId == null) {
+            if (blockId == null || itemId == null)
                 throw new IllegalStateException("Unregistered block or item: " + blockItem);
-            }
-
             withExistingParent(itemId.getPath(), modLoc("block/" + blockId.getPath()));
         } else {
             throw new IllegalArgumentException("Item should be a BlockItem type for From Block Parent model");
@@ -61,7 +64,15 @@ public class VItemModelProvider extends ItemModelProvider {
                 .texture("layer0", new ResourceLocation(modId, "item/" + id.getPath()));
     }
 
-    public void basic(Item item, ItemEntry itemEntry) {
+    public void basicNotBlock(Item item) {
+        ResourceLocation id =  BuiltInRegistries.ITEM.getKey(item);
+        String path = "item/" + id.getPath();
+
+        withExistingParent(id.getPath(), new ResourceLocation("item/generated"))
+                .texture("layer0", new ResourceLocation(modId, path));
+    }
+
+    public void basic(Item item, @NotNull ItemEntry itemEntry) {
         ResourceLocation id =  BuiltInRegistries.ITEM.getKey(item);
         String path;
         if (itemEntry.isFromBlock()) {
@@ -72,6 +83,7 @@ public class VItemModelProvider extends ItemModelProvider {
         withExistingParent(id.getPath(), new ResourceLocation("item/generated"))
                 .texture("layer0", new ResourceLocation(modId, path));
     }
+
 
     public void doublePane(Item item) {
         if (item instanceof BlockItem blockItem) {
@@ -99,5 +111,9 @@ public class VItemModelProvider extends ItemModelProvider {
         } else {
             throw new IllegalArgumentException("Item should be a BlockItem type for Pane ItemModel");
         }
+    }
+
+    public <T> Optional<T> as(@NotNull Class<T> clazz) {
+        return clazz.isInstance(this) ? Optional.of(clazz.cast(this)) : Optional.empty();
     }
 }

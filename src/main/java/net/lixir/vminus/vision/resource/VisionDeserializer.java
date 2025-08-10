@@ -3,11 +3,11 @@ package net.lixir.vminus.vision.resource;
 import com.google.gson.*;
 import net.lixir.vminus.VMinus;
 import net.lixir.vminus.vision.VisionEntry;
-import net.lixir.vminus.vision.VisionPropertyType;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperty;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.resource.codec.VisionCodec;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
@@ -27,18 +27,18 @@ public class VisionDeserializer<T> implements JsonDeserializer<VisionEntry<T>> {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         VisionEntry<T> visionEntry = new VisionEntry<>();
-        visionEntry.addEntries(VisionProcessor.getEntries(listName, jsonObject));
+        visionEntry.addEntries(VisionFormatter.getEntries(listName, jsonObject));
 
-        List<VisionPropertyType<?>> propertyTypes = VisionPropertyTypes.fromVisionType(visionType);
+        List<VisionProperty<?>> propertyTypes = VisionProperties.fromVisionType(visionType);
         if (visionEntry.getEntries().contains("villager")) {
             VMinus.LOGGER.info("Is villager and {}", propertyTypes);
         }
 
-        for (VisionPropertyType<?> property : propertyTypes) {
+        for (VisionProperty<?> property : propertyTypes) {
             String propertyId = property.getId();
             if (jsonObject.has(propertyId)) {
                 VisionCodec<?> propertyCodec = property.getCodec();
-                List<? extends VisionProperty<?>> parsedList = propertyCodec.decode(jsonObject, propertyId);
+                List<? extends VisionValue<?>> parsedList = propertyCodec.decode(jsonObject, propertyId);
                 visionEntry.addValues(propertyId, parsedList);
             }
         }

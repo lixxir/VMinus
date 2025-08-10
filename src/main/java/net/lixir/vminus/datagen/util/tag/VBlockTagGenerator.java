@@ -1,8 +1,9 @@
 package net.lixir.vminus.datagen.util.tag;
 
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.UnifiedRegistry;
-import net.lixir.vminus.registry.entry.BlockEntryAccessor;
+import net.lixir.vminus.registry.VRegistry;
+import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.TagKey;
@@ -14,22 +15,22 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
-public class VBlockTagGenerator extends BlockTagsProvider {
+public abstract class VBlockTagGenerator extends BlockTagsProvider {
     public VBlockTagGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, modId, existingFileHelper);
     }
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
-        for (Block block : UnifiedRegistry.fromId(modId).getBlocks()) {
+        for (Block block : VRegistry.fromId(modId).getBlocks()) {
             BlockEntryAccessor accessor = (BlockEntryAccessor) block;
             BlockEntry blockEntry = accessor.vminus$getEntry();
             if (blockEntry == null)
                 continue;
+            VMinus.LOGGER.info("Tags for block {}: {}", block, blockEntry.getTags());
 
             for (TagKey<Block> tagKey : blockEntry.getTags()) {
-                var tag = tag(tagKey);
-                tag.add(block);
+                tag(tagKey).add(block);
             }
         }
     }

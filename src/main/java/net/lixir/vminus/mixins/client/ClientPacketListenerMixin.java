@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.client;
 
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
@@ -29,7 +29,7 @@ public abstract class ClientPacketListenerMixin {
         Entity entity = vMinus$self.getLevel().getEntity(packet.getItemId());
 
         if (entity instanceof ItemEntity itemEntity) {
-            SoundEvent soundEvent = VisionUtil.getOverrideValue(((VisionDuck) itemEntity.getItem().getItem()), VisionPropertyTypes.Items.COLLECT_SOUND, new VisionContext(itemEntity));
+            SoundEvent soundEvent = VisionUtils.getOverrideValue(((VisionDuck) itemEntity.getItem().getItem()), VisionProperties.Items.COLLECT_SOUND, new VisionContext(itemEntity));
             if (soundEvent != null) {
                 vMinus$self.getLevel().playLocalSound(
                         entity.getX(),

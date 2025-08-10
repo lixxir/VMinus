@@ -1,9 +1,10 @@
 package net.lixir.vminus.mixins.creative;
 
 import net.lixir.vminus.vision.*;
-import net.lixir.vminus.vision.util.VisionCreativeOrder;
-import net.lixir.vminus.vision.util.VisionItemReplacement;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.util.CreativeOrder;
+import net.lixir.vminus.vision.util.ItemReplacement;
+import net.lixir.vminus.vision.util.ItemStackWrapper;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -38,16 +39,14 @@ public class CreativeModeTabMixin implements VisionDuck {
 
     @Inject(method = "getIconItem", at = @At(value = "RETURN"), cancellable = true)
     private void vMinus$getIconItem(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack itemStack;
-        ItemStack iconItemStack = VisionUtil.getOverrideValue(((VisionDuck) vMinus$self), VisionPropertyTypes.Tabs.ICON, null);
-        if (iconItemStack != null) {
-            itemStack = iconItemStack;
-        } else {
-            itemStack = cir.getReturnValue();
-        }
-        // Makes a tab item specifically detectable with its nbt data.
-        itemStack.getOrCreateTag().putBoolean("tab_item", true);
-        cir.setReturnValue(itemStack);
+        ItemStack chosenItemStack = cir.getReturnValue();
+        ItemStackWrapper visionIconItemStack = VisionUtils.getOverrideValue(((VisionDuck) vMinus$self), VisionProperties.Tabs.ICON, null);
+        if (visionIconItemStack != null)
+            chosenItemStack = visionIconItemStack.itemStack();
+
+        // Makes a tab item specifically detectable with its NBT data
+        chosenItemStack.getOrCreateTag().putBoolean("tab_item", true);
+        cir.setReturnValue(chosenItemStack);
     }
 
     @SuppressWarnings("deprecation")
@@ -55,17 +54,17 @@ public class CreativeModeTabMixin implements VisionDuck {
     private void vMinus$buildContents(CreativeModeTab.ItemDisplayParameters displayContext, CallbackInfo ci) {
         CreativeTabModeAccessor accessor = (CreativeTabModeAccessor) vMinus$self;
 
-        Vision vision = Vision.getVision((VisionDuck) vMinus$self);
-        List<VisionCreativeOrder> visionCreativeOrders = vision.getValues(VisionPropertyTypes.Tabs.ORDER);
-        List<VisionItemReplacement> removals = vision.getValues(VisionPropertyTypes.Tabs.REMOVE);
+        Vision vision = Vision.get((VisionDuck) vMinus$self);
+        List<CreativeOrder> creativeOrders = vision.getValues(VisionProperties.Tabs.ORDER);
+        List<ItemReplacement> removals = vision.getValues(VisionProperties.Tabs.REMOVE);
 
         List<Item> itemsToRemove = new ArrayList<>(removals.stream()
-                .filter((VisionItemReplacement t) -> t.itemStack() != null)
-                .map((VisionItemReplacement t) -> t.itemStack().getItem())
+                .filter((ItemReplacement t) -> t.itemStack() != null)
+                .map((ItemReplacement t) -> t.itemStack().getItem())
                 .toList());
 
         List<TagKey<Item>> itemTagsToRemove = new ArrayList<>(removals.stream()
-                .map(VisionItemReplacement::tag)
+                .map(ItemReplacement::tag)
                 .filter(Objects::nonNull)
                 .toList());
 
@@ -74,7 +73,7 @@ public class CreativeModeTabMixin implements VisionDuck {
         vminus$processHiddenItems(accessor.getSearchItems(), itemsToRemove, itemTagsToRemove);
 
 
-        List<VisionCreativeOrder> orders = new ArrayList<>(visionCreativeOrders);
+        List<CreativeOrder> orders = new ArrayList<>(creativeOrders);
         List<ItemStack> itemList = new ArrayList<>(accessor.getDisplayItems());
 
         orders.sort(Comparator.comparingInt(order -> {
@@ -83,7 +82,7 @@ public class CreativeModeTabMixin implements VisionDuck {
         }));
 
 
-        for (VisionCreativeOrder order : orders) {
+        for (CreativeOrder order : orders) {
             ItemStack itemStack = order.getItemStack();
             TagKey<Item> tagKey = order.getTagKey();
             ItemStack targetItemStack = order.getTargetItemStack();
@@ -154,14 +153,14 @@ public class CreativeModeTabMixin implements VisionDuck {
 
             Item item = itemStack.getItem();
             VisionDuck visionDuck = (VisionDuck) item;
-            Boolean ban = VisionUtil.getOverrideValue(visionDuck, VisionPropertyTypes.Items.BAN, new VisionContext(itemStack));
-            VisionItemReplacement visionItemReplacement = VisionUtil.getOverrideValue(visionDuck, VisionPropertyTypes.Items.REPLACE, new VisionContext(itemStack));
+            Boolean ban = VisionUtils.getOverrideValue(visionDuck, VisionProperties.Items.BAN, new VisionContext(itemStack));
+            ItemReplacement itemReplacement = VisionUtils.getOverrideValue(visionDuck, VisionProperties.Items.REPLACE, new VisionContext(itemStack));
             boolean isTaggedForRemoval = itemTagsToRemove.stream().anyMatch(tagKey ->
                     tagCollection != null && tagCollection.getTag(tagKey).contains(item));
 
             if ((ban != null && ban) ||
-                    (visionItemReplacement != null &&
-                            (visionItemReplacement.itemStack() != null || visionItemReplacement.tag() != null)) ||
+                    (itemReplacement != null &&
+                            (itemReplacement.itemStack() != null || itemReplacement.tag() != null)) ||
                     itemsToRemove.contains(item) || isTaggedForRemoval) {
                 itemsToRemove.add(item);
             }
@@ -175,10 +174,10 @@ public class CreativeModeTabMixin implements VisionDuck {
 
     @Unique
     private void vminus$addItemsToTab(@Nullable Item targetItem, Item item, boolean before) {
-        Boolean ban = VisionUtil.getOverrideValue(((VisionDuck) item), VisionPropertyTypes.Items.BAN, new VisionContext(item));
+        Boolean ban = VisionUtils.getOverrideValue(((VisionDuck) item), VisionProperties.Items.BAN, new VisionContext(item));
         if (ban != null && ban)
             return;
-        Boolean targetBan = VisionUtil.getOverrideValue(((VisionDuck) targetItem), VisionPropertyTypes.Items.BAN, new VisionContext(targetItem));
+        Boolean targetBan = VisionUtils.getOverrideValue(((VisionDuck) targetItem), VisionProperties.Items.BAN, new VisionContext(targetItem));
         if (targetBan != null && targetBan)
             return;
 

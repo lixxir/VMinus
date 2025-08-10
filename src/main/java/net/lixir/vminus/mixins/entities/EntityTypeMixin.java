@@ -1,12 +1,12 @@
 package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.registry.entry.EntityEntry;
-import net.lixir.vminus.registry.entry.EntityEntryAccessor;
+import net.lixir.vminus.registry.entry.accessor.EntityEntryAccessor;
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.VisionTypes;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -31,7 +31,7 @@ public class EntityTypeMixin implements VisionDuck, EntityEntryAccessor {
 
     @Inject(method = "canSummon", at = @At("RETURN"), cancellable = true)
     private void vMinus$canSummon(CallbackInfoReturnable<Boolean> cir) {
-        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Entities.BAN, new VisionContext(vMinus$self));
+        VisionUtils.tryOverride(cir, this, VisionProperties.Entities.BAN, new VisionContext(vMinus$self));
     }
 
     @Override

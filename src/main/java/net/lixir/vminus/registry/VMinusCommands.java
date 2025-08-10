@@ -11,7 +11,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.lixir.vminus.cape.Cape;
 import net.lixir.vminus.command.VMinusCommandSuggestionProviders;
 import net.lixir.vminus.network.SyncCapePacket;
-import net.lixir.vminus.network.VminusModVariables;
+import net.lixir.vminus.network.VMinusSavedData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -99,7 +99,7 @@ public class VMinusCommands {
 
                             if (player != null) {
                                 if (Cape.ownsCape(player, capeId) || capeId.equals("default")) {
-                                    player.getCapability(VminusModVariables.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
+                                    player.getCapability(VMinusSavedData.PLAYER_VARIABLES_CAPABILITY, null).ifPresent(capability -> {
                                         capability.cape_id = capeId;
                                         capability.syncPlayerVariables(player);
 

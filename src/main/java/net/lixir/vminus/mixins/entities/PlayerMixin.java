@@ -1,12 +1,16 @@
 package net.lixir.vminus.mixins.entities;
 
+import net.lixir.vminus.roles.Role;
+import net.lixir.vminus.roles.RoleManager;
+import net.lixir.vminus.roles.RoleSavedData;
 import net.lixir.vminus.sight.resource.SightManager;
 import net.lixir.vminus.util.SizeAttributeUtil;
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
@@ -32,9 +36,9 @@ public abstract class PlayerMixin implements VisionDuck {
             index = 4
     )
     private SoundEvent vMinus$replaceBurpSound(SoundEvent originalSound) {
-        VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
+        VisionFoodProperties visionFoodProperties = VisionUtils.getOverrideValue(this, VisionProperties.Items.FOOD, new VisionContext(vMinus$self));
         if (visionFoodProperties != null) {
-            SoundEvent burpSound = visionFoodProperties.getBurpSound();
+            SoundEvent burpSound = visionFoodProperties.burpSound();
             if (burpSound != null) {
                 return burpSound;
             }
@@ -42,8 +46,22 @@ public abstract class PlayerMixin implements VisionDuck {
         return originalSound;
     }
 
+    @Inject(method = "canUseGameMasterBlocks", at = @At("RETURN"), cancellable = true)
+    private void vminus$canUseGameMasterBlocks(CallbackInfoReturnable<Boolean> cir) {
+        if (!(vMinus$self instanceof ServerPlayer))
+            return;
+        RoleSavedData data = RoleSavedData.get(vMinus$self.level());
+        String name = data.getRole(vMinus$self.getUUID());
+        Role role = RoleManager.INSTANCE.getRole(name);
+        if (role == null)
+            return;
+        boolean canUseCommandBlocks = role.canUseGameMasterBlocks();
+        cir.setReturnValue(canUseCommandBlocks && vMinus$self.getAbilities().instabuild);
+    }
+
+
     @Inject(method = "getDimensions", at = @At(value = "RETURN"), cancellable = true)
-    public void getDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
+    private void vminus$getDimensions(Pose pose, CallbackInfoReturnable<EntityDimensions> cir) {
         if (!SightManager.get("size_attributes"))
             return;
         float defaultHeight = cir.getReturnValue().height;

@@ -6,13 +6,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 
 public class VMinusTags {
     public static class Blocks {
+        public static final TagKey<Block> WOODEN_FENCE_GATES = tag("soul_torches");
+        public static final TagKey<Block> REDSTONE_TORCHES = tag("redstone_torches");
         public static final TagKey<Block> SOUL_TORCHES = tag("soul_torches");
         public static final TagKey<Block> TORCHES = tag("torches");
         public static final TagKey<Block> ALL_TORCHES = tag("all_torches");
@@ -40,9 +44,32 @@ public class VMinusTags {
         public static final TagKey<Block> TALL_GRASSES = tag("tall_grasses");
         public static final TagKey<Block> LEASHABLE = tag("leashable");
         public static final TagKey<Block> COCAO_PLANTABLE_ON = tag("cocao_plantable_on");
+        public static final TagKey<Block> DEAD_CORAL_BLOCKS = tag("dead_coral_blocks");
+        public static final TagKey<Block> DEAD_CORALS = tag("dead_corals");
+        public static final TagKey<Block> DEAD_CORAL_FANS = tag("dead_coral_fans");
 
         private static @NotNull TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(VMinus.ID, name));
+        }
+    }
+
+    public static class DamageTypes {
+        public static final TagKey<DamageType> BLUNT_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/blunt"));
+        public static final TagKey<DamageType> BLAST_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/blast"));
+        public static final TagKey<DamageType> FALL_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/fall"));
+        public static final TagKey<DamageType> FIRE_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/fire"));
+        public static final TagKey<DamageType> MAGIC_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/magic"));
+
+        private static @NotNull TagKey<DamageType> create(ResourceLocation p_203849_) {
+            return TagKey.create(Registries.DAMAGE_TYPE, p_203849_);
+        }
+    }
+
+    public static class Fluids {
+        public static final TagKey<Fluid> OOZE = create("ooze");
+
+        private static @NotNull TagKey<Fluid> create(String id) {
+            return TagKey.create(Registries.FLUID, ResourceLocation.fromNamespaceAndPath(VMinus.ID, id));
         }
     }
 
@@ -97,6 +124,10 @@ public class VMinusTags {
         public static final TagKey<Item> SOLID_BUCKETS = tag("buckets/solid");
         public static final TagKey<Item> MOB_BUCKETS = tag("buckets/mob");
         public static final TagKey<Item> FOOD_BUCKETS = tag("buckets/food");
+        public static final TagKey<Item> DEAD_CORAL_BLOCKS = tag("dead_coral_blocks");
+        public static final TagKey<Item> DEAD_CORALS = tag("dead_corals");
+        public static final TagKey<Item> DEAD_CORAL_FANS = tag("dead_coral_fans");
+        public static final TagKey<Item> WOODEN_FENCE_GATES = tag("wooden_fence_gates");
 
         private static @NotNull TagKey<Item> tag(String name) {
             return ItemTags.create(new ResourceLocation(VMinus.ID, name));

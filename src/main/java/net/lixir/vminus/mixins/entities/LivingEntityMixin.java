@@ -1,7 +1,9 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.item.trait.ItemTraits;
-import net.lixir.vminus.attribute.VMinusAttributes;
+import net.lixir.vminus.entity.attribute.VMinusAttributes;
+import net.lixir.vminus.item.IEquipmentItem;
+import net.lixir.vminus.network.ServerboundJumpPacket;
+import net.lixir.vminus.network.VMinusNetwork;
 import net.lixir.vminus.sight.resource.SightManager;
 import net.lixir.vminus.entity.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
@@ -19,6 +21,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,6 +30,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity implements VariantEntity, VisionDuck {
+    @Shadow protected boolean jumping;
+
+    @Shadow private int noJumpDelay;
+
+    @Shadow public abstract ItemStack getItemBySlot(EquipmentSlot p_21127_);
+
     public LivingEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
@@ -50,6 +59,30 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity,
             vMinus$variantTexture = texture;
         }
     }
+
+    @Unique
+    private boolean vminus$wasJumping = false;
+
+    @Inject(method = "aiStep", at = @At("HEAD"))
+    private void vminus$onJumpTick(CallbackInfo ci) {
+
+
+        boolean jumpingNow = this.jumping;
+        boolean justPressedJump = jumpingNow && !vminus$wasJumping;
+
+        if (justPressedJump && !this.onGround() && !this.isCrouching() && noJumpDelay == 0) {
+            ItemStack boots = this.getItemBySlot(EquipmentSlot.FEET);
+            if (boots.getItem() instanceof IEquipmentItem IEquipmentItem) {
+                if (level().isClientSide) {
+                    IEquipmentItem.onEntityJump(level(), vMinus$self, boots, false);
+                    VMinusNetwork.CHANNEL.sendToServer(new ServerboundJumpPacket(this.getId(), false));
+                }
+            }
+        }
+
+        vminus$wasJumping = jumpingNow;
+    }
+
 
     @Override
     public @Nullable ResourceLocation vMinus$getVariantTexture() {
@@ -111,19 +144,6 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity,
             cir.setReturnValue((cir.getReturnValue() * increase) * SizeAttributeUtil.getHeight(vMinus$self) * 0.2f);
     }
 
-    @Inject(method = "getEyeHeight", at = @At("RETURN"), cancellable = true)
-    public void getEyeHeight(CallbackInfoReturnable<Float> callbackInfo) {
-        if (!SightManager.get("size_attributes"))
-            return;
-        if (vMinus$self == null)
-            return;
-        if (vMinus$self.tickCount > 0) {
-            float height = SizeAttributeUtil.getHeight(vMinus$self);
-            if (height != 1) {
-                callbackInfo.setReturnValue(callbackInfo.getReturnValue() * height);
-            }
-        }
-    }
     @Unique
     private float vMinus$lastWidthScale = 1.0f;
     @Unique
@@ -181,18 +201,8 @@ public abstract class LivingEntityMixin extends Entity implements VariantEntity,
     }
 
 
-    @Inject(method = "canFreeze", at = @At("RETURN"), cancellable = true)
-    public void canFreeze(CallbackInfoReturnable<Boolean> cir) {
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (slot.getType() == EquipmentSlot.Type.ARMOR) {
-                ItemStack armorPiece = vMinus$self.getItemBySlot(slot);
-                if (ItemTraits.hasTrait(armorPiece, ItemTraits.INSULATED.get())) {
-                    cir.setReturnValue(ItemTraits.getTrait(armorPiece, ItemTraits.INSULATED.get()));
-                    return;
-                }
-            }
-        }
-    }
+
+
 
     /*
 

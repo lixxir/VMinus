@@ -1,8 +1,8 @@
 package net.lixir.vminus.mixins.forge.registries;
 
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistry;
@@ -25,7 +25,7 @@ public abstract class ForgeRegistryMixin<V> {
         Collection<V> filtered = original.stream()
                 .filter(value -> {
                     if (value instanceof Item item) {
-                        Boolean ban = VisionUtil.getOverrideValue((VisionDuck) item, VisionPropertyTypes.Items.BAN, new VisionContext(item));
+                        Boolean ban = VisionUtils.getOverrideValue((VisionDuck) item, VisionProperties.Items.BAN, new VisionContext(item));
                         return ban == null || !ban;
                     }
                     return true;

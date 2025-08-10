@@ -1,21 +1,18 @@
 package net.lixir.vminus.mixins.items;
 
 import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionPropertyTypes;
+import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.VisionTypes;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
-import net.lixir.vminus.vision.util.VisionUtil;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.extensions.IForgeItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,7 +41,7 @@ public abstract class ItemStackMixin implements IForgeItemStack, VisionDuck {
 
     @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
     private void getBarWidth(CallbackInfoReturnable<Integer> cir) {
-        Integer maxDamage = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
+        Integer maxDamage = VisionUtils.getOverrideValue(this, VisionProperties.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
         /* Patches out an issue with damage bars not scaling properly when a new durability is applied.
          Only do it with vision applied durability to prevent altering vanilla behavior.
          */
@@ -55,9 +52,18 @@ public abstract class ItemStackMixin implements IForgeItemStack, VisionDuck {
         }
     }
 
+    @Inject(method = "isBarVisible", at = @At("RETURN"), cancellable = true)
+    private void vMinus$isBarVisible(CallbackInfoReturnable<Boolean> cir) {
+        Integer maxDamage = VisionUtils.getOverrideValue(this, VisionProperties.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
+        if (maxDamage != null && vMinus$self.isDamaged()) {
+            cir.setReturnValue(true);
+        }
+    }
+
+
     @Inject(method = "isEnchantable", at = @At("RETURN"), cancellable = true)
     private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.ENCHANTABLE, new VisionContext(vMinus$self));
+        VisionUtils.tryOverride(cir, this, VisionProperties.Items.ENCHANTABLE, new VisionContext(vMinus$self));
     }
 
     @Inject(method = "getDrinkingSound", at = @At("RETURN"), cancellable = true)
@@ -72,19 +78,18 @@ public abstract class ItemStackMixin implements IForgeItemStack, VisionDuck {
 
     @Unique
     private void vMinus$trySetEatSound(CallbackInfoReturnable<SoundEvent> cir) {
-        VisionFoodProperties visionFoodProperties = VisionUtil.getOverrideValue(this, VisionPropertyTypes.Items.FOOD, new VisionContext(vMinus$self));
+        VisionFoodProperties visionFoodProperties = VisionUtils.getOverrideValue(this, VisionProperties.Items.FOOD, new VisionContext(vMinus$self));
         if (visionFoodProperties == null)
             return;
-        SoundEvent eatSound = visionFoodProperties.getEatSound();
+        SoundEvent eatSound = visionFoodProperties.eatSound();
         if (eatSound != null)
             cir.setReturnValue(eatSound);
     }
 
     @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
     private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        VisionUtil.tryOverride(cir, this, VisionPropertyTypes.Items.USE_TICKS, new VisionContext(vMinus$self));
+        VisionUtils.tryOverride(cir, this, VisionProperties.Items.USE_TICKS, new VisionContext(vMinus$self));
     }
-
 
 
 

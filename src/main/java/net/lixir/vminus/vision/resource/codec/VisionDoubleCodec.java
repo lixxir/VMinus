@@ -1,7 +1,7 @@
 package net.lixir.vminus.vision.resource.codec;
 
 import com.google.gson.*;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.values.VisionValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,15 +15,15 @@ public class VisionDoubleCodec extends VisionCodec<Double> {
     }
 
     @Override
-    public @Nullable List<VisionProperty<Double>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<Double>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<Double>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<Double>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
             double value = arrayObject.getAsJsonPrimitive("value").getAsDouble();
 
-            visionProperties.add(VisionProperty.create(value, arrayObject, jsonObject, key));
+            visionProperties.add(VisionValue.create(value, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }

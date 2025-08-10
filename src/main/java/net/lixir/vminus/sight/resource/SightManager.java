@@ -79,13 +79,10 @@ public class SightManager extends SimpleJsonResourceReloadListener {
         return Collections.unmodifiableMap(SIGHTS);
     }
 
-    public static void clearSights(){
-        SIGHTS.clear();
-    }
-
     public static void setAll(Map<String, Boolean> newSights) {
-        clearSights();
-        SIGHTS.putAll(newSights);
+        SIGHTS.clear();
         PRIORITIES.clear();
+        SIGHTS.putAll(newSights);
+
     }
 }

@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import net.lixir.vminus.vision.util.VisionBaseAttribute;
-import net.lixir.vminus.vision.values.VisionProperty;
+import net.lixir.vminus.vision.util.BaseAttribute;
+import net.lixir.vminus.vision.values.VisionValue;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -15,15 +15,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VisionBaseAttributeCodec extends VisionCodec<VisionBaseAttribute> {
+public class VisionBaseAttributeCodec extends VisionCodec<BaseAttribute> {
     @Override
-    public Class<VisionBaseAttribute> getClassType() {
-        return VisionBaseAttribute.class;
+    public Class<BaseAttribute> getClassType() {
+        return BaseAttribute.class;
     }
 
     @Override
-    public @Nullable List<VisionProperty<VisionBaseAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
-        List<VisionProperty<VisionBaseAttribute>> visionProperties = new ArrayList<>();
+    public @Nullable List<VisionValue<BaseAttribute>> decode(@NotNull JsonObject jsonObject, String key) throws JsonParseException {
+        List<VisionValue<BaseAttribute>> visionProperties = new ArrayList<>();
 
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         if (jsonArray == null)
@@ -46,14 +46,14 @@ public class VisionBaseAttributeCodec extends VisionCodec<VisionBaseAttribute> {
                 throw new JsonParseException("Invalid attribute id for key '" + key + "': " + resourceLocation);
             }
 
-            VisionBaseAttribute visionBaseAttribute = new VisionBaseAttribute(value, attribute);
-            visionProperties.add(VisionProperty.create(visionBaseAttribute, arrayObject, jsonObject, key));
+            BaseAttribute baseAttribute = new BaseAttribute(value, attribute);
+            visionProperties.add(VisionValue.create(baseAttribute, arrayObject, jsonObject, key));
         }
         return visionProperties;
     }
 
     @Override
-    public @Nullable JsonObject encode(@NotNull VisionBaseAttribute value) {
+    public @Nullable JsonObject encode(@NotNull BaseAttribute value) {
         JsonObject jsonObject = new JsonObject();
 
         ResourceLocation key = ForgeRegistries.ATTRIBUTES.getKey(value.attribute());

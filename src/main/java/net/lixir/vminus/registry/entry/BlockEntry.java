@@ -1,28 +1,72 @@
 package net.lixir.vminus.registry.entry;
 
-import net.lixir.vminus.registry.BlockModel;
-import net.lixir.vminus.registry.TaggedRegistryEntry;
+import net.lixir.vminus.VMinus;
+import net.lixir.vminus.datagen.BlockLootTable;
+import net.lixir.vminus.datagen.BlockModel;
 import net.lixir.vminus.registry.TintType;
-import net.lixir.vminus.registry.UnifiedRegistry;
+import net.lixir.vminus.registry.VRegistry;
+import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements TaggedRegistryEntry<BlockEntry, Block> {
-    protected final List<TagKey<Block>> tags = new ArrayList<>();
-    protected String renderType = "unset";
-    protected TintType tintType = TintType.UNSET;
-    protected BlockModel model = BlockModel.UNSET;
+public class BlockEntry extends RegistryEntry<BlockEntry, Block> {
+    public static final BlockEntry EMPTY = of();
+    protected final @NotNull Set<TagKey<Block>> tags = new HashSet<>();
+    protected @NotNull String renderType = "unset";
+    protected @NotNull ItemEntry itemEntry = ItemEntry.of();
+    protected @NotNull String modelTextureSuffix = "unset";
+    protected @NotNull TintType tintType = TintType.UNSET;
+    protected @NotNull BlockModel model = BlockModel.UNSET;
+    protected @NotNull BlockLootTable lootTable = BlockLootTable.SELF;
+    protected @NotNull ResourceLocation modelTextureOverride = UNSET_RESOURCE_LOCATION;
     private boolean isDefaulted = false;
+
+    private BlockEntry() {
+    }
+    public static @NotNull BlockEntry of(@NotNull BlockItem blockItem) {
+        return of(blockItem.getBlock());
+    }
+
+    public static @NotNull BlockEntry of(@NotNull Block block) {
+        BlockEntry accessed = ((BlockEntryAccessor) block).vminus$getEntry();
+        return accessed != null ? accessed : of();
+    }
+
+    public boolean isEmpty() {
+        return this.equals(EMPTY);
+    }
+
+    public @NotNull BlockLootTable getLootTable() {
+        return lootTable;
+    }
+
+    public BlockEntry lootTable(BlockLootTable lootTable) {
+        this.lootTable = lootTable;
+
+        return this;
+    }
+
+    public @NotNull ResourceLocation getModelTextureOverride() {
+        return modelTextureOverride;
+    }
 
     @Contract(" -> new")
     public static @NotNull BlockEntry of() {
         return new BlockEntry();
+    }
+
+    public @NotNull String getModelTextureSuffix() {
+        return modelTextureSuffix;
     }
 
     public static @NotNull BlockEntry defaults() {
@@ -32,27 +76,64 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
     }
 
     public BlockEntry setDefault(@NotNull Block block) {
-        BlockEntry blockEntry = UnifiedRegistry.getBlockEntry(block.getClass());
-        merge(this, blockEntry);
+        BlockEntry blockEntry = VRegistry.getBlockEntry(block);
+        BlockEntry mergedEntry = merge(blockEntry);
+        VMinus.LOGGER.debug("Merged Entry:{}", mergedEntry);
+        return mergedEntry;
+    }
+
+    @Override
+    public @NotNull BlockEntry merge(@Nullable BlockEntry other) {
+        if (other == null)
+            return this;
+        this.tags.addAll(other.tags);
+        this.itemEntry.merge(other.itemEntry);
+        if (this.tintType == TintType.UNSET)
+            this.tintType = other.tintType;
+        if (this.model == BlockModel.UNSET)
+            this.model = other.model;
+        if (this.lootTable == BlockLootTable.UNSET)
+            this.lootTable = other.lootTable;
+        if (this.renderType.equals("unset"))
+            this.renderType = other.renderType;
+        if (this.modelTextureSuffix.equals("unset"))
+            this.modelTextureSuffix = other.modelTextureSuffix;
+        if (this.modelTextureOverride.equals(UNSET_RESOURCE_LOCATION))
+            this.modelTextureOverride = other.modelTextureOverride;
         return this;
     }
 
-    @Override
-    public void merge(@NotNull BlockEntry self, @Nullable BlockEntry other) {
-        if (other == null)
-            return;
-        self.tags(other.tags);
-        if (self.tintType == TintType.UNSET)
-            self.tintType = other.tintType;
-        if (self.model == BlockModel.UNSET)
-            self.model = other.model;
-        if (self.renderType.equals("unset"))
-            self.renderType = other.renderType;
+    public @NotNull ItemEntry getItemEntry() {
+        return itemEntry;
     }
 
-    @Override
-    public BlockEntry tag(TagKey<Block> tag) {
-        this.tags.add(tag);
+    public BlockEntry itemEntry(@NotNull ItemEntry itemEntry) {
+
+        itemEntry.setDefaulted(true);
+        this.itemEntry = itemEntry;
+        return this;
+    }
+
+    @SafeVarargs
+    public final BlockEntry tags(TagKey<Block>... tags) {
+        if (isDatagen())
+            this.tags.addAll(Arrays.asList(tags));
+        return this;
+    }
+
+    public @NotNull Set<TagKey<Block>> getTags() {
+        return Collections.unmodifiableSet(tags);
+    }
+
+    public BlockEntry modelTextureOverride(@NotNull ResourceLocation modelTextureOverride) {
+        if (isDatagen())
+            this.modelTextureOverride = modelTextureOverride;
+        return this;
+    }
+
+    public BlockEntry modelTextureSuffix(@NotNull String modelTextureSuffix) {
+        if (isDatagen())
+            this.modelTextureSuffix = modelTextureSuffix;
         return this;
     }
 
@@ -67,19 +148,9 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
     }
 
     public BlockEntry model(@NotNull BlockModel model) {
-        this.model = model;
+        if (isDatagen())
+            this.model = model;
         return this;
-    }
-
-    @Override
-    public BlockEntry tags(List<TagKey<Block>> tags) {
-        this.tags.addAll(tags);
-        return this;
-    }
-
-    @Override
-    public @NotNull List<TagKey<Block>> getTags() {
-        return tags;
     }
 
     public @NotNull String getRenderType() {
@@ -87,7 +158,7 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
     }
 
 
-    public TintType getTintType() {
+    public @NotNull TintType getTintType() {
         return tintType;
     }
 
@@ -97,7 +168,8 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
 
     @Override
     public BlockEntry lang(String langValue) {
-        this.langValue = langValue;
+        if (isDatagen())
+            this.lang = langValue;
         return this;
     }
 
@@ -110,10 +182,14 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> implements Tagg
         return "BlockEntry{" +
                 "tags=" + tags +
                 ", renderType='" + renderType + '\'' +
+                ", itemEntry=" + itemEntry +
+                ", modelTextureSuffix='" + modelTextureSuffix + '\'' +
                 ", tintType=" + tintType +
-                ", model=" + (model != null ? model.getClass().getSimpleName() : "null") +
+                ", model=" + model +
+                ", lootTable=" + lootTable +
+                ", modelTextureOverride=" + modelTextureOverride +
                 ", isDefaulted=" + isDefaulted +
-                ", langValue='" + langValue + '\'' +
+                ", langValue='" + lang + '\'' +
                 '}';
     }
 }

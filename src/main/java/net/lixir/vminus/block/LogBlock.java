@@ -1,15 +1,10 @@
 package net.lixir.vminus.block;
 
-import net.lixir.vminus.registry.entry.BlockEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.List;
 
 public class LogBlock extends RotatedPillarBlock {
     public LogBlock(Properties pProperties) {
