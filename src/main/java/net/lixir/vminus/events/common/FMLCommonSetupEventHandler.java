@@ -10,30 +10,35 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.File;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber
 public class FMLCommonSetupEventHandler {
     @SubscribeEvent
-    public static void vminus$FMLClientSetupEvent(FMLCommonSetupEvent event) {
+    public static void onFMLCommonSetup(final FMLCommonSetupEvent event) {
         createConfigDirectories();
     }
 
     // Creates directories for the config Visions if they do not already exist.
     private static void createConfigDirectories() {
-        File visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), "visions");
-        if (!visionConfigDirectory.exists()) {
-            visionConfigDirectory.mkdirs();
+        File visionDir = new File(FMLPaths.CONFIGDIR.get().toFile(), "visions");
+        if (!visionDir.exists()) {
+            visionDir.mkdirs();
         }
 
-        File sightConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), "sights");
-        if (!sightConfigDirectory.exists()) {
-            sightConfigDirectory.mkdirs();
+        File sightDir = new File(FMLPaths.CONFIGDIR.get().toFile(), "sights");
+        if (!sightDir.exists()) {
+            sightDir.mkdirs();
         }
 
-        for (VisionType visionType : VisionTypes.getAll()) {
-            visionConfigDirectory = new File(FMLPaths.CONFIGDIR.get().toFile(), visionType.getDirectory());
-            if (!visionConfigDirectory.exists()) {
+        File banRecipes = new File(FMLPaths.CONFIGDIR.get().toFile(), "bans/recipes");
+        if (!banRecipes.exists()) {
+            banRecipes.mkdirs();
+        }
 
-                visionConfigDirectory.mkdirs();
+        for (VisionType<?> visionType : VisionTypes.getAll()) {
+            visionDir = new File(FMLPaths.CONFIGDIR.get().toFile(), visionType.getDirectory());
+            if (!visionDir.exists()) {
+
+                visionDir.mkdirs();
             }
         }
     }

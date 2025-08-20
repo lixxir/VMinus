@@ -8,11 +8,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public record ItemReplacement(@Nullable ItemStack itemStack, @Nullable TagKey<Item> tag) {
+
     @Override
     public @Nullable ItemStack itemStack() {
         return itemStack != null ? itemStack.copy() : null;
@@ -34,12 +37,20 @@ public record ItemReplacement(@Nullable ItemStack itemStack, @Nullable TagKey<It
         return Vision.getValue(stack, VisionProperties.Items.REPLACE, visionContext);
     }
 
+    public static @NotNull ItemStack resolve(ItemStack stack) {
+        return resolve(from(stack));
+    }
+
+    public static @NotNull ItemStack resolve(Item item) {
+        return resolve(from(item));
+    }
+
     @SuppressWarnings("deprecation")
-    public static ItemStack resolve(@Nullable ItemReplacement replacement) {
+    public static @NotNull ItemStack resolve(@Nullable ItemReplacement replacement) {
         if (replacement == null)
             return ItemStack.EMPTY;
-        ItemStack itemStack = replacement.itemStack;
-        TagKey<Item> tag = replacement.tag;
+        ItemStack itemStack = replacement.itemStack();
+        TagKey<Item> tag = replacement.tag();
         if (itemStack != null && !itemStack.isEmpty()) {
             return itemStack;
         } else if (tag != null) {
@@ -54,16 +65,20 @@ public record ItemReplacement(@Nullable ItemStack itemStack, @Nullable TagKey<It
     }
 
     public static boolean tryReplace(ItemStack original, Consumer<ItemStack> apply) {
-        Boolean ban = Vision.getValue(original, VisionProperties.Items.BAN);
         ItemReplacement replacement = Vision.getValue(original, VisionProperties.Items.REPLACE);
-        if (VisionUtils.isItemBannedOrReplaced(replacement, ban)) {
-            ItemStack replaced = resolve(replacement);
-            if (replaced != null) {
-                replaced.setCount(original.getCount());
-                apply.accept(replaced);
-                return true;
-            }
+        ItemStack replaced = resolve(replacement);
+        if (!replaced.isEmpty()) {
+            replaced.setCount(original.getCount());
+            apply.accept(replaced);
+            return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemReplacement[" +
+                "itemStack=" + itemStack + ", " +
+                "tag=" + tag + ']';
     }
 }

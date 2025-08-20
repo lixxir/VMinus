@@ -1,6 +1,6 @@
 package net.lixir.vminus.network;
 
-import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.resources.data.sight.SightManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.jetbrains.annotations.Contract;

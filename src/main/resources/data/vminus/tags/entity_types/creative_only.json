@@ -1,0 +1,12 @@
+{
+  "values": [
+    "minecraft:marker",
+    "minecraft:illusioner",
+    "minecraft:text_display",
+    "minecraft:giant",
+    "minecraft:interaction",
+    "minecraft:block_display",
+    "minecraft:spawner_minecart",
+    "minecraft:command_block_minecart"
+  ]
+}

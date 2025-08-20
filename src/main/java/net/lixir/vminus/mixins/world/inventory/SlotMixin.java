@@ -1,11 +1,7 @@
 package net.lixir.vminus.mixins.world.inventory;
 
-import net.lixir.vminus.vision.Vision;
-import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.ItemReplacement;
 import net.lixir.vminus.vision.util.VisionUtils;
-import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -29,38 +25,34 @@ public abstract class SlotMixin {
     
     @Inject(method = "hasItem", at = @At("RETURN"), cancellable = true)
     private void vMinus$preventBannedItemTake(CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemStack = getItem();
-        Boolean ban = Vision.getValue(itemStack, VisionProperties.Items.BAN);
-        if (Boolean.TRUE.equals(ban))
+        ItemStack stack = getItem();
+        if (VisionUtils.isBanned(stack))
             cir.setReturnValue(false);
     }
 
     @Inject(method = "mayPlace", at = @At("RETURN"), cancellable = true)
-    private void vMinus$preventBannedItemTake(@NotNull ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
-        Boolean ban = Vision.getValue(itemStack, VisionProperties.Items.BAN);
-        if (Boolean.TRUE.equals(ban))
+    private void vMinus$preventBannedItemTake(@NotNull ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
+        if (VisionUtils.isBanned(stack))
             cir.setReturnValue(false);
     }
 
     @Inject(method = "mayPickup", at = @At("RETURN"), cancellable = true)
     private void vMinus$preventBannedItemTake(Player player, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack itemStack = getItem();
-        Boolean ban = Vision.getValue(itemStack, VisionProperties.Items.BAN);
-        if (Boolean.TRUE.equals(ban))
+        ItemStack stack = getItem();
+        if (VisionUtils.isBanned(stack))
             cir.setReturnValue(false);
     }
 
     @Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
-    private void vMinus$preventBannedItemTake(Player player, @NotNull ItemStack itemStack, CallbackInfo ci) {
-        Boolean ban = Vision.getValue(itemStack, VisionProperties.Items.BAN);
-        if (Boolean.TRUE.equals(ban)) {
+    private void vMinus$preventBannedItemTake(Player player, @NotNull ItemStack stack, CallbackInfo ci) {
+        if (VisionUtils.isBanned(stack)) {
             setChanged();
             ci.cancel();
         }
     }
 
     @Inject(method = "set", at = @At("HEAD"), cancellable = true)
-    private void vminus$set(@NotNull ItemStack itemStack, CallbackInfo ci) {
+    private void vMinus$set(@NotNull ItemStack itemStack, CallbackInfo ci) {
         SlotAccessor slotAccessor = (SlotAccessor) vminus$slot;
         if (ItemReplacement.tryReplace(itemStack, replaced ->
                 vminus$slot.container.setItem(slotAccessor.getSlot(), replaced))) {

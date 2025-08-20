@@ -4,9 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.lixir.vminus.util.NbtConversionUtil;
-import net.lixir.vminus.vision.resource.VisionFormatter;
-import net.lixir.vminus.vision.resource.codec.VisionCodec;
-import net.lixir.vminus.vision.resource.manager.VisionManager;
+import net.lixir.vminus.resources.data.vision.VisionFormatter;
+import net.lixir.vminus.resources.data.vision.codec.VisionCodec;
+import net.lixir.vminus.resources.data.vision.VisionManager;
 import net.lixir.vminus.vision.values.VisionValue;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.nbt.CompoundTag;
@@ -141,21 +141,44 @@ public class Vision {
 
         fromEntry(id, visionEntry, visionType);
     }
-
-    public static <T> @Nullable T getValue(@NotNull ItemStack itemStack, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(itemStack, visionProperty, new VisionContext(itemStack));
+    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entityType).getValue(visionProperty.getId(), visionContext);
     }
 
-    public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(item, visionProperty, new VisionContext(item));
+    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(entityType, visionProperty, new VisionContext(entityType));
+    }
+
+    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entity).getValue(visionProperty.getId(), visionContext);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(entity, visionProperty, new VisionContext(entity));
+    }
+
+    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(state).getValue(visionProperty.getId(), visionContext);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(state, visionProperty, new VisionContext(state));
     }
 
     public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
         return Vision.get(item).getValue(visionProperty.getId(), visionContext);
     }
 
+    public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(item, visionProperty, new VisionContext(item));
+    }
+
     public static <T> @Nullable T getValue(@NotNull ItemStack itemStack, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
         return Vision.get(itemStack).getValue(visionProperty.getId(), visionContext);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull ItemStack itemStack, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(itemStack, visionProperty, new VisionContext(itemStack));
     }
 
     private static <T> void encodeProperty(@NotNull VisionProperty<T> propertyType, @NotNull VisionValue<?> visionValue, JsonArray jsonArray) {

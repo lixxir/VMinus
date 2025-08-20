@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.world;
 
-import net.lixir.vminus.block.IVBlock;
+import net.lixir.vminus.block.VBlockExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
@@ -19,9 +19,9 @@ public class WorldGenRegionMixin {
     @Shadow @Final private ServerLevel level;
 
     @Inject(method = "setBlock", at = @At("TAIL"))
-    private void detour$onFeatureBlockPlacement(BlockPos pos, @NotNull BlockState state, int flags, int recursionLimit, CallbackInfoReturnable<Boolean> cir) {
-        if (state.getBlock() instanceof IVBlock IVBlock) {
-            int tick = IVBlock.getWorldGenScheduledTick(level, state, pos);
+    private void vMinus$setBlock(BlockPos pos, @NotNull BlockState state, int flags, int recursionLimit, CallbackInfoReturnable<Boolean> cir) {
+        if (state.getBlock() instanceof VBlockExtensions VBlockExtensions) {
+            int tick = VBlockExtensions.getWorldGenScheduledTick(level, state, pos);
             if (tick <= 0)
                 return;
             ((WorldGenLevel) this).scheduleTick(pos, state.getBlock(), tick);

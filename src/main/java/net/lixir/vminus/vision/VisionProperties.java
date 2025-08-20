@@ -1,6 +1,6 @@
 package net.lixir.vminus.vision;
 
-import net.lixir.vminus.vision.resource.codec.VisionCodecs;
+import net.lixir.vminus.resources.data.vision.codec.VisionCodecs;
 import net.lixir.vminus.vision.util.*;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -101,7 +101,7 @@ public class VisionProperties {
         public static final VisionProperty<Float> SPEED_FACTOR = blockProperty(VisionProperty.create("speed_factor", VisionCodecs.FLOAT));
         public static final VisionProperty<Float> JUMP_FACTOR = blockProperty(VisionProperty.create("jump_factor", VisionCodecs.FLOAT));
         public static final VisionProperty<Float> BLAST_RESISTANCE = blockProperty(VisionProperty.create("blast_resistance", VisionCodecs.FLOAT));
-        public static final VisionProperty<Float> HARDNESS = blockProperty(VisionProperty.create("hardness", VisionCodecs.FLOAT));
+        public static final VisionProperty<Float> BREAK_SPEED = blockProperty(VisionProperty.create("break_speed", VisionCodecs.FLOAT));
         public static final VisionProperty<Float> FRICTION = blockProperty(VisionProperty.create("friction", VisionCodecs.FLOAT));
         public static final VisionProperty<Boolean> BAN = blockProperty(VisionProperty.create("ban", VisionCodecs.BOOLEAN));
         public static final VisionProperty<Block> REPLACE = blockProperty(VisionProperty.create("replace", VisionCodecs.BLOCK));

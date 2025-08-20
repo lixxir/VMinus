@@ -10,7 +10,7 @@ import net.minecraft.world.item.Item;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(BowItem.class)
-public abstract class BowItemMixin extends Item  implements IMaxDurationGetter {
+public abstract class BowItemMixin extends Item implements IMaxDurationGetter {
     public BowItemMixin(Properties properties) {
         super(properties);
     }

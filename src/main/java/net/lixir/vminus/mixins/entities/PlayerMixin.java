@@ -1,9 +1,9 @@
 package net.lixir.vminus.mixins.entities;
 
 import net.lixir.vminus.roles.Role;
-import net.lixir.vminus.roles.RoleManager;
+import net.lixir.vminus.resources.data.RoleManager;
 import net.lixir.vminus.roles.RoleSavedData;
-import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.resources.data.sight.SightManager;
 import net.lixir.vminus.util.SizeAttributeUtil;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;

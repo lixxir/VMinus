@@ -43,14 +43,12 @@ public class EntityJoinLevelEventHandler {
             }
         }
 
-        Boolean ban = VisionUtils.getOverrideValue((VisionDuck) entity, VisionProperties.Entities.BAN, new VisionContext(entity));
-        // Banning banned entities
-        if (ban != null && ban) {
-            if (event.isCancelable()) {
+        Boolean ban = Vision.getValue(entity, VisionProperties.Entities.BAN);
+        if (Boolean.TRUE.equals(ban)) {
+            if (event.isCancelable())
                 event.setCanceled(true);
-            } else if (event.hasResult()) {
+            else if (event.hasResult())
                 event.setResult(Event.Result.DENY);
-            }
             return;
         }
 

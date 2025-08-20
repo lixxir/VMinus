@@ -56,6 +56,10 @@ public abstract class VLangProvider extends LanguageProvider {
         gamerule(rule, name, null);
     }
 
+    protected void subtitle(String name, String translation) {
+        add("subtitles." + name, translation);
+    }
+
     protected void gamerule(GameRules.@NotNull Key<?> rule, String name, @Nullable String description) {
         String id = rule.getId();
         add("gamerule." + id, name);

@@ -50,7 +50,7 @@ public abstract class BlockStateBaseMixin implements VisionDuck {
 
     @Inject(method = "getDestroySpeed", at = @At("RETURN"), cancellable = true)
     private void getDestroySpeed(BlockGetter p_60801_, BlockPos p_60802_, CallbackInfoReturnable<Float> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.HARDNESS, new VisionContext(vMinus$self));
+        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.BREAK_SPEED, new VisionContext(vMinus$self));
     }
 
     @Override

@@ -30,6 +30,16 @@ public class VMinusItemTagGenerator extends VItemTagGenerator {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         super.addTags(pProvider);
+        tag(VMinusTags.Items.CREATIVE_ONLY)
+                .add(Items.COMMAND_BLOCK)
+                .add(Items.COMMAND_BLOCK_MINECART)
+                .add(Items.CHAIN_COMMAND_BLOCK)
+                .add(Items.JIGSAW)
+                .add(Items.BARRIER)
+                .add(Items.DEBUG_STICK)
+                .add(Items.LIGHT)
+                .add(Items.STRUCTURE_VOID)
+                .add(Items.STRUCTURE_BLOCK);
         tag(VMinusTags.Items.DEAD_CORAL_BLOCKS)
                 .add(Items.DEAD_TUBE_CORAL_BLOCK)
                 .add(Items.DEAD_BRAIN_CORAL_BLOCK)

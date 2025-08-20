@@ -1,6 +1,5 @@
 package net.lixir.vminus.events.entity;
 
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,9 +12,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber
 public class EntityAttackedEventHandler {
     @SubscribeEvent
-    public static void onEntityAttacked(LivingAttackEvent event) {
+    public static void onEntityAttacked(final LivingAttackEvent event) {
         if (event != null && event.getEntity() != null) {
-            DamageSource damagesource = event.getSource();
             LivingEntity entity = event.getEntity();
             Entity sourceentity = event.getSource().getEntity();
             Entity immediatesourceentity = event.getSource().getDirectEntity();
@@ -24,7 +22,8 @@ public class EntityAttackedEventHandler {
                 return;
             if (!entity.isAttackable())
                 return;
-            // Damage horse armor when attacked if it has durability.
+            // Damage horse armor when attacked if it has durability
+            // TODO: Make this a HorseMixin instead
             if (entity instanceof Horse) {
                 ItemStack horseArmor = entity.getItemBySlot(EquipmentSlot.CHEST);
                 if (!(horseArmor.getItem() == ItemStack.EMPTY.getItem())) {

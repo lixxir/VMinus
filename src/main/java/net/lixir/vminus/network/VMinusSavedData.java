@@ -30,7 +30,7 @@ public class VMinusSavedData {
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        VMinusNetwork.addNetworkMessage(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer, PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
+        VMinusNetwork.register(PlayerVariablesSyncMessage.class, PlayerVariablesSyncMessage::buffer, PlayerVariablesSyncMessage::new, PlayerVariablesSyncMessage::handler);
     }
 
     @SubscribeEvent

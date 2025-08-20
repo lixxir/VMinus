@@ -32,6 +32,7 @@ public class VMinusAttributes {
         event.add(EntityType.PLAYER, MAGIC_PROTECTION);
         event.add(EntityType.PLAYER, FALL_PROTECTION);
         event.add(EntityType.PLAYER, BLUNT_PROTECTION);
+        event.add(EntityType.PLAYER, MINING_SPEED);
         event.add(EntityType.PLAYER, FIRE_PROTECTION);
         event.add(EntityType.PLAYER, MOB_DETECTION_RANGE);
         event.add(EntityType.PLAYER, JUMP_BOOST);

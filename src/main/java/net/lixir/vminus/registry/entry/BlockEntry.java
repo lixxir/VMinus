@@ -27,7 +27,7 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> {
     protected @NotNull String modelTextureSuffix = "unset";
     protected @NotNull TintType tintType = TintType.UNSET;
     protected @NotNull BlockModel model = BlockModel.UNSET;
-    protected @NotNull BlockLootTable lootTable = BlockLootTable.SELF;
+    protected @NotNull BlockLootTable lootTable = BlockLootTable.UNSET;
     protected @NotNull ResourceLocation modelTextureOverride = UNSET_RESOURCE_LOCATION;
     private boolean isDefaulted = false;
 
@@ -50,7 +50,7 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> {
         return lootTable;
     }
 
-    public BlockEntry lootTable(BlockLootTable lootTable) {
+    public @NotNull BlockEntry lootTable(@NotNull BlockLootTable lootTable) {
         this.lootTable = lootTable;
 
         return this;
@@ -75,11 +75,9 @@ public class BlockEntry extends RegistryEntry<BlockEntry, Block> {
         return blockEntry;
     }
 
-    public BlockEntry setDefault(@NotNull Block block) {
+    public @NotNull BlockEntry setDefault(@NotNull Block block) {
         BlockEntry blockEntry = VRegistry.getBlockEntry(block);
-        BlockEntry mergedEntry = merge(blockEntry);
-        VMinus.LOGGER.debug("Merged Entry:{}", mergedEntry);
-        return mergedEntry;
+        return merge(blockEntry);
     }
 
     @Override

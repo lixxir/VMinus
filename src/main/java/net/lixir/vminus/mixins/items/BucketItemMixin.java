@@ -12,9 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BucketItem.class)
 public class BucketItemMixin {
-    @Inject(method = "getEmptySuccessItem", at = @At("RETURN"))
+    // Patches to make stacks work above 1
+    @Inject(method = "getEmptySuccessItem", at = @At("RETURN"), cancellable = true)
     private static void vMinus$getEmptySuccessItem(@NotNull ItemStack itemStack, Player player, CallbackInfoReturnable<ItemStack> cir) {
-        if (itemStack.getMaxStackSize() == 1)
+        if (itemStack.getCount() == 1)
             return;
         if (!player.getAbilities().instabuild) {
             if (itemStack.getItem() instanceof BucketItem) {
@@ -23,6 +24,8 @@ public class BucketItemMixin {
                     player.drop(emptyBucket, false);
                 }
             }
+            itemStack.shrink(1);
+            cir.setReturnValue(itemStack);
         }
     }
 }

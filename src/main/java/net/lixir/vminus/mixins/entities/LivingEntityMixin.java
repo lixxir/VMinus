@@ -4,7 +4,7 @@ import net.lixir.vminus.entity.attribute.VMinusAttributes;
 import net.lixir.vminus.item.IEquipmentItem;
 import net.lixir.vminus.network.ServerboundJumpPacket;
 import net.lixir.vminus.network.VMinusNetwork;
-import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.resources.data.sight.SightManager;
 import net.lixir.vminus.entity.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
 import net.lixir.vminus.vision.VisionDuck;

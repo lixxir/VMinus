@@ -36,7 +36,6 @@ public class VMinus {
 
     public VMinus(@NotNull FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.register(this);
-        context.registerConfig(ModConfig.Type.COMMON, VMinusConfig.COMMON_CONFIG);
     }
 
     public static void init() {

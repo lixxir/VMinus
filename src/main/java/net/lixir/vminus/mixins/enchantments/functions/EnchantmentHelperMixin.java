@@ -19,10 +19,8 @@ import java.util.List;
 
 @Mixin(EnchantmentHelper.class)
 public class EnchantmentHelperMixin {
-    /**
-     * @author lixir
-     * @reason To prevent banned enchantments from appearing in available enchantment results.
-     */
+    /*
+
     @Inject(method = "getAvailableEnchantmentResults", at = @At("RETURN"), cancellable = true)
     private static void getAvailableEnchantmentResults(int p_44818_, ItemStack stack, boolean p_44820_, CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
         List<EnchantmentInstance> list = Lists.newArrayList();
@@ -43,13 +41,11 @@ public class EnchantmentHelperMixin {
 
     }
 
-    /**
-     * @author lixir
-     * @reason To make getBlockEfficiency always return 0
-     * in favor of adding attribute modifiers
-     */
+
     @Overwrite
     public static int getBlockEfficiency(LivingEntity entity) {
         return 0;
     }
+
+     */
 }

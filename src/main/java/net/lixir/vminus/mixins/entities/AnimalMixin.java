@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.resources.data.sight.SightManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.animal.Animal;

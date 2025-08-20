@@ -2,7 +2,7 @@ package net.lixir.vminus.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.lixir.vminus.roles.RoleManager;
+import net.lixir.vminus.resources.data.RoleManager;
 import net.lixir.vminus.roles.RoleSavedData;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

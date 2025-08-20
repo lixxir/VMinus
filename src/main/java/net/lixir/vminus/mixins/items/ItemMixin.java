@@ -8,6 +8,7 @@ import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionType;
 import net.lixir.vminus.vision.VisionTypes;
+import net.lixir.vminus.vision.util.ItemReplacement;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
 import net.lixir.vminus.vision.util.ItemStackWrapper;
 import net.lixir.vminus.vision.util.VisionUtils;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+
 @Mixin(Item.class)
 public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, IMaxDurationGetter, IForgeItem {
     @Unique
@@ -42,8 +44,16 @@ public abstract class ItemMixin implements VisionDuck, ItemEntryAccessor, IMaxDu
     @Unique
     private ResourceLocation vMinus$visionId = null;
 
+    /*
+    @Inject(method = "getDefaultInstance", at = @At("RETURN"), cancellable = true)
+    private void vMinus$getDefaultInstance(@NotNull CallbackInfoReturnable<ItemStack> cir) {
+       ItemReplacement.tryReplace(cir.getReturnValue(), cir::setReturnValue);
+    }
+
+     */
+
     @Inject(method = "finishUsingItem", at = @At("RETURN"), cancellable = true)
-    public void vMinus$finishUsingItem(@NotNull ItemStack itemStack, Level p_40685_, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
+    private void vMinus$finishUsingItem(@NotNull ItemStack itemStack, Level p_40685_, LivingEntity entity, CallbackInfoReturnable<ItemStack> cir) {
         ItemStackWrapper useRemainder = VisionUtils.getOverrideValue(this, VisionProperties.Items.USE_REMAINDER, new VisionContext(vMinus$self));
         if (useRemainder == null)
             return;

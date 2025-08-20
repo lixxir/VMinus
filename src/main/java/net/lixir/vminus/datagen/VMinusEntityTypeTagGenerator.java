@@ -20,7 +20,15 @@ public class VMinusEntityTypeTagGenerator extends EntityTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
         tag(VMinusTags.Entities.BANNED);
-
+        tag(VMinusTags.Entities.CREATIVE_ONLY)
+                .add(EntityType.MARKER)
+                .add(EntityType.ILLUSIONER)
+                .add(EntityType.TEXT_DISPLAY)
+                .add(EntityType.GIANT)
+                .add(EntityType.INTERACTION)
+                .add(EntityType.BLOCK_DISPLAY)
+                .add(EntityType.SPAWNER_MINECART)
+                .add(EntityType.COMMAND_BLOCK_MINECART);
         tag(VMinusTags.Entities.ZOMBIES)
                 .add(EntityType.ZOMBIE)
                 .add(EntityType.HUSK)

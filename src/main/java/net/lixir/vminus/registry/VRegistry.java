@@ -65,8 +65,6 @@ public class VRegistry {
     @SuppressWarnings("unchecked")
     public static @Nullable <E extends RegistryEntry<E, T>, T> RegistryEntry<E, T> getRegistryEntry(@NotNull T targetObject) {
         Class<?> targetClass = targetObject.getClass();
-        VMinus.LOGGER.debug("[DEBUG] Looking for registry entry for object of type: {}", targetClass.getName());
-
         List<RegistryEntryGroup<?>> compatibleGroups = new ArrayList<>();
         RegistryEntryGroup<?> bestGroup = null;
         int bestDistance = Integer.MAX_VALUE;
@@ -80,12 +78,10 @@ public class VRegistry {
 
                 int distance = getClassDistance(targetClass, groupClass);
                 groupDistances.put(group, distance);
-                VMinus.LOGGER.debug("[DEBUG] Compatible group found: {} -> distance={}", groupClass.getName(), distance);
 
                 if (distance < bestDistance) {
                     bestDistance = distance;
                     bestGroup = group;
-                    VMinus.LOGGER.debug("[DEBUG] New best group selected (distance {}): {}", distance, groupClass.getName());
                 }
             }
         }
@@ -95,28 +91,22 @@ public class VRegistry {
             Object supplied = entry.getKey().get();
             if (targetObject.equals(supplied)) {
                 bestGroup = entry.getValue();
-                VMinus.LOGGER.debug("[DEBUG] Supplier match found, overriding best group: {}", bestGroup);
                 break;
             }
         }
 
         compatibleGroups.remove(bestGroup);
         if (bestGroup != null) {
-            VMinus.LOGGER.debug("[DEBUG] Final best group: {}", bestGroup);
             RegistryEntry<E, T> bestEntry = (RegistryEntry<E, T>) bestGroup.getEntry();
 
             // Sort classes from highest to lowest distance
             compatibleGroups.sort(Comparator.comparingInt(g -> groupDistances.getOrDefault(g, Integer.MAX_VALUE)));
             for (RegistryEntryGroup<?> group : compatibleGroups) {
                 RegistryEntry<E, T> otherEntry = (RegistryEntry<E, T>) group.getEntry();
-                VMinus.LOGGER.debug("[DEBUG] Merging group entry into best entry: {}", otherEntry);
                 bestEntry.merge((E) otherEntry);
             }
-            VMinus.LOGGER.debug("[DEBUG] Final best entry: {}", bestEntry);
             return bestEntry;
         }
-
-        VMinus.LOGGER.debug("[DEBUG] No matching registry entry found for object: {}", targetObject);
         return null;
     }
 
@@ -154,7 +144,6 @@ public class VRegistry {
             throw new IllegalStateException("UnifiedRegistry already exists for mod ID: " + modId);
         if (registryEntryGroupsProvider != null)
             registryEntryGroupsProvider.run();
-        VMinus.LOGGER.info("Registered Unified Registry with ID: {}", modId);
         return registry;
     }
 

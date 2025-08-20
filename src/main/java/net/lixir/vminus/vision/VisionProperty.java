@@ -1,6 +1,6 @@
 package net.lixir.vminus.vision;
 
-import net.lixir.vminus.vision.resource.codec.VisionCodec;
+import net.lixir.vminus.resources.data.vision.codec.VisionCodec;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 

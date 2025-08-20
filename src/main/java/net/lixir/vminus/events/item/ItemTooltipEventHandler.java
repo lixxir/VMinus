@@ -1,18 +1,22 @@
 package net.lixir.vminus.events.item;
 
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.registry.VMinusChatFormatting;
+import net.lixir.vminus.resources.asset.VMinusFonts;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +24,8 @@ import java.util.List;
 @Mod.EventBusSubscriber(Dist.CLIENT)
 @SuppressWarnings("deprecation")
 public class ItemTooltipEventHandler {
-    private static final String INSPECT_PREFIX = "\uEF02" + " ";
-    private static final String FLAVOR_PREFIX = "\uEF03" + " ";
     @SubscribeEvent
-    public static void onItemTooltip(ItemTooltipEvent event) {
+    public static void onItemTooltip(@NotNull final ItemTooltipEvent event) {
         List<Component> tooltip = event.getToolTip();
         if (tooltip == null)
 
@@ -40,8 +42,6 @@ public class ItemTooltipEventHandler {
         int inspectIndex = 0;
 
         boolean altDown = Screen.hasAltDown();
-        boolean shiftDown = Screen.hasShiftDown();
-
 
         List<MutableComponent> inspections = new ArrayList<>();
         while (true) {
@@ -58,20 +58,52 @@ public class ItemTooltipEventHandler {
         boolean hasFlavor = false;
         String flavorKey = "item." + modId + "." + itemId + ".flavor";
         String flavorTranslation = I18n.get(flavorKey);
-        if (!(flavorTranslation.equals(flavorKey))) {
+        if (!(flavorTranslation.equals(flavorKey)))
             hasFlavor = true;
-        }
+
         if (inspectable || hasFlavor) {
             if (!altDown) {
-                tooltip.add(Component.literal("§9[ALT§r\uEEE4§r§9]"));
+                MutableComponent mutableComponent = Component.literal("[ALT")
+                        .withStyle(ChatFormatting.BLUE)
+                        .append(Component.literal("0")
+                                .withStyle(Style.EMPTY.withFont(VMinusFonts.ICONS).withColor(ChatFormatting.WHITE)))
+                        .append(Component.literal("]")
+                                .withStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT).withColor(ChatFormatting.BLUE)));
+                tooltip.add(mutableComponent);
             } else {
-                for (MutableComponent mutableComponent : inspections)
-                    tooltip.add(Component.literal(INSPECT_PREFIX).append(mutableComponent.withStyle(ChatFormatting.DARK_GREEN)));
-                if (hasFlavor)
-                    tooltip.add(Component.literal(FLAVOR_PREFIX).append(Component.literal(flavorTranslation).withStyle(ChatFormatting.ITALIC).withStyle(VMinusChatFormatting.INDIGO)));
-                tooltip.add(Component.literal("§8[ALT§r\uEEE5§r§8]"));
+                // Inspections
+                for (MutableComponent inspection : inspections) {
+                    MutableComponent inspectionText = inspection.copy()
+                            .withStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT).withColor(ChatFormatting.DARK_GREEN));
+
+                    MutableComponent mutableComponent = Component.literal("2")
+                            .withStyle(Style.EMPTY.withFont(VMinusFonts.ICONS).withColor(ChatFormatting.WHITE))
+                            .append(inspectionText);
+                    tooltip.add(mutableComponent);
+                }
+
+                // Flavor text
+                if (hasFlavor) {
+                    MutableComponent flavorText = Component.literal(flavorTranslation)
+                            .withStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT).withColor(VMinusChatFormatting.INDIGO).withItalic(true)); // default font
+
+                    MutableComponent mutableComponent = Component.literal("3")
+                            .withStyle(Style.EMPTY.withFont(VMinusFonts.ICONS).withColor(ChatFormatting.WHITE))
+                            .append(flavorText);
+                    tooltip.add(mutableComponent);
+                }
+
+                MutableComponent mutableComponent = Component.literal("[ALT")
+                        .withStyle(ChatFormatting.DARK_GRAY)
+                        .append(Component.literal("1")
+                                .withStyle(Style.EMPTY.withFont(VMinusFonts.ICONS).withColor(ChatFormatting.WHITE)))
+                        .append(Component.literal("]")
+                                .withStyle(Style.EMPTY.withFont(Style.DEFAULT_FONT).withColor(ChatFormatting.DARK_GRAY))); // reset font
+                tooltip.add(mutableComponent);
             }
         }
+
+
 
     }
 }

@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.server;
 
 import net.lixir.vminus.roles.Role;
-import net.lixir.vminus.roles.RoleManager;
+import net.lixir.vminus.resources.data.RoleManager;
 import net.lixir.vminus.roles.RoleSavedData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;

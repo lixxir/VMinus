@@ -51,7 +51,7 @@ public class ItemEntry extends RegistryEntry<ItemEntry, Item> {
     }
 
     public static @NotNull ItemEntry from(@Nullable BlockEntry blockEntry) {
-        ItemEntry itemEntry = new ItemEntry();
+        ItemEntry itemEntry = of();
         if (blockEntry != null) {
             itemEntry.lang = null;
             itemEntry.tint = blockEntry.tintType;
@@ -65,7 +65,7 @@ public class ItemEntry extends RegistryEntry<ItemEntry, Item> {
     }
 
     public static @NotNull ItemEntry from(Block block) {
-        return from(((BlockEntryAccessor) block).vminus$getEntry());
+        return from(BlockEntry.of(block));
     }
 
     public boolean isEmpty() {

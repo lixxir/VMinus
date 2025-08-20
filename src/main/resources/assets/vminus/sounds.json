@@ -1,8 +1,0 @@
-{
-  "ui.inventory.item.drop": {
-    "sounds": [
-      "vminus:ui/inventory/item/drop.opus"
-    ],
-    "subtitle": "subtitles.ui.inventory.item.drop"
-  }
-}

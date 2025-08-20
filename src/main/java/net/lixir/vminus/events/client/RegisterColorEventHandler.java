@@ -25,36 +25,7 @@ public class RegisterColorEventHandler {
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         for (VRegistry vRegistry : VRegistry.getRegistries()) {
-            /*
-            for (Block block : vRegistry.getBlocks()) {
-                BlockEntryAccessor accessor = (BlockEntryAccessor) block;
-                BlockEntry blockEntry = accessor.vminus$getEntry();
-                if (blockEntry == null)
-                    continue;
-                TintType tint = blockEntry.getItemEntry().getTint();
-                if (tint.equals(TintType.UNSET) || tint.equals(TintType.NONE))
-                    continue;
-
-                BlockItem blockItem = null;
-                for (Item item : ForgeRegistries.ITEMS.getValues()) {
-                    if (item instanceof BlockItem _blockItem && _blockItem.getBlock() == block) {
-                        blockItem = _blockItem;
-                        break;
-                    }
-                }
-                if (blockItem == null)
-                    continue;
-
-                switch (tint) {
-                    case FOLIAGE -> event.register((stack, index) -> index == 0 ? FoliageColor.getDefaultColor() : -1, blockItem);
-                    case GRASS -> event.register((stack, index) -> index == 0 ? GrassColor.getDefaultColor() : -1, blockItem);
-                }
-            }
-
-             */
             for (Item item : vRegistry.getItems()) {
-                if (item instanceof BlockItem)
-                    continue;
                 ItemEntryAccessor accessor = (ItemEntryAccessor) item;
                 ItemEntry itemEntry = accessor.vminus$getEntry();
                 if (itemEntry == null)
@@ -67,9 +38,7 @@ public class RegisterColorEventHandler {
                     case GRASS ->  event.register((stack, tintIndex) -> tintIndex == 0 ? GrassColor.getDefaultColor() : -1, item);
                 }
             }
-
         }
-
     }
 
     @SubscribeEvent
@@ -81,7 +50,7 @@ public class RegisterColorEventHandler {
                 if (blockEntry == null)
                     continue;
                 TintType tintType = blockEntry.getTintType();
-                if (tintType == null || tintType == TintType.UNSET)
+                if (tintType == TintType.UNSET || tintType == TintType.NONE)
                     continue;
                 switch (tintType) {
                     case FOLIAGE -> event.getBlockColors().register(

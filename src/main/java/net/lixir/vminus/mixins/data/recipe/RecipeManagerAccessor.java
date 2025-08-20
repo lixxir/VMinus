@@ -13,7 +13,7 @@ import java.util.Map;
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor {
     @Accessor("recipes")
-    Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> getRecipes();
+    Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> detour$getRecipes();
 
     @Invoker("byType")
     <C extends net.minecraft.world.Container, T extends Recipe<C>> Map<ResourceLocation, T> vminus$getByType(RecipeType<T> type);

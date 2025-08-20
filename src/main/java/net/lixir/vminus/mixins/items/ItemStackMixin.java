@@ -1,9 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.VisionType;
-import net.lixir.vminus.vision.VisionTypes;
+import net.lixir.vminus.vision.*;
+import net.lixir.vminus.vision.util.ItemReplacement;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
 import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
@@ -13,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.extensions.IForgeItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,6 +37,21 @@ public abstract class ItemStackMixin implements IForgeItemStack, VisionDuck {
     public @Nullable ResourceLocation vMinus$getVisionId() {
         return ((VisionDuck) getItem()).vMinus$getVisionId();
     }
+
+    /*
+    @Inject(method = "getItem", at = @At("RETURN"), cancellable = true)
+    private void vMinus$getItem(@NotNull CallbackInfoReturnable<Item> cir) {
+        Item originalItem = cir.getReturnValue();
+        ItemReplacement replacement = Vision.getValue(originalItem, VisionProperties.Items.REPLACE, new VisionContext(originalItem));
+        ItemStack replaced = ItemReplacement.resolve(replacement);
+
+        if (!replaced.isEmpty() && replaced.getItem() != originalItem) {
+            ItemStackAccessor accessor = (ItemStackAccessor) (Object) replaced;
+            cir.setReturnValue(accessor.getDelegate().get());
+        }
+    }
+
+     */
 
     @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
     private void getBarWidth(CallbackInfoReturnable<Integer> cir) {

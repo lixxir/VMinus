@@ -1,8 +1,8 @@
 package net.lixir.vminus.network;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.network.vision.ClientboundVisionListPacket;
 import net.lixir.vminus.network.vision.ClientboundDataResetPacket;
+import net.lixir.vminus.network.vision.ClientboundVisionListPacket;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,39 +30,20 @@ public class VMinusNetwork {
 
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent event) {
-        addNetworkMessage(
-                VariantSyncPacket.class,
-                VariantSyncPacket::encode,
-                VariantSyncPacket::new,
-                VariantSyncPacket::handle);
-        addNetworkMessage(
-                SyncCapePacket.class,
-                SyncCapePacket::encode,
-                SyncCapePacket::decode,
-                SyncCapePacket::handle);
-        addNetworkMessage(ClientboundSightSyncPacket.class,
-                ClientboundSightSyncPacket::encode,
-                ClientboundSightSyncPacket::decode,
-                ClientboundSightSyncPacket::handle);
-        addNetworkMessage(ClientboundDataResetPacket.class,
-                ClientboundDataResetPacket::encode,
-                ClientboundDataResetPacket::decode,
-                ClientboundDataResetPacket::handle);
-        addNetworkMessage(ClientboundVisionListPacket.class,
-                ClientboundVisionListPacket::encode,
-                ClientboundVisionListPacket::decode,
-                ClientboundVisionListPacket::handle);
-        addNetworkMessage(ServerboundJumpPacket.class,
-                ServerboundJumpPacket::encode,
-                ServerboundJumpPacket::decode,
-                ServerboundJumpPacket::handle);
+        register(VariantSyncPacket.class, VariantSyncPacket::encode, VariantSyncPacket::new, VariantSyncPacket::handle);
+        register(SyncCapePacket.class, SyncCapePacket::encode, SyncCapePacket::decode, SyncCapePacket::handle);
+        register(ClientboundSightSyncPacket.class, ClientboundSightSyncPacket::encode, ClientboundSightSyncPacket::decode, ClientboundSightSyncPacket::handle);
+        register(ClientboundDataResetPacket.class, ClientboundDataResetPacket::encode, ClientboundDataResetPacket::decode, ClientboundDataResetPacket::handle);
+        register(ClientboundVisionListPacket.class, ClientboundVisionListPacket::encode, ClientboundVisionListPacket::decode, ClientboundVisionListPacket::handle);
+        register(ServerboundJumpPacket.class, ServerboundJumpPacket::encode, ServerboundJumpPacket::decode, ServerboundJumpPacket::handle);
+        register(RequestCapesPacket.class, RequestCapesPacket::encode, RequestCapesPacket::decode, RequestCapesPacket::handle);
     }
 
 
-    public static <T> void addNetworkMessage(Class<T> messageType,
-                                             BiConsumer<T, FriendlyByteBuf> encoder,
-                                             Function<FriendlyByteBuf, T> decoder,
-                                             BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
+    public static <T> void register(Class<T> messageType,
+                                    BiConsumer<T, FriendlyByteBuf> encoder,
+                                    Function<FriendlyByteBuf, T> decoder,
+                                    BiConsumer<T, Supplier<NetworkEvent.Context>> messageConsumer) {
         CHANNEL.registerMessage(MESSAGE_ID, messageType, encoder, decoder, messageConsumer);
         MESSAGE_ID++;
     }

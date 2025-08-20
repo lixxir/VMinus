@@ -4,7 +4,7 @@ import net.lixir.vminus.VMinus;
 import net.lixir.vminus.entity.VariantEntity;
 import net.lixir.vminus.network.VMinusNetwork;
 import net.lixir.vminus.network.VariantSyncPacket;
-import net.lixir.vminus.sight.resource.SightManager;
+import net.lixir.vminus.resources.data.sight.SightManager;
 import net.lixir.vminus.vision.util.VisionEntityVariant;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;

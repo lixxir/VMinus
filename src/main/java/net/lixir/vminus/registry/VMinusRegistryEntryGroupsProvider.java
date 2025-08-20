@@ -22,6 +22,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
     );
     public static final RegistryEntryGroup<Block> BLOCK = RegistryEntryGroup.create(
             BlockEntry.of()
+                    .model(BlockModel.CUBE_ALL)
                     .lootTable(BlockLootTable.SELF)
     );
     public static final RegistryEntryGroup<Block> FIRE = RegistryEntryGroup.create(
@@ -32,6 +33,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
             BlockEntry.of()
                     .tintType(TintType.NONE)
                     .renderType("cutout")
+                    .lootTable(BlockLootTable.SELF)
                     .itemEntry(ItemEntry.of().tint(TintType.NONE))
     );
     public static final RegistryEntryGroup<Block> GLASS = RegistryEntryGroup.create(
@@ -67,6 +69,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
             BlockEntry.of()
                     .renderType("cutout")
                     .model(BlockModel.CROSS)
+                    .lootTable(BlockLootTable.SELF)
                     .tintType(TintType.NONE)
                     .itemEntry(ItemEntry.of().tint(TintType.NONE))
     );
@@ -74,10 +77,52 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
             BlockEntry.of()
                     .tintType(TintType.NONE)
                     .renderType("cutout")
+                    .lootTable(BlockLootTable.PINK_PETALS)
                     .model(BlockModel.PINK_PETALS)
+    );
+    public static final RegistryEntryGroup<Block> HANGING_SIGN = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.NONE)
+    );
+    public static final RegistryEntryGroup<Block> WALL_HANGING_SIGN = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.NONE)
+    );
+    public static final RegistryEntryGroup<Block> WALL_SIGN = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.NONE)
+    );
+    public static final RegistryEntryGroup<Block> IRON_BARS_BLOCK = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.NONE)
+    );
+    public static final RegistryEntryGroup<Block> SIGN = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.NONE)
+    );
+    public static final RegistryEntryGroup<Block> WOODEN_DOOR = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .modelTextureSuffix("_planks")
+    );
+    public static final RegistryEntryGroup<Block> WOODEN_TRAPDOOR = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .modelTextureSuffix("_planks")
+    );
+    public static final RegistryEntryGroup<Block> TRAPDOOR = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.TRAPDOOR)
+                    .itemEntry(ItemEntry.of().model(ItemModel.BASIC))
+                    .renderType("solid")
+    );
+    public static final RegistryEntryGroup<Block> DOOR = RegistryEntryGroup.create(
+            BlockEntry.of()
+                    .model(BlockModel.DOOR)
+                    .itemEntry(ItemEntry.of().model(ItemModel.BASIC))
+                    .renderType("solid")
     );
     public static final RegistryEntryGroup<Block> DOUBLE_PLANT = RegistryEntryGroup.create(
             BlockEntry.of()
+                    .lootTable(BlockLootTable.DOUBLE_PLANT_SHEARS)
                     .model(BlockModel.DOUBLE_CROSS)
     );
     public static final RegistryEntryGroup<Block> BUSH = RegistryEntryGroup.create(
@@ -85,6 +130,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
                     .renderType("cutout")
                     .tintType(TintType.GRASS)
                     .model(BlockModel.CROSS)
+                    .lootTable(BlockLootTable.SHEARS)
                     .itemEntry(ItemEntry.of().tint(TintType.GRASS))
     );
     public static final RegistryEntryGroup<Block> FLOWER = RegistryEntryGroup.create(
@@ -93,12 +139,14 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
                     .tags(BlockTags.SMALL_FLOWERS)
                     .model(BlockModel.CROSS)
                     .tintType(TintType.NONE)
+                    .lootTable(BlockLootTable.SELF)
                     .itemEntry(ItemEntry.of().tags(ItemTags.SMALL_FLOWERS).tint(TintType.NONE))
     );
     public static final RegistryEntryGroup<Block> ROOTS = RegistryEntryGroup.create(
             BlockEntry.of()
                     .renderType("cutout")
                     .tintType(TintType.NONE)
+                    .lootTable(BlockLootTable.SELF)
                     .model(BlockModel.CROSS)
                     .itemEntry(ItemEntry.of().tint(TintType.NONE))
     );
@@ -202,6 +250,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
             BlockEntry.of()
                     .tags(BlockTags.LEAVES)
                     .tintType(TintType.FOLIAGE)
+                    .lootTable(BlockLootTable.SHEARS)
                     .renderType("cutout_mipped")
                     .model(BlockModel.TINTED_CUBE_ALL)
                     .itemEntry(ItemEntry.of().tint(TintType.FOLIAGE).tags(ItemTags.LEAVES))
@@ -227,6 +276,14 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
 
     @Override
     public void run() {
+        assign(WALL_HANGING_SIGN, WallHangingSignBlock.class);
+        assign(HANGING_SIGN, CeilingHangingSignBlock.class);
+        assign(WALL_SIGN, WallSignBlock.class);
+        assign(SIGN, StandingSignBlock.class);
+        assign(WOODEN_DOOR, WoodenDoorBlock.class);
+        assign(WOODEN_TRAPDOOR, WoodenTrapdoorBlock.class);
+        assign(TRAPDOOR, TrapDoorBlock.class);
+        assign(DOOR, DoorBlock.class);
         assign(PINK_PETALS, PinkPetalsBlock.class);
         assign(BLOCK, Block.class);
         assign(WOODEN_FENCE_GATE, WoodenFenceGateBlock.class);
@@ -236,6 +293,7 @@ public class VMinusRegistryEntryGroupsProvider extends RegistryEntryGroupsProvid
         assign(GRASS_BLOCK, GrassBlock.class);
         assign(WOOL_CARPET, WoolCarpetBlock.class);
         assign(CARPET, CarpetBlock.class);
+        assign(IRON_BARS_BLOCK, IronBarsBlock.class);
         assign(GLASS, AbstractGlassBlock.class);
         assign(STAINED_GLASS, StainedGlassBlock.class);
         assign(LOG, LogBlock.class);

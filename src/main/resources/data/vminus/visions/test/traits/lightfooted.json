@@ -1,7 +1,0 @@
-{
-  "item": "minecraft:leather_boots",
-  "trait": {
-    "id": "vminus:lightfooted",
-    "value": true
-  }
-}

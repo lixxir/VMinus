@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "type": "reference",
+      "id": "vminus:include/icons",
+      "filter": {
+        "uniform": false
+      }
+    }
+  ]
+}

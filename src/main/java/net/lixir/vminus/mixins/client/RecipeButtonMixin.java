@@ -2,6 +2,7 @@ package net.lixir.vminus.mixins.client;
 
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionProperties;
+import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.client.gui.screens.recipebook.RecipeButton;
 import net.minecraft.world.item.ItemStack;
@@ -22,13 +23,13 @@ public abstract class RecipeButtonMixin {
     private final RecipeButton vminus$recipeButton = (RecipeButton) (Object) this;
 
 
+
     @Inject(method = "getOrderedRecipes", at = @At("RETURN"), cancellable = true)
     private void vminus$filterOrdered(@NotNull CallbackInfoReturnable<List<Recipe<?>>> cir) {
         List<Recipe<?>> filtered = cir.getReturnValue().stream()
                 .filter(recipe -> {
                     ItemStack result = recipe.getResultItem(vminus$recipeButton.getCollection().registryAccess());
-                    Boolean ban = Vision.get(result).getValue(VisionProperties.Items.BAN, new VisionContext(result));
-                    return ban == null || !ban;
+                    return !VisionUtils.isBanned(result);
                 })
                 .toList();
 

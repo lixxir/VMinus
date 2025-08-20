@@ -5,6 +5,7 @@
   "refmap": "mixins.vminus.refmap.json",
   "mixins": [
     "ChatFormattingMixin",
+    "ItemPredicateMixin",
     "block.BlockBehaviorMixin",
     "block.BlockMixin",
     "block.BlockStateBaseMixin",
@@ -16,16 +17,14 @@
     "core.registries.BuiltInRegistriesMixin",
     "crafting.CompoundIngredientMixin",
     "crafting.CustomRecipeMixin",
-    "crafting.DifferenceIngredientMixin",
-    "crafting.IngredientAccessor",
     "crafting.IngredientMixin",
-    "crafting.IntersectionIngredientMixin",
     "crafting.ShapedRecipeMixin",
     "crafting.ShapelessRecipeMixin",
     "creative.CreativeModeTabMixin",
     "creative.CreativeModeTabRegistryMixin",
     "creative.CreativeModeTabsMixin",
     "creative.CreativeTabModeAccessor",
+    "data.ReloadableServerResourcesMixin",
     "data.language.LanguageProviderAccessor",
     "data.recipe.RecipeManagerAccessor",
     "data.recipe.RecipeManagerMixin",
@@ -92,7 +91,6 @@
     "items.SolidBucketItemMixin",
     "level.LevelChunkMixin",
     "level.LevelChunkSectionMixin",
-    "server.ReloadableServerResourcesMixin",
     "server.ServerGamePacketListenerImplMixin",
     "server.SimpleJsonResourceReloadListenerAccessor",
     "world.SimpleContainerMixin",
@@ -119,8 +117,7 @@
     "client.sounds.SoundBufferLibraryAccessor",
     "client.sounds.SoundBufferLibraryMixin",
     "client.sounds.SoundManagerPreparationsMixin",
-    "client.sounds.SoundMixin",
-    "crafting.RecipeCollectionMixin"
+    "client.sounds.SoundMixin"
   ],
   "minVersion": "0.8"
 }

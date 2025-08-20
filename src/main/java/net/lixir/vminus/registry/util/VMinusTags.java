@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class VMinusTags {
     public static class Blocks {
-        public static final TagKey<Block> WOODEN_FENCE_GATES = tag("soul_torches");
+        public static final TagKey<Block> WOODEN_FENCE_GATES = tag("wooden_fence_gates");
         public static final TagKey<Block> REDSTONE_TORCHES = tag("redstone_torches");
         public static final TagKey<Block> SOUL_TORCHES = tag("soul_torches");
         public static final TagKey<Block> TORCHES = tag("torches");
@@ -49,19 +49,19 @@ public class VMinusTags {
         public static final TagKey<Block> DEAD_CORAL_FANS = tag("dead_coral_fans");
 
         private static @NotNull TagKey<Block> tag(String name) {
-            return BlockTags.create(new ResourceLocation(VMinus.ID, name));
+            return BlockTags.create(ResourceLocation.fromNamespaceAndPath(VMinus.ID, name));
         }
     }
 
     public static class DamageTypes {
-        public static final TagKey<DamageType> BLUNT_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/blunt"));
-        public static final TagKey<DamageType> BLAST_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/blast"));
-        public static final TagKey<DamageType> FALL_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/fall"));
-        public static final TagKey<DamageType> FIRE_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/fire"));
-        public static final TagKey<DamageType> MAGIC_DAMAGE = create(new ResourceLocation(VMinus.ID, "protection/magic"));
+        public static final TagKey<DamageType> BLUNT_DAMAGE = tag("protection/blunt");
+        public static final TagKey<DamageType> BLAST_DAMAGE = tag("protection/blast");
+        public static final TagKey<DamageType> FALL_DAMAGE = tag("protection/fall");
+        public static final TagKey<DamageType> FIRE_DAMAGE = tag("protection/fire");
+        public static final TagKey<DamageType> MAGIC_DAMAGE = tag("protection/magic");
 
-        private static @NotNull TagKey<DamageType> create(ResourceLocation p_203849_) {
-            return TagKey.create(Registries.DAMAGE_TYPE, p_203849_);
+        private static @NotNull TagKey<DamageType> tag(String id) {
+            return TagKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(VMinus.ID, id));
         }
     }
 
@@ -74,11 +74,12 @@ public class VMinusTags {
     }
 
     public static class Entities {
-        public static final TagKey<EntityType<?>> ZOMBIES = create(new ResourceLocation(VMinus.ID, "zombies"));
-        public static final TagKey<EntityType<?>> BANNED = create(new ResourceLocation(VMinus.ID, "banned"));
+        public static final TagKey<EntityType<?>> ZOMBIES = tag("zombies");
+        public static final TagKey<EntityType<?>> BANNED = tag("banned");
+        public static final TagKey<EntityType<?>> CREATIVE_ONLY = tag("creative_only");
 
-        private static @NotNull TagKey<EntityType<?>> create(ResourceLocation p_203849_) {
-            return TagKey.create(Registries.ENTITY_TYPE, p_203849_);
+        private static @NotNull TagKey<EntityType<?>> tag(String name) {
+            return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(VMinus.ID, name));
         }
     }
 
@@ -128,9 +129,10 @@ public class VMinusTags {
         public static final TagKey<Item> DEAD_CORALS = tag("dead_corals");
         public static final TagKey<Item> DEAD_CORAL_FANS = tag("dead_coral_fans");
         public static final TagKey<Item> WOODEN_FENCE_GATES = tag("wooden_fence_gates");
+        public static final TagKey<Item> CREATIVE_ONLY = tag("creative_only");
 
         private static @NotNull TagKey<Item> tag(String name) {
-            return ItemTags.create(new ResourceLocation(VMinus.ID, name));
+            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(VMinus.ID, name));
         }
     }
 }
