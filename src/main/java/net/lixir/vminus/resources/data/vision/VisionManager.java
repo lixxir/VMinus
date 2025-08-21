@@ -26,6 +26,7 @@ import java.util.*;
 @SuppressWarnings("deprecated")
 public class VisionManager<T> extends SimpleJsonResourceReloadListener {
     private static final Set<VisionManager<?>> VISION_MANAGERS = new HashSet<>();
+    protected final Map<ResourceLocation, Vision> idToVisionMap = new HashMap<>();
     private final ICondition.IContext context;
     private final String directory;
     private final String singleListName;
@@ -33,7 +34,6 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
     private final Gson gson;
     private final VisionType<T> visionType;
     private final Registry<T> registry;
-    protected final Map<ResourceLocation, Vision> idToVisionMap = new HashMap<>();
 
     public VisionManager(@NotNull VisionType<T> visionType, Registry<T> registry, ICondition.IContext context) {
         super(new GsonBuilder()
@@ -50,6 +50,14 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
         this.registry = registry;
         this.gson = ((SimpleJsonResourceReloadListenerAccessor) this).getGson();
         VISION_MANAGERS.add(this);
+    }
+
+    public static void clearVisionManagers() {
+        VISION_MANAGERS.clear();
+    }
+
+    public static @NotNull @UnmodifiableView Set<VisionManager<?>> getVisionManagers() {
+        return VISION_MANAGERS;
     }
 
     @Override
@@ -91,7 +99,7 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
             if (id == null)
                 continue;
 
-            ((VisionDuck)value).vMinus$setVisionId(id);
+            ((VisionDuck) value).vMinus$setVisionId(id);
             VisionEntry<T> mergedEntry = buildMergedEntry(value, id.toString(), visionEntries);
 
             if (!mergedEntry.isEmpty()) {
@@ -116,19 +124,12 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
     private void loadVisionEntry(String source, JsonElement element, List<VisionEntry<T>> outputList) {
         try {
             JsonObject processed = VisionFormatter.processJson(singleListName, multiListName, element);
-            VisionEntry<T> entry = gson.fromJson(processed, new TypeToken<VisionEntry<T>>() {}.getType());
+            VisionEntry<T> entry = gson.fromJson(processed, new TypeToken<VisionEntry<T>>() {
+            }.getType());
             outputList.add(entry);
         } catch (Exception e) {
             VMinus.LOGGER.error("Failed to load VisionEntry from '{}': {}", source, e.getMessage());
         }
-    }
-
-    public static void clearVisionManagers() {
-        VISION_MANAGERS.clear();
-    }
-
-    public static @NotNull @UnmodifiableView Set<VisionManager<?>> getVisionManagers() {
-        return VISION_MANAGERS;
     }
 
     public Set<Map.Entry<ResourceLocation, Vision>> getVisionEntries() {

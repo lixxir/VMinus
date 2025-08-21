@@ -11,13 +11,13 @@ public class VisionFormatter {
 
         if (!jsonFileObject.has(multiListName))
             jsonFileObject.add(multiListName, new JsonArray());
-        // Wrap single keys in a list
+        // Wrap single keys if they exist into lists for further formatting
         keyToArray(jsonFileObject, singleListName, multiListName);
         keyToArray(jsonFileObject, "tag", multiListName);
 
         JsonObject processedJsonObject = new JsonObject();
 
-        // Add the list back if it existed.
+        // Add the list back if it existed
         if (jsonFileObject.has(multiListName) && jsonFileObject.get(multiListName).isJsonArray())
             processedJsonObject.add(multiListName, jsonFileObject.get(multiListName));
 

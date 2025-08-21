@@ -16,7 +16,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.*;
 
 public class VisionProperties {
-    public static void init() { // Need to force load these classes or else the properties will not get registered.
+    public static void init() { // Need to force load these classes or else the properties will not get registered
         Class<?>[] classes = {
                 Items.class,
                 Effects.class,
@@ -28,7 +28,7 @@ public class VisionProperties {
             try {
                 Class.forName(clazz.getName());
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("Failed to load VisionPropertyTypes nested class: " + clazz.getName(), e);
+                throw new RuntimeException("Failed to load VisionPropertyTypes inner class: " + clazz.getName(), e);
             }
         }
     }
@@ -55,86 +55,61 @@ public class VisionProperties {
     }
 
     public static class Items {
-        public static final VisionProperty<VisionFoodProperties> FOOD = itemProperty(VisionProperty.create("food", VisionCodecs.FOOD_PROPERTIES));
-        public static final VisionProperty<SoundEvent> COLLECT_SOUND = itemProperty(VisionProperty.create("collect_sound", VisionCodecs.SOUND_EVENT));
-        public static final VisionProperty<UseAnim> USE_ANIMATION = itemProperty(VisionProperty.create("use_animation", VisionCodecs.USE_ANIMATION));
-        public static final VisionProperty<Integer> MAX_DAMAGE = itemProperty(VisionProperty.create("max_damage", VisionCodecs.INTEGER));
-        public static final VisionProperty<Integer> MAX_STACK_SIZE = itemProperty(VisionProperty.create("max_stack_size", VisionCodecs.INTEGER));
-        public static final VisionProperty<Integer> USE_TICKS = itemProperty(VisionProperty.create("use_ticks", VisionCodecs.INTEGER));
-        public static final VisionProperty<Integer> MAX_USE_TICKS = itemProperty(VisionProperty.create("max_use_ticks", VisionCodecs.INTEGER));
-        public static final VisionProperty<Integer> FUEL_TICKS = itemProperty(VisionProperty.create("fuel_ticks", VisionCodecs.INTEGER));
-        public static final VisionProperty<Integer> ENCHANTABILITY = itemProperty(VisionProperty.create("enchantability", VisionCodecs.INTEGER));
-        public static final VisionProperty<Boolean> GLINT = itemProperty(VisionProperty.create("glint", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> ENCHANTABLE = itemProperty(VisionProperty.create("enchantable", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> FIRE_RESISTANT = itemProperty(VisionProperty.create("fire_resistant", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> CAN_EQUIP = itemProperty(VisionProperty.create("can_equip", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> BAN = itemProperty(VisionProperty.create("ban", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<ItemStackWrapper> USE_REMAINDER = itemProperty(VisionProperty.create("use_remainder", VisionCodecs.ITEM_STACK));
-        public static final VisionProperty<ItemReplacement> REPLACE = itemProperty(VisionProperty.create("replace", VisionCodecs.ITEM_REPLACEMENT));
-        public static final VisionProperty<EquipmentSlot> EQUIP_SLOT = itemProperty(VisionProperty.create("equip_slot", VisionCodecs.EQUIP_SLOT));
-        public static final VisionProperty<Rarity> RARITY = itemProperty(VisionProperty.create("rarity", VisionCodecs.RARITY));
-        public static final VisionProperty<VisionAttribute> ATTRIBUTE = itemProperty(VisionProperty.create("attribute", VisionCodecs.ATTRIBUTE));
+        public static final VisionProperty<VisionFoodProperties> FOOD = register(VisionTypes.ITEM, VisionProperty.create("food", VisionCodecs.FOOD_PROPERTIES));
+        public static final VisionProperty<SoundEvent> COLLECT_SOUND = register(VisionTypes.ITEM, VisionProperty.create("collect_sound", VisionCodecs.SOUND_EVENT));
+        public static final VisionProperty<UseAnim> USE_ANIMATION = register(VisionTypes.ITEM, VisionProperty.create("use_animation", VisionCodecs.USE_ANIMATION));
+        public static final VisionProperty<Integer> MAX_DAMAGE = register(VisionTypes.ITEM, VisionProperty.create("max_damage", VisionCodecs.INTEGER));
+        public static final VisionProperty<Integer> MAX_STACK_SIZE = register(VisionTypes.ITEM, VisionProperty.create("max_stack_size", VisionCodecs.INTEGER));
+        public static final VisionProperty<Integer> USE_TICKS = register(VisionTypes.ITEM, VisionProperty.create("use_ticks", VisionCodecs.INTEGER));
+        public static final VisionProperty<Integer> MAX_USE_TICKS = register(VisionTypes.ITEM, VisionProperty.create("max_use_ticks", VisionCodecs.INTEGER));
+        public static final VisionProperty<Integer> FUEL_TICKS = register(VisionTypes.ITEM, VisionProperty.create("fuel_ticks", VisionCodecs.INTEGER));
+        public static final VisionProperty<Integer> ENCHANTABILITY = register(VisionTypes.ITEM, VisionProperty.create("enchantability", VisionCodecs.INTEGER));
+        public static final VisionProperty<Boolean> GLINT = register(VisionTypes.ITEM, VisionProperty.create("glint", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> ENCHANTABLE = register(VisionTypes.ITEM, VisionProperty.create("enchantable", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> FIRE_RESISTANT = register(VisionTypes.ITEM, VisionProperty.create("fire_resistant", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> CAN_EQUIP = register(VisionTypes.ITEM, VisionProperty.create("can_equip", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> BAN = register(VisionTypes.ITEM, VisionProperty.create("ban", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<ItemStackWrapper> USE_REMAINDER = register(VisionTypes.ITEM, VisionProperty.create("use_remainder", VisionCodecs.ITEM_STACK));
+        public static final VisionProperty<ItemReplacement> REPLACE = register(VisionTypes.ITEM, VisionProperty.create("replace", VisionCodecs.ITEM_REPLACEMENT));
+        public static final VisionProperty<EquipmentSlot> EQUIP_SLOT = register(VisionTypes.ITEM, VisionProperty.create("equip_slot", VisionCodecs.EQUIP_SLOT));
+        public static final VisionProperty<Rarity> RARITY = register(VisionTypes.ITEM, VisionProperty.create("rarity", VisionCodecs.RARITY));
+        public static final VisionProperty<VisionAttribute> ATTRIBUTE = register(VisionTypes.ITEM, VisionProperty.create("attribute", VisionCodecs.ATTRIBUTE));
     }
 
     public static class Effects {
-        public static final VisionProperty<MobEffectCategory> CATEGORY = effectProperty(VisionProperty.create("category", VisionCodecs.EFFECT_CATEGORY));
-        public static final VisionProperty<Integer> COLOR = effectProperty(VisionProperty.create("color", VisionCodecs.HEX));
-        public static final VisionProperty<Boolean> BAN = effectProperty(VisionProperty.create("ban", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<MobEffectCategory> CATEGORY = register(VisionTypes.EFFECT, VisionProperty.create("category", VisionCodecs.EFFECT_CATEGORY));
+        public static final VisionProperty<Integer> COLOR = register(VisionTypes.EFFECT, VisionProperty.create("color", VisionCodecs.HEX));
+        public static final VisionProperty<Boolean> BAN = register(VisionTypes.EFFECT, VisionProperty.create("ban", VisionCodecs.BOOLEAN));
     }
 
     public static class Tabs {
-        public static final VisionProperty<ItemStackWrapper> ICON = tabProperty(VisionProperty.create("icon", VisionCodecs.ITEM_STACK));
-        public static final VisionProperty<Boolean> HIDE = tabProperty(VisionProperty.create("hide", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<CreativeOrder> ORDER = tabProperty(VisionProperty.create("order", VisionCodecs.CREATIVE_ORDER));
-        public static final VisionProperty<ItemReplacement> REMOVE = tabProperty(VisionProperty.create("remove", VisionCodecs.ITEM_REPLACEMENT));
+        public static final VisionProperty<ItemStackWrapper> ICON = register(VisionTypes.TAB, VisionProperty.create("icon", VisionCodecs.ITEM_STACK));
+        public static final VisionProperty<Boolean> HIDE = register(VisionTypes.TAB, VisionProperty.create("hide", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<CreativeOrder> ORDER = register(VisionTypes.TAB, VisionProperty.create("order", VisionCodecs.CREATIVE_ORDER));
+        public static final VisionProperty<ItemReplacement> REMOVE = register(VisionTypes.TAB, VisionProperty.create("remove", VisionCodecs.ITEM_REPLACEMENT));
     }
 
     public static class Entities {
-        public static final VisionProperty<VisionEntityVariant> VARIANT = entityProperty(VisionProperty.create("variant", VisionCodecs.ENTITY_VARIANT));
-        public static final VisionProperty<Boolean> BAN = entityProperty(VisionProperty.create("ban", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> SILENT = entityProperty(VisionProperty.create("silent", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> DAMPENS_VIBRATION = entityProperty(VisionProperty.create("dampens_vibration", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<BaseAttribute> BASE_ATTRIBUTE = entityProperty(VisionProperty.create("base_attribute", VisionCodecs.BASE_ATTRIBUTE, false));
+        public static final VisionProperty<VisionEntityVariant> VARIANT = register(VisionTypes.ENTITY, VisionProperty.create("variant", VisionCodecs.ENTITY_VARIANT));
+        public static final VisionProperty<Boolean> BAN = register(VisionTypes.ENTITY, VisionProperty.create("ban", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> SILENT = register(VisionTypes.ENTITY, VisionProperty.create("silent", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> DAMPENS_VIBRATION = register(VisionTypes.ENTITY, VisionProperty.create("dampens_vibration", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<BaseAttribute> BASE_ATTRIBUTE = register(VisionTypes.ENTITY, VisionProperty.create("base_attribute", VisionCodecs.BASE_ATTRIBUTE, false));
     }
 
     public static class Blocks {
-        public static final VisionProperty<Float> SPEED_FACTOR = blockProperty(VisionProperty.create("speed_factor", VisionCodecs.FLOAT));
-        public static final VisionProperty<Float> JUMP_FACTOR = blockProperty(VisionProperty.create("jump_factor", VisionCodecs.FLOAT));
-        public static final VisionProperty<Float> BLAST_RESISTANCE = blockProperty(VisionProperty.create("blast_resistance", VisionCodecs.FLOAT));
-        public static final VisionProperty<Float> BREAK_SPEED = blockProperty(VisionProperty.create("break_speed", VisionCodecs.FLOAT));
-        public static final VisionProperty<Float> FRICTION = blockProperty(VisionProperty.create("friction", VisionCodecs.FLOAT));
-        public static final VisionProperty<Boolean> BAN = blockProperty(VisionProperty.create("ban", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Block> REPLACE = blockProperty(VisionProperty.create("replace", VisionCodecs.BLOCK));
-        public static final VisionProperty<Boolean> EMISSIVE = blockProperty(VisionProperty.create("emissive", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> OCCLUDE = blockProperty(VisionProperty.create("occlude", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Boolean> REDSTONE_CONDUCTOR = blockProperty(VisionProperty.create("redstone_conductor", VisionCodecs.BOOLEAN));
-        public static final VisionProperty<Integer> LIGHT_LEVEL = blockProperty(VisionProperty.create("light_level", VisionCodecs.INTEGER));
-        public static final VisionProperty<SoundType> SOUND = blockProperty(VisionProperty.create("sound", VisionCodecs.SOUND_TYPE));
-    }
-
-    @Contract("_ -> param1")
-    public static <V> @NotNull VisionProperty<V> itemProperty(VisionProperty<V> property) {
-        return register(VisionTypes.ITEM, property);
-    }
-
-    @Contract("_ -> param1")
-    public static <V> @NotNull VisionProperty<V> blockProperty(VisionProperty<V> property) {
-        return register(VisionTypes.BLOCK, property);
-    }
-
-    @Contract("_ -> param1")
-    public static <V> @NotNull VisionProperty<V> entityProperty(VisionProperty<V> property) {
-        return register(VisionTypes.ENTITY, property);
-    }
-
-    @Contract("_ -> param1")
-    public static <V> @NotNull VisionProperty<V> effectProperty(VisionProperty<V> property) {
-        return register(VisionTypes.EFFECT, property);
-    }
-
-    @Contract("_ -> param1")
-    public static <V> @NotNull VisionProperty<V> tabProperty(VisionProperty<V> property) {
-        return register(VisionTypes.TAB, property);
+        public static final VisionProperty<Float> SPEED_FACTOR = register(VisionTypes.BLOCK, VisionProperty.create("speed_factor", VisionCodecs.FLOAT));
+        public static final VisionProperty<Float> JUMP_FACTOR = register(VisionTypes.BLOCK, VisionProperty.create("jump_factor", VisionCodecs.FLOAT));
+        public static final VisionProperty<Float> BLAST_RESISTANCE = register(VisionTypes.BLOCK, VisionProperty.create("blast_resistance", VisionCodecs.FLOAT));
+        public static final VisionProperty<Float> BREAK_SPEED = register(VisionTypes.BLOCK, VisionProperty.create("break_speed", VisionCodecs.FLOAT));
+        public static final VisionProperty<Float> FRICTION = register(VisionTypes.BLOCK, VisionProperty.create("friction", VisionCodecs.FLOAT));
+        public static final VisionProperty<Boolean> BAN = register(VisionTypes.BLOCK, VisionProperty.create("ban", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Block> REPLACE = register(VisionTypes.BLOCK, VisionProperty.create("replace", VisionCodecs.BLOCK));
+        public static final VisionProperty<Boolean> EMISSIVE = register(VisionTypes.BLOCK, VisionProperty.create("emissive", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> OCCLUDE = register(VisionTypes.BLOCK, VisionProperty.create("occlude", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Boolean> REDSTONE_CONDUCTOR = register(VisionTypes.BLOCK, VisionProperty.create("redstone_conductor", VisionCodecs.BOOLEAN));
+        public static final VisionProperty<Integer> LIGHT_LEVEL = register(VisionTypes.BLOCK, VisionProperty.create("light_level", VisionCodecs.INTEGER));
+        public static final VisionProperty<SoundType> SOUND = register(VisionTypes.BLOCK, VisionProperty.create("sound", VisionCodecs.SOUND_TYPE));
     }
 
     private record Key(VisionType<?> type, String id) {}

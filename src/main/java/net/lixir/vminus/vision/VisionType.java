@@ -17,21 +17,21 @@ public final class VisionType<T> {
     private final String id;
     private final String multiList;
     private final Registry<? extends T> registry;
-    private final Function<ResourceLocation, ?> registryGetter;
     private final BiConsumer<Object, ResourceLocation> visionSetter;
 
-    public VisionType(
-            String id,
-            String multiList,
-            Registry<? extends T> registry,
-            Function<ResourceLocation, ?> registryGetter,
-            BiConsumer<Object, ResourceLocation> visionSetter
-    ) {
+    // Method for simple plural ids
+    public VisionType(String id, Registry<? extends T> registry) {
+        this.id = id;
+        this.multiList = id + "s";
+        this.registry = registry;
+        this.visionSetter = (obj, id2) -> ((VisionDuck) obj).vMinus$setVisionId(id2);
+    }
+
+    public VisionType(String id, String multiList, Registry<? extends T> registry) {
         this.id = id;
         this.multiList = multiList;
         this.registry = registry;
-        this.registryGetter = registryGetter;
-        this.visionSetter = visionSetter;
+        this.visionSetter = (obj, id2) -> ((VisionDuck) obj).vMinus$setVisionId(id2);
     }
 
     private final Map<ResourceLocation, Vision> visions = new HashMap<>();
@@ -78,10 +78,6 @@ public final class VisionType<T> {
         return registry;
     }
 
-    public Function<ResourceLocation, ?> getRegistryGetter() {
-        return registryGetter;
-    }
-
     public BiConsumer<Object, ResourceLocation> getVisionSetter() {
         return visionSetter;
     }
@@ -96,13 +92,12 @@ public final class VisionType<T> {
         return Objects.equals(this.id, that.id) &&
                 Objects.equals(this.multiList, that.multiList) &&
                 Objects.equals(this.registry, that.registry) &&
-                Objects.equals(this.registryGetter, that.registryGetter) &&
                 Objects.equals(this.visionSetter, that.visionSetter);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, multiList, registry, registryGetter, visionSetter);
+        return Objects.hash(id, multiList, registry, visionSetter);
     }
 
     @Contract(pure = true)

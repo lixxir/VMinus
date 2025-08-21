@@ -78,7 +78,7 @@ public class ClientboundVisionListPacket {
                 for (ResourceLocation id : ids) {
                     try {
                         Vision.decode(id, tag, visionType);
-                        Object target = visionType.getRegistryGetter().apply(id);
+                        Object target = visionType.getRegistry().get(id);
                         if (target != null) {
                             visionType.getVisionSetter().accept(target, id);
                         }

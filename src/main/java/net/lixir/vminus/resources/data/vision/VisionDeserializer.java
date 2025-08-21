@@ -29,17 +29,16 @@ public class VisionDeserializer<T> implements JsonDeserializer<VisionEntry<T>> {
         VisionEntry<T> visionEntry = new VisionEntry<>();
         visionEntry.addEntries(VisionFormatter.getEntries(listName, jsonObject));
 
-        List<VisionProperty<?>> propertyTypes = VisionProperties.fromVisionType(visionType);
-        if (visionEntry.getEntries().contains("villager")) {
-            VMinus.LOGGER.info("Is villager and {}", propertyTypes);
-        }
-
-        for (VisionProperty<?> property : propertyTypes) {
-            String propertyId = property.getId();
-            if (jsonObject.has(propertyId)) {
+        // Gathers all available vision properties based on vision type
+        List<VisionProperty<?>> visionProperties = VisionProperties.fromVisionType(visionType);
+        for (VisionProperty<?> property : visionProperties) {
+            String id = property.getId();
+            // Checks if the vision contains the id of the VisionProperty
+            if (jsonObject.has(id)) {
                 VisionCodec<?> propertyCodec = property.getCodec();
-                List<? extends VisionValue<?>> parsedList = propertyCodec.decode(jsonObject, propertyId);
-                visionEntry.addValues(propertyId, parsedList);
+                // Uses codec from VisionProperty to parse values
+                List<? extends VisionValue<?>> parsedList = propertyCodec.decode(jsonObject, id);
+                visionEntry.addValues(id, parsedList);
             }
         }
         return visionEntry;

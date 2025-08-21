@@ -5,6 +5,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.UseAnim;
 
 public class VisionCodecs {
+    // Collection of static instances of VisionCodecs for parsing values from JSONs
     public static final VisionIntegerCodec INTEGER = new VisionIntegerCodec();
     public static final VisionFloatCodec FLOAT = new VisionFloatCodec();
     public static final VisionDoubleCodec DOUBLE = new VisionDoubleCodec();

@@ -16,8 +16,6 @@ public abstract class VisionCodec<V> {
     protected VisionCodec() {
     }
 
-    public abstract Class<V> getClassType();
-
     protected static ResourceLocation parseResourceLocation(String key, JsonObject jsonObject) throws JsonParseException {
         return parseResourceLocation("value", key, jsonObject);
     }
@@ -63,6 +61,8 @@ public abstract class VisionCodec<V> {
         }
         return fallback;
     }
+
+    public abstract Class<V> getClassType();
 
     public abstract @Nullable List<VisionValue<V>> decode(JsonObject jsonObject, String key) throws JsonParseException;
 
