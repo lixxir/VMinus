@@ -1,79 +1,85 @@
 package net.lixir.vminus.mixins.block;
 
-import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
-import net.lixir.vminus.vision.VisionDuck;
-import net.lixir.vminus.vision.VisionProperties;
-import net.lixir.vminus.vision.VisionType;
-import net.lixir.vminus.vision.VisionTypes;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.lixir.vminus.api.registry.definition.BlockDefinition;
+import net.lixir.vminus.api.registry.definition.duck.BlockDefinitionDuck;
+import net.lixir.vminus.vision.*;
+import net.lixir.vminus.vision.util.ItemReplacement;
 import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockState;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Block.class)
-public class BlockMixin implements VisionDuck, BlockEntryAccessor {
+public class BlockMixin implements VisionDuck, BlockDefinitionDuck {
     @Unique
     private final Block vMinus$self = (Block) (Object) this;
 
     @Unique
-    private BlockEntry vMinus$blockEntry = null;
+    private BlockDefinition vMinus$blockDefinition = null;
 
     @Unique
     private ResourceLocation vMinus$visionId = null;
 
-    @Inject(method = "getSpeedFactor", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getSpeedFactor(CallbackInfoReturnable<Float> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.SPEED_FACTOR, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getCloneItemStack", at = @At("RETURN"))
+    private ItemStack vMinus$getCloneItemStack(ItemStack original) {
+        ItemStack replacement = ItemReplacement.resolve(original);
+        if (!replacement.isEmpty()) {
+            return replacement;
+        }
+        return original;
     }
 
-    @Inject(method = "getFriction", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getFriction(CallbackInfoReturnable<Float> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.FRICTION, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getSpeedFactor", at = @At("RETURN"))
+    private float vMinus$getSpeedFactor(float original) {
+        return Vision.getValue(vMinus$self, VisionProperties.Blocks.SPEED_FACTOR, original);
     }
 
-    @Inject(method = "getJumpFactor", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getJumpFactor(CallbackInfoReturnable<Float> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.JUMP_FACTOR, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getFriction", at = @At("RETURN"))
+    private float vMinus$getFriction(float original) {
+        return Vision.getValue(vMinus$self, VisionProperties.Blocks.FRICTION, original);
     }
 
-    @Inject(method = "getExplosionResistance", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getExplosionResistance(CallbackInfoReturnable<Float> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Blocks.BLAST_RESISTANCE, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getJumpFactor", at = @At("RETURN"))
+    private float vMinus$getJumpFactor(float original) {
+        return Vision.getValue(vMinus$self, VisionProperties.Blocks.JUMP_FACTOR, original);
+    }
+
+    @ModifyReturnValue(method = "getExplosionResistance", at = @At("RETURN"))
+    private float vMinus$getExplosionResistance(float original) {
+        return Vision.getValue(vMinus$self, VisionProperties.Blocks.BLAST_RESISTANCE, original);
     }
 
     @SuppressWarnings("deprecation")
-    @Inject(method = "getSoundType", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getSoundType(BlockState state, @NotNull CallbackInfoReturnable<SoundType> cir) {
-        SoundType original = cir.getReturnValue();
+    @ModifyReturnValue(method = "getSoundType", at = @At("RETURN"))
+    private SoundType vMinus$getSoundType(SoundType original) {
         SoundType override = VisionUtils.getOverrideValue(this, VisionProperties.Blocks.SOUND, new VisionContext(vMinus$self));
 
         if (override != null) {
             float volume = override.getVolume() != 0.0F ? override.getVolume() : original.getVolume();
             float pitch = override.getPitch() != 0.0F ? override.getPitch() : original.getPitch();
-            cir.setReturnValue(new SoundType(volume, pitch, override.getBreakSound(), override.getStepSound(), override.getPlaceSound(), override.getHitSound(), override.getFallSound()));
+            return new SoundType(volume, pitch, override.getBreakSound(), override.getStepSound(), override.getPlaceSound(), override.getHitSound(), override.getFallSound());
         }
+        return original;
     }
 
 
     @Override
-    public void vminus$setEntry(BlockEntry blockEntry) {
-        this.vMinus$blockEntry = blockEntry;
+    public void vMinus$setDefinition(@Nullable BlockDefinition blockDefinition) {
+        this.vMinus$blockDefinition = blockDefinition;
     }
 
+    @Nullable
     @Override
-    public BlockEntry vminus$getEntry() {
-        return vMinus$blockEntry;
+    public BlockDefinition vMinus$getDefinition() {
+        return vMinus$blockDefinition;
     }
 
     @Override
