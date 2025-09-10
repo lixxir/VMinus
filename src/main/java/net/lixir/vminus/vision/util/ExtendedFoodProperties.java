@@ -7,11 +7,11 @@ import net.minecraft.world.effect.MobEffectInstance;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public record VisionFoodProperties(Integer nutrition, Float saturation, Boolean alwaysEdible, Boolean isMeat,
-                                   SoundEvent eatSound, SoundEvent burpSound,
-                                   List<Pair<MobEffectInstance, Float>> effects) {
-    public VisionFoodProperties(@Nullable Integer nutrition, @Nullable Float saturation, @Nullable Boolean alwaysEdible, @Nullable Boolean isMeat,
-                                @Nullable SoundEvent eatSound, @Nullable SoundEvent burpSound, @Nullable List<Pair<MobEffectInstance, Float>> effects) {
+public record ExtendedFoodProperties(Integer nutrition, Float saturation, Boolean alwaysEdible, Boolean isMeat,
+                                     SoundEvent eatSound, SoundEvent burpSound,
+                                     List<Pair<MobEffectInstance, Float>> effects) {
+    public ExtendedFoodProperties(@Nullable Integer nutrition, @Nullable Float saturation, @Nullable Boolean alwaysEdible, @Nullable Boolean isMeat,
+                                  @Nullable SoundEvent eatSound, @Nullable SoundEvent burpSound, @Nullable List<Pair<MobEffectInstance, Float>> effects) {
         this.nutrition = nutrition;
         this.saturation = saturation;
         this.alwaysEdible = alwaysEdible;
