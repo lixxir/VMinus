@@ -1,7 +1,7 @@
-package net.lixir.vminus.datagen;
+package net.lixir.vminus.datagen.block;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.tag.VBlockTagGenerator;
+import net.lixir.vminus.api.datagen.block.tag.provider.VBlockTagProvider;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -16,8 +16,8 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class VMinusBlockTagGenerator extends VBlockTagGenerator {
-    public VMinusBlockTagGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
+public class VMinusBlockTagProvider extends VBlockTagProvider {
+    public VMinusBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
         super(output, lookupProvider, VMinus.ID, existingFileHelper);
     }
 

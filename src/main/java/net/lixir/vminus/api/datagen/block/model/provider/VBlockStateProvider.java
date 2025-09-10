@@ -1,11 +1,12 @@
-package net.lixir.vminus.datagen.util;
+package net.lixir.vminus.api.datagen.block.model.provider;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.BlockModel;
-import net.lixir.vminus.registry.VRegistry;
-import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.TintType;
-import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
+import net.lixir.vminus.api.datagen.block.model.BlockModelType;
+import net.lixir.vminus.api.registry.VRegistry;
+import net.lixir.vminus.api.tint.TintType;
+import net.lixir.vminus.api.registry.definition.BlockDefinition;
+import net.lixir.vminus.api.tint.BuiltInTintTypes;
+import net.lixir.vminus.api.registry.definition.duck.BlockDefinitionDuck;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -42,19 +43,18 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         var blocks = VRegistry.fromId(modId).getBlocks();
         for (Block block : blocks) {
-            BlockEntryAccessor accessor = (BlockEntryAccessor) block;
-            BlockEntry blockEntry = accessor.vminus$getEntry();
-            if (blockEntry == null)
+            BlockDefinitionDuck accessor = (BlockDefinitionDuck) block;
+            BlockDefinition blockDefinition = accessor.vMinus$getDefinition();
+            if (blockDefinition == null)
                 continue;
-            BlockModel model = blockEntry.getModel();
-            VMinus.LOGGER.debug("Generating model {} for block {}", model, block);
-            model.apply(block, blockEntry, this);
+            BlockModelType model = blockDefinition.getModelType();
+            model.apply(block, this);
         }
     }
 
     public void carpet(Block block, String modelTextureSuffix, @NotNull ResourceLocation modelTextureOverride) {
         String blockPath = BuiltInRegistries.BLOCK.getKey(block).getPath();
-        ResourceLocation texture = modelTextureOverride.equals(BlockEntry.UNSET_RESOURCE_LOCATION)
+        ResourceLocation texture = modelTextureOverride.equals(BlockDefinition.UNSET_RESOURCE_LOCATION)
                 ? textureFromBlock(block, "_carpet", modelTextureSuffix)
                 : modelTextureOverride;
         simpleBlock(block, this.models().withExistingParent(blockPath, new ResourceLocation("minecraft", "block/carpet")).texture("wool", texture));
@@ -267,7 +267,7 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
     }
 
     public void cross(Block block, String renderType, TintType tintType) {
-        if (tintType == TintType.NONE) {
+        if (tintType.getName().equals(BuiltInTintTypes.NONE.getName())) {
             simpleBlock(block, models().cross(blockTexture(block).getPath(),
                     blockTexture(block)).renderType(renderType));
         } else {
@@ -284,10 +284,9 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
                 ":block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath()));
     }
 
-
     public void doubleCross(Block block, @NotNull String renderType, @NotNull TintType tintType) {
         String modelPath;
-        if (tintType == TintType.NONE) {
+        if (tintType.getName().equals(BuiltInTintTypes.NONE.getName())) {
             modelPath = "block/cross";
         } else {
             modelPath = "block/tinted_cross";
@@ -310,7 +309,7 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
     private static final List<String> AUTO_PLURALIZE = List.of("brick", "plank");
 
     private ResourceLocation getSuffixedBlockTexture(@NotNull ResourceLocation override, String blockPath, String addSuffix, String removeSuffix) {
-        if (!override.equals(BlockEntry.UNSET_RESOURCE_LOCATION)) {
+        if (!override.equals(BlockDefinition.UNSET_RESOURCE_LOCATION)) {
             return override;
         }
         return modLoc("block/" + formSuffixedTexturePath(blockPath, removeSuffix) + addSuffix);

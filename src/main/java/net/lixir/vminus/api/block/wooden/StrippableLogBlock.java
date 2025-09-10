@@ -1,4 +1,4 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.context.UseOnContext;

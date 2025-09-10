@@ -1,10 +1,9 @@
-package net.lixir.vminus.datagen.util.loottable;
+package net.lixir.vminus.api.datagen.block.loottable.provider;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.BlockLootTable;
-import net.lixir.vminus.registry.VRegistry;
-import net.lixir.vminus.registry.entry.BlockEntry;
-import net.lixir.vminus.registry.entry.accessor.BlockEntryAccessor;
+import net.lixir.vminus.api.datagen.block.BlockData;
+import net.lixir.vminus.api.datagen.block.loottable.BlockLootTableType;
+import net.lixir.vminus.api.registry.VRegistry;
+import net.lixir.vminus.api.registry.definition.BlockDefinition;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -29,8 +28,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Base class for generating block loot tables in VMinus.
+ * <p>
+ * Automatically iterates over all blocks in the {@link VRegistry} for the given mod ID
+ * and applies {@link BlockLootTableType} behavior defined in each block's {@link BlockDefinition}.
+ * Provides utility methods for common loot behaviors (e.g., shears, double plants, petals),
+ * but the main customization comes from the block definitions themselves.
+ */
 public abstract class VBlockLootProvider extends BlockLootSubProvider {
-    private final String modId;
+    // Exposed modId instead of private like in BlockLootSubProvider
+    protected final String modId;
 
     public VBlockLootProvider(String modId) {
         super(Set.of(), FeatureFlags.REGISTRY.allFlags());
@@ -40,20 +48,18 @@ public abstract class VBlockLootProvider extends BlockLootSubProvider {
     public String getModId() {
         return modId;
     }
+
     @Override
     protected void generate() {
         var blocks = VRegistry.fromId(modId).getBlocks();
         for (Block block : blocks) {
             if (block.getLootTable().equals(BuiltInLootTables.EMPTY))
                 continue;
-            BlockEntryAccessor accessor = (BlockEntryAccessor) block;
-            BlockEntry blockEntry = accessor.vminus$getEntry();
-            if (blockEntry == null)
+            BlockDefinition blockDefinition = BlockDefinition.of(block);
+            BlockLootTableType tableType = blockDefinition.getLootTableType();
+            if (tableType.isEmpty())
                 continue;
-            BlockLootTable lootTable = blockEntry.getLootTable();
-            if (lootTable.isEmpty())
-                continue;
-            lootTable.apply(block, blockEntry, this);
+            tableType.apply(BlockData.of(block), this);
         }
     }
 
@@ -63,10 +69,8 @@ public abstract class VBlockLootProvider extends BlockLootSubProvider {
                 .filter(block -> {
                     if (block.getLootTable().equals(BuiltInLootTables.EMPTY))
                         return false;
-                    BlockEntry blockEntry = ((BlockEntryAccessor) block).vminus$getEntry();
-                    if (blockEntry == null)
-                        return false;
-                    BlockLootTable lootTable = blockEntry.getLootTable();
+                    BlockDefinition blockDefinition = BlockDefinition.of(block);
+                    BlockLootTableType lootTable = blockDefinition.getLootTableType();
                     return !lootTable.isEmpty();
                 })
                 .toList();

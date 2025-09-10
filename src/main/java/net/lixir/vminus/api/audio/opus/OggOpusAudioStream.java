@@ -1,4 +1,4 @@
-package net.lixir.vminus.audio;
+package net.lixir.vminus.api.audio.opus;
 
 import net.lixir.vminus.VMinus;
 import net.minecraft.client.sounds.AudioStream;
@@ -14,6 +14,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * An {@link AudioStream} implementation for reading Ogg Opus audio from an {@link InputStream}.
+ * <p>
+ * This class decodes Ogg Opus packets on the fly using the Concentus Opus decoder
+ * and provides the audio in PCM16 format.
+ */
 public class OggOpusAudioStream implements AudioStream {
     private static final int SAMPLE_RATE = 48000;
     private static final int FRAME_SIZE = 960; // 20ms at 48kHz
@@ -29,6 +35,12 @@ public class OggOpusAudioStream implements AudioStream {
     private boolean initialized = false;
     private int channels = 1;
 
+    /**
+     * Constructs a new OggOpusAudioStream from the given input stream.
+     *
+     * @param stream the input stream containing Ogg Opus audio data
+     * @throws IOException if the stream cannot be read
+     */
     public OggOpusAudioStream(InputStream stream) throws IOException {
         this.sourceStream = stream;
         this.reader = new OggPacketReader(stream);
@@ -36,6 +48,12 @@ public class OggOpusAudioStream implements AudioStream {
         this.outputBuffer.flip();
     }
 
+    /**
+     * Returns the {@link AudioFormat} of the decoded audio.
+     * Defaults to mono 48kHz PCM16 if not yet initialized.
+     *
+     * @return the audio format
+     */
     @Override
     public @NotNull AudioFormat getFormat() {
         if (format == null)
@@ -43,6 +61,12 @@ public class OggOpusAudioStream implements AudioStream {
         return format;
     }
 
+    /**
+     * Reads the entire remaining audio stream into a direct {@link ByteBuffer}.
+     *
+     * @return a ByteBuffer containing all decoded audio
+     * @throws IOException if an I/O error occurs
+     */
     public ByteBuffer readAll() throws IOException {
         ByteBuffer all = ByteBuffer.allocateDirect(1024 * 1024);
         ByteBuffer chunk;
@@ -61,6 +85,13 @@ public class OggOpusAudioStream implements AudioStream {
         return all;
     }
 
+    /**
+     * Reads up to {@code size} bytes of decoded audio into a direct {@link ByteBuffer}.
+     *
+     * @param size the maximum number of bytes to read
+     * @return a ByteBuffer containing up to {@code size} bytes of audio
+     * @throws IOException if the stream is closed or a decoding error occurs
+     */
     @Override
     public @NotNull ByteBuffer read(int size) throws IOException {
         if (closed)
@@ -84,6 +115,12 @@ public class OggOpusAudioStream implements AudioStream {
         return result;
     }
 
+    /**
+     * Decodes the next Ogg Opus packet into the internal output buffer.
+     *
+     * @return true if a packet was successfully decoded, false if the stream ended
+     * @throws IOException if a decoding error occurs
+     */
     private boolean decodeNextPacket() throws IOException {
         while (true) {
             OggPacket packet = reader.getNextPacket();
@@ -92,7 +129,7 @@ public class OggOpusAudioStream implements AudioStream {
 
             byte[] data = packet.getData();
 
-            // Parse OpusHead to get channel count
+            // Parse OpusHead to initialize decoder and channel count
             if (data.length >= 19 && new String(data, 0, 8, StandardCharsets.US_ASCII).equals("OpusHead")) {
                 channels = data[9] & 0xFF; // unsigned byte
                 format = new AudioFormat(SAMPLE_RATE, 16, channels, true, false);
@@ -106,6 +143,7 @@ public class OggOpusAudioStream implements AudioStream {
                 continue;
             }
 
+            // Skip OpusTags packets
             if (data.length >= 8 && new String(data, 0, 8, StandardCharsets.US_ASCII).equals("OpusTags"))
                 continue;
 
@@ -132,6 +170,10 @@ public class OggOpusAudioStream implements AudioStream {
         }
     }
 
+    /**
+     * Closes the audio stream and the underlying {@link InputStream}.
+     * Logs a warning if closing the stream fails.
+     */
     @Override
     public void close() {
         closed = true;

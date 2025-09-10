@@ -1,10 +1,10 @@
-package net.lixir.vminus.datagen.util;
+package net.lixir.vminus.api.datagen.item.model;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.ItemModel;
-import net.lixir.vminus.registry.VRegistry;
-import net.lixir.vminus.registry.entry.ItemEntry;
-import net.lixir.vminus.registry.entry.accessor.ItemEntryAccessor;
+import net.lixir.vminus.api.datagen.item.ItemData;
+import net.lixir.vminus.api.registry.VRegistry;
+import net.lixir.vminus.api.registry.definition.ItemDefinition;
+import net.lixir.vminus.api.registry.definition.duck.ItemDefinitionDuck;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -30,17 +30,15 @@ public abstract class VItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         for (Item item : VRegistry.fromId(modId).getItems()) {
-            ItemEntryAccessor accessor = (ItemEntryAccessor) item;
-            ItemEntry itemEntry = accessor.vminus$getEntry();
+            ItemDefinitionDuck accessor = (ItemDefinitionDuck) item;
+            ItemDefinition itemEntry = accessor.vMinus$getDefinition();
             if (itemEntry == null)
                 continue;
-            ItemModel model = itemEntry.getModel();
+            ItemModelType model = itemEntry.getModelType();
 
-            if (model.equals(ItemModel.UNSET) || model.equals(ItemModel.NONE))
+            if (model.isEmpty())
                 continue;
-            ItemModel.Data itemModelData = new ItemModel.Data(item, itemEntry);
-            VMinus.LOGGER.debug("Generating {} for {}", model, item);
-            model.apply(itemModelData, this);
+            model.apply(ItemData.of(item), this);
         }
     }
 
@@ -72,7 +70,7 @@ public abstract class VItemModelProvider extends ItemModelProvider {
                 .texture("layer0", new ResourceLocation(modId, path));
     }
 
-    public void basic(Item item, @NotNull ItemEntry itemEntry) {
+    public void basic(Item item, @NotNull ItemDefinition itemEntry) {
         ResourceLocation id =  BuiltInRegistries.ITEM.getKey(item);
         String path;
         if (itemEntry.isFromBlock()) {

@@ -1,16 +1,14 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
 
-public class PlanksBlock extends Block {
-    public PlanksBlock(Properties properties) {
-        super(properties);
+public class LogBlock extends RotatedPillarBlock {
+    public LogBlock(Properties pProperties) {
+        super(pProperties);
     }
 
     @Override
@@ -25,6 +23,6 @@ public class PlanksBlock extends Block {
 
     @Override
     public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return 20;
+        return 5;
     }
 }

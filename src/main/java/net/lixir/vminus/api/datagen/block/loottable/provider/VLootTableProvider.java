@@ -1,4 +1,4 @@
-package net.lixir.vminus.datagen.util.loottable;
+package net.lixir.vminus.api.datagen.block.loottable.provider;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;

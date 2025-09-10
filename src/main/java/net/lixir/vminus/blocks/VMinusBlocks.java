@@ -1,12 +1,4 @@
-package net.lixir.vminus.block;
-
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.StainedGlassBlock;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-
-import static net.lixir.vminus.VMinus.REGISTRY;
+package net.lixir.vminus.blocks;
 
 public class VMinusBlocks {
     public static void init() {}

@@ -1,7 +1,7 @@
-package net.lixir.vminus.datagen;
+package net.lixir.vminus.datagen.item;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.tag.VItemTagGenerator;
+import net.lixir.vminus.api.datagen.item.tag.VItemTagProvider;
 import net.lixir.vminus.mixins.items.BoatItemAccessor;
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.minecraft.core.HolderLookup;
@@ -21,9 +21,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class VMinusItemTagGenerator extends VItemTagGenerator {
-    public VMinusItemTagGenerator(PackOutput p_275343_, CompletableFuture<HolderLookup.Provider> p_275729_,
-                                  CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
+public class VMinusItemTagProvider extends VItemTagProvider {
+    public VMinusItemTagProvider(PackOutput p_275343_, CompletableFuture<HolderLookup.Provider> p_275729_,
+                                 CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
         super(p_275343_, p_275729_, p_275322_, existingFileHelper, VMinus.ID);
     }
 
