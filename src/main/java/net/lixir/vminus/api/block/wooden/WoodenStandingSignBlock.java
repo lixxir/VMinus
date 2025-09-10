@@ -1,17 +1,17 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 
-public class WoodenDoorBlock extends DoorBlock {
-    public WoodenDoorBlock(Properties properties, BlockSetType blockSetType) {
-        super(properties, blockSetType);
+public abstract class WoodenStandingSignBlock extends StandingSignBlock {
+    public WoodenStandingSignBlock(Properties p_56990_, WoodType p_56991_) {
+        super(p_56990_, p_56991_);
     }
+
 
     @Override
     public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {

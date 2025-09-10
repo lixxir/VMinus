@@ -1,15 +1,14 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.PressurePlateBlock;
+import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
 
-public class WoodenPressurePlateBlock extends PressurePlateBlock {
-    public WoodenPressurePlateBlock(Properties properties, BlockSetType blockSetType) {
-        super(Sensitivity.EVERYTHING, properties, blockSetType);
+public class WoodenFenceBlock extends FenceBlock {
+    public WoodenFenceBlock(Properties properties) {
+        super(properties);
     }
 
     @Override

@@ -1,18 +1,16 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.CeilingHangingSignBlock;
-import net.minecraft.world.level.block.WallHangingSignBlock;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 
-public abstract class WoodenWallHangingSignBlock extends WallHangingSignBlock {
-    public WoodenWallHangingSignBlock(Properties p_56990_, WoodType p_56991_) {
-        super(p_56990_, p_56991_);
+public class WoodenDoorBlock extends DoorBlock {
+    public WoodenDoorBlock(Properties properties, BlockSetType blockSetType) {
+        super(properties, blockSetType);
     }
-
 
     @Override
     public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {

@@ -1,4 +1,4 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

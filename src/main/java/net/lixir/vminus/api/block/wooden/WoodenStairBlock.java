@@ -1,16 +1,15 @@
-package net.lixir.vminus.block;
+package net.lixir.vminus.api.block.wooden;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockSetType;
 
-public class WoodenButtonBlock extends ButtonBlock {
-    public WoodenButtonBlock(Properties properties, BlockSetType blockSetType) {
-        super(properties, blockSetType, 30, true);
+public class WoodenStairBlock extends StairBlock {
+    public WoodenStairBlock(BlockState blockState, BlockBehaviour.Properties properties) {
+        super(blockState, properties);
     }
 
     @Override
