@@ -13,7 +13,6 @@ build/
 out/
 classes/
 .libs/
-libs/
 
 run/
 .run/
