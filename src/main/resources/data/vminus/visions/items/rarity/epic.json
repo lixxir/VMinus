@@ -1,4 +1,12 @@
 {
-  "tag": "vminus:rarity/epic",
-  "rarity": "epic"
+  "item": "all",
+  "decorator": {
+    "texture": "detour:textures/decorator/rarity/epic.png"
+  },
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "epic"
+    }
+  ]
 }

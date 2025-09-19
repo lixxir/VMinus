@@ -141,44 +141,164 @@ public class Vision {
 
         fromEntry(id, visionEntry, visionType);
     }
-    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return Vision.get(entityType).getValue(visionProperty.getId(), visionContext);
-    }
+    // ==================== getValue overloads ====================
 
-    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(entityType, visionProperty, new VisionContext(entityType));
-    }
-
-    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return Vision.get(entity).getValue(visionProperty.getId(), visionContext);
-    }
-
-    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(entity, visionProperty, new VisionContext(entity));
-    }
-
-    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return Vision.get(state).getValue(visionProperty.getId(), visionContext);
-    }
-
-    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(state, visionProperty, new VisionContext(state));
+    // ---- Item ----
+    public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(item, visionProperty, new VisionContext(item), null);
     }
 
     public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return Vision.get(item).getValue(visionProperty.getId(), visionContext);
+        return Vision.get(item).getValue(visionProperty.getId(), visionContext, null);
     }
 
-    public static <T> @Nullable T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(item, visionProperty, new VisionContext(item));
+    public static <T> T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty, T fallback) {
+        return getValue(item, visionProperty, new VisionContext(item), fallback);
     }
 
-    public static <T> @Nullable T getValue(@NotNull ItemStack itemStack, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return Vision.get(itemStack).getValue(visionProperty.getId(), visionContext);
+    public static <T> T getValue(@NotNull Item item, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(item).getValue(visionProperty.getId(), visionContext, fallback);
     }
 
-    public static <T> @Nullable T getValue(@NotNull ItemStack itemStack, @NotNull VisionProperty<T> visionProperty) {
-        return getValue(itemStack, visionProperty, new VisionContext(itemStack));
+    // ---- ItemStack ----
+    public static <T> @Nullable T getValue(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(stack, visionProperty, new VisionContext(stack), null);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(stack).getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public static <T> T getValue(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty, T fallback) {
+        return getValue(stack, visionProperty, new VisionContext(stack), fallback);
+    }
+
+    public static <T> T getValue(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(stack).getValue(visionProperty.getId(), visionContext, fallback);
+    }
+
+    // ---- Block ----
+    public static <T> @Nullable T getValue(@NotNull Block block, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(block, visionProperty, new VisionContext(block), null);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull Block block, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(block).getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public static <T> T getValue(@NotNull Block block, @NotNull VisionProperty<T> visionProperty, T fallback) {
+        return getValue(block, visionProperty, new VisionContext(block), fallback);
+    }
+
+    public static <T> T getValue(@NotNull Block block, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(block).getValue(visionProperty.getId(), visionContext, fallback);
+    }
+
+    // ---- BlockState ----
+    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(state, visionProperty, new VisionContext(state), null);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(state).getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public static <T> T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @NotNull T fallback) {
+        return getValue(state, visionProperty, new VisionContext(state), fallback);
+    }
+
+    public static <T> T getValue(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(state).getValue(visionProperty.getId(), visionContext, fallback);
+    }
+
+    // ---- Entity ----
+    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(entity, visionProperty, new VisionContext(entity), null);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entity).getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public static <T> T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @NotNull T fallback) {
+        return getValue(entity, visionProperty, new VisionContext(entity), fallback);
+    }
+
+    public static <T> T getValue(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(entity).getValue(visionProperty.getId(), visionContext, fallback);
+    }
+
+    // ---- EntityType ----
+    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty) {
+        return getValue(entityType, visionProperty, new VisionContext(entityType), null);
+    }
+
+    public static <T> @Nullable T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entityType).getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public static <T> T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @NotNull T fallback) {
+        return getValue(entityType, visionProperty, new VisionContext(entityType), fallback);
+    }
+
+    public static <T> T getValue(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return Vision.get(entityType).getValue(visionProperty.getId(), visionContext, fallback);
+    }
+
+    // ==================== getValues overloads ====================
+
+    // ---- Item ----
+    public static <T> @NotNull List<T> getValues(@NotNull Item item, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(item, visionProperty, new VisionContext(item));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull Item item, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(item).getValues(visionProperty.getId(), visionContext);
+    }
+
+    // ---- ItemStack ----
+    public static <T> @NotNull List<T> getValues(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(stack, visionProperty, new VisionContext(stack));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull ItemStack stack, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(stack).getValues(visionProperty.getId(), visionContext);
+    }
+
+    // ---- Block ----
+    public static <T> @NotNull List<T> getValues(@NotNull Block block, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(block, visionProperty, new VisionContext(block));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull Block block, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(block).getValues(visionProperty.getId(), visionContext);
+    }
+
+    // ---- BlockState ----
+    public static <T> @NotNull List<T> getValues(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(state, visionProperty, new VisionContext(state));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull BlockState state, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(state).getValues(visionProperty.getId(), visionContext);
+    }
+
+    // ---- Entity ----
+    public static <T> @NotNull List<T> getValues(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(entity, visionProperty, new VisionContext(entity));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull Entity entity, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entity).getValues(visionProperty.getId(), visionContext);
+    }
+
+    // ---- EntityType ----
+    public static <T> @NotNull List<T> getValues(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty) {
+        return getValues(entityType, visionProperty, new VisionContext(entityType));
+    }
+
+    public static <T> @NotNull List<T> getValues(@NotNull EntityType<?> entityType, @NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        return Vision.get(entityType).getValues(visionProperty.getId(), visionContext);
     }
 
     private static <T> void encodeProperty(@NotNull VisionProperty<T> propertyType, @NotNull VisionValue<?> visionValue, JsonArray jsonArray) {
@@ -198,30 +318,34 @@ public class Vision {
     }
 
     public <T> T getValue(String id) {
-        return getValue(id, null);
+        return getValue(id, null, null);
     }
 
     public <T> T getValue(@NotNull Vision vision, String id) {
-        return vision.getValue(id, null);
+        return vision.getValue(id, null, null);
     }
 
     public <T> @Nullable T getValue(@NotNull VisionProperty<T> visionProperty) {
-        return getValue(visionProperty.getId(), null);
+        return getValue(visionProperty.getId(), null, null);
     }
 
     public <T> List<T> getValues(String id) {
-        return getValue(id, null);
+        return getValue(id, null, null);
     }
 
     public <T> @Nullable T getValue(@NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
-        return getValue(visionProperty.getId(), visionContext);
+        return getValue(visionProperty.getId(), visionContext, null);
+    }
+
+    public <T> @Nullable T getValue(@NotNull VisionProperty<T> visionProperty, @Nullable VisionContext visionContext, T fallback) {
+        return getValue(visionProperty.getId(), visionContext, fallback);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> @Nullable T getValue(String id, @Nullable VisionContext visionContext) {
+    public <T> @Nullable T getValue(String id, @Nullable VisionContext visionContext,  T fallback) {
         VisionValue<T>[] visionProperties = (VisionValue<T>[]) values.getOrDefault(id, null);
         if (visionProperties == null)
-            return null;
+            return fallback;
         for (VisionValue<T> visionValue : visionProperties) {
             T value = visionValue.getValue();
             if (visionValue.testConditions(visionContext)) {
@@ -229,7 +353,7 @@ public class Vision {
             }
         }
 
-        return null;
+        return fallback;
     }
 
     public <T> List<T> getValues(@NotNull VisionProperty<T> visionProperty) {

@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import net.lixir.vminus.item.IMaxDurationGetter;
+import net.lixir.vminus.world.item.IMaxDurationGetter;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.VisionUtils;

@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
 import com.google.common.collect.Multimap;
-import net.lixir.vminus.entity.attribute.VMinusAttributes;
+import net.lixir.vminus.world.entity.attribute.VMinusAttributes;
 import net.lixir.vminus.resources.data.sight.SightManager;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;

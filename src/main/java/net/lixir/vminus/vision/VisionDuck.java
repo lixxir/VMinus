@@ -12,4 +12,6 @@ public interface VisionDuck {
 
     @NonNull
     VisionType<?> vMinus$getVisionType();
+
+    default void vMinus$update(){}
 }

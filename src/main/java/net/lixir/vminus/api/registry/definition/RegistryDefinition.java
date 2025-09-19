@@ -5,6 +5,7 @@ import net.lixir.vminus.api.registry.VRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.data.loading.DatagenModLoader;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ import java.util.Objects;
  */
 public abstract class RegistryDefinition<E extends RegistryDefinition<E, T>, T> {
     public static final ResourceLocation UNSET_RESOURCE_LOCATION = new ResourceLocation("minecraft", "unset");
-    protected LangKey langKey = LangKey.DEFAULT;
+    protected @NotNull LangKey langKey = LangKey.UNSET;
     protected boolean isDefaulted;
 
     /**
@@ -86,14 +87,27 @@ public abstract class RegistryDefinition<E extends RegistryDefinition<E, T>, T> 
     }
 
     /**
-     * Merges another definition into this one.
+     * Merges values from another definition into this one.
      * <p>
-     * Implementations should combine metadata, models, loot tables, etc.
+     * Currently, only the {@code langKey} is merged. If this definition's
+     * {@code langKey} is unset (default), it will be replaced with the value
+     * from the other definition. All other properties are left unchanged.
+     * <p>
+     * Future implementations may extend this method to merge additional
+     * properties such as metadata, models, or loot tables, but values should
+     * generally only be overwritten when this definition's corresponding
+     * value is considered unset.
      *
-     * @param other the other definition to merge
-     * @return this definition after merging
+     * @param other the other definition to merge from (ignored if {@code null})
+     * @return this definition, after merging
      */
-    public abstract @NotNull E merge(E other);
+    @SuppressWarnings("unchecked")
+    public @NotNull E merge(@Nullable E other) {
+        if (other == null)
+            return (E) this;
+        langKey = langKey.isUnset() ? other.langKey : langKey;
+        return (E) this;
+    }
 
     @Override
     public boolean equals(Object obj) {

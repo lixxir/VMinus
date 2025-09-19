@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.registry.entry.EntityEntry;
-import net.lixir.vminus.registry.entry.accessor.EntityEntryAccessor;
+import net.lixir.vminus.api.registry.definition.EntityDefinition;
+import net.lixir.vminus.api.registry.definition.duck.EntityDefinitionDuck;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionType;
@@ -19,12 +19,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityType.class)
-public class EntityTypeMixin implements VisionDuck, EntityEntryAccessor {
+public class EntityTypeMixin implements VisionDuck, EntityDefinitionDuck {
     @Unique
     private final EntityType<?> vMinus$self = (EntityType<?>) (Object) this;
 
     @Unique
-    private EntityEntry vMinus$entityEntry = null;
+    private EntityDefinition vMinus$entityDefinition = null;
 
     @Unique
     private ResourceLocation vMinus$visionId = null;
@@ -35,13 +35,14 @@ public class EntityTypeMixin implements VisionDuck, EntityEntryAccessor {
     }
 
     @Override
-    public void vminus$setEntry(EntityEntry entry) {
-        this.vMinus$entityEntry = entry;
+    public void vMinus$setDefinition(@javax.annotation.Nullable EntityDefinition entry) {
+        this.vMinus$entityDefinition = entry;
     }
 
+    @javax.annotation.Nullable
     @Override
-    public @Nullable EntityEntry vminus$getEntry() {
-        return vMinus$entityEntry;
+    public @Nullable EntityDefinition vMinus$getDefinition() {
+        return vMinus$entityDefinition;
     }
 
     @Override

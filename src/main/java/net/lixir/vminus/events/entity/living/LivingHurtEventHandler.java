@@ -2,7 +2,7 @@ package net.lixir.vminus.events.entity.living;
 
 import net.lixir.vminus.registry.util.VMinusTags;
 import net.lixir.vminus.util.AttributeHelper;
-import net.lixir.vminus.entity.attribute.VMinusAttributes;
+import net.lixir.vminus.world.entity.attribute.VMinusAttributes;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;

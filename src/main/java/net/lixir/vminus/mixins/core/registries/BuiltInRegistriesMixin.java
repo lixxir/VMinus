@@ -7,10 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BuiltInRegistries.class)
+@Mixin(value = BuiltInRegistries.class, priority = 10000)
 public abstract class BuiltInRegistriesMixin {
     @Inject(method = "bootStrap", at = @At("HEAD"))
-    private static void vminus$bootStrap(CallbackInfo ci) {
+    private static void vMinus$bootStrap(CallbackInfo ci) {
         VMinus.init();
     }
 }

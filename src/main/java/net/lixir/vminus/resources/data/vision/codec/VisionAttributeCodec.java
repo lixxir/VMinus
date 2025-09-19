@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import net.lixir.vminus.vision.util.VisionAttribute;
 import net.lixir.vminus.vision.values.VisionValue;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -96,7 +97,7 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
                 throw new JsonParseException("Name is null.");
 
             AttributeModifier attributeModifier = new AttributeModifier(uuid, name, value, operation);
-            VisionAttribute visionAttribute = new VisionAttribute(remove, replace, attributeModifier, attribute, equipmentSlot, id);
+            VisionAttribute visionAttribute = new VisionAttribute(remove, replace, attributeModifier, attribute, equipmentSlot);
 
             visionProperties.add(VisionValue.create(visionAttribute, arrayObject, jsonObject, key));
         }
@@ -109,9 +110,10 @@ public class VisionAttributeCodec extends VisionCodec<VisionAttribute> {
 
         AttributeModifier modifier = visionAttribute.attributeModifier();
         jsonObject.addProperty("uuid", modifier.getId().toString());
-        jsonObject.addProperty("id", visionAttribute.id());
+        jsonObject.addProperty("id", BuiltInRegistries.ATTRIBUTE.getId(visionAttribute.attribute()));
         jsonObject.addProperty("value", modifier.getAmount());
-        jsonObject.addProperty("operation", modifier.getOperation().name().toLowerCase());
+        if (modifier.getOperation() != AttributeModifier.Operation.ADDITION)
+            jsonObject.addProperty("operation", modifier.getOperation().name().toLowerCase());
         if (visionAttribute.replace())
             jsonObject.addProperty("replace", true);
         if (visionAttribute.remove())

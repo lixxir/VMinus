@@ -1,6 +1,6 @@
 package net.lixir.vminus.network;
 
-import net.lixir.vminus.entity.VariantEntity;
+import net.lixir.vminus.world.entity.VariantEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;

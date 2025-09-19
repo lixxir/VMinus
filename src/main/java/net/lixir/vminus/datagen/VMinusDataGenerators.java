@@ -1,8 +1,8 @@
 package net.lixir.vminus.datagen;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.datagen.util.*;
-import net.lixir.vminus.datagen.util.tag.VFluidTagsProvider;
+import net.lixir.vminus.datagen.block.VMinusBlockTagProvider;
+import net.lixir.vminus.datagen.item.VMinusItemTagProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -27,7 +27,7 @@ public class VMinusDataGenerators {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         CompletableFuture<TagsProvider.TagLookup<Block>> blockTagLookup = generator.addProvider(
                 event.includeServer(),
-                new VMinusBlockTagGenerator(packOutput, lookupProvider, existingFileHelper)
+                new VMinusBlockTagProvider(packOutput, lookupProvider, existingFileHelper)
         ).contentsGetter();
         generator.addProvider(
                 event.includeServer(),
@@ -35,7 +35,11 @@ public class VMinusDataGenerators {
         );
         generator.addProvider(
                 event.includeServer(),
-                new VMinusItemTagGenerator(packOutput, lookupProvider, blockTagLookup, existingFileHelper)
+                new VMinusVisionProvider(packOutput)
+        );
+        generator.addProvider(
+                event.includeServer(),
+                new VMinusItemTagProvider(packOutput, lookupProvider, blockTagLookup, existingFileHelper)
         );
         generator.addProvider(event.includeClient(), new VMinusLangProvider(packOutput, "en_us"));
     }

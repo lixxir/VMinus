@@ -8,6 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -15,6 +16,18 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public record ItemReplacement(@Nullable ItemStack itemStack, @Nullable TagKey<Item> tag) {
+
+    public static @NotNull ItemReplacement of(@NotNull ItemStack itemStack) {
+        return new ItemReplacement(itemStack, null);
+    }
+
+    public static @NotNull ItemReplacement of(@NotNull Item item) {
+        return of(item.getDefaultInstance());
+    }
+
+    public static @NotNull ItemReplacement of(@NotNull TagKey<Item> tag) {
+        return new ItemReplacement(null, tag);
+    }
 
     @Override
     public @Nullable ItemStack itemStack() {

@@ -28,7 +28,7 @@ import java.util.Set;
  * BlockDefinitions can be merged to combine metadata from multiple sources.
  */
 public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> {
-    public static final BlockDefinition EMPTY = of();
+    private static final BlockDefinition EMPTY = of();
     protected final Set<TagKey<Block>> tags = new HashSet<>();
     protected RenderTypeKey renderTypeKey = RenderTypeKey.UNSET;
     protected ItemDefinition itemDefinition = ItemDefinition.of();
@@ -37,7 +37,6 @@ public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> 
     protected BlockModelType modelType = BuiltInBlockModelTypes.UNSET;
     protected BlockLootTableType lootTableType = BuiltInBlockLootTableTypes.UNSET;
     protected ResourceLocation modelTextureOverride = UNSET_RESOURCE_LOCATION;
-    private boolean isDefaulted = false;
 
     protected BlockDefinition() {
     }
@@ -103,7 +102,7 @@ public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> 
         modelTextureSuffix = modelTextureSuffix.equals("unset") ? other.modelTextureSuffix : modelTextureSuffix;
         modelTextureOverride = modelTextureOverride.equals(UNSET_RESOURCE_LOCATION) ? other.modelTextureOverride : modelTextureOverride;
 
-        return this;
+        return super.merge(other);
     }
 
     /**
@@ -114,12 +113,12 @@ public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> 
      */
     @Override
     public @NotNull BlockDefinition setDefault(@NotNull Block block) {
-        return merge(VRegistry.getDefaultBlockDefinition(block));
+        return this.merge(VRegistry.getDefaultBlockDefinition(block));
     }
 
     @Override
     public boolean isEmpty() {
-        return this == EMPTY;
+        return this.equals(EMPTY);
     }
 
     public @NotNull Set<TagKey<Block>> getTags() {
@@ -147,7 +146,7 @@ public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> 
     }
 
     public @NotNull String getModelTextureSuffix() {
-        return modelTextureSuffix;
+        return modelTextureSuffix.equals("unset") ? "" : modelTextureSuffix;
     }
 
     public @NotNull ResourceLocation getModelTextureOverride() {
@@ -214,5 +213,39 @@ public class BlockDefinition extends RegistryDefinition<BlockDefinition, Block> 
                 ", isDefaulted=" + isDefaulted +
                 ", langValue='" + langKey + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof BlockDefinition other))
+            return false;
+
+        return isDefaulted == other.isDefaulted &&
+                tags.equals(other.tags) &&
+                renderTypeKey.equals(other.renderTypeKey) &&
+                itemDefinition.equals(other.itemDefinition) &&
+                modelTextureSuffix.equals(other.modelTextureSuffix) &&
+                tintType.equals(other.tintType) &&
+                modelType.equals(other.modelType) &&
+                lootTableType.equals(other.lootTableType) &&
+                modelTextureOverride.equals(other.modelTextureOverride) &&
+                super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + tags.hashCode();
+        result = 31 * result + renderTypeKey.hashCode();
+        result = 31 * result + itemDefinition.hashCode();
+        result = 31 * result + modelTextureSuffix.hashCode();
+        result = 31 * result + tintType.hashCode();
+        result = 31 * result + modelType.hashCode();
+        result = 31 * result + lootTableType.hashCode();
+        result = 31 * result + modelTextureOverride.hashCode();
+        result = 31 * result + Boolean.hashCode(isDefaulted);
+        return result;
     }
 }

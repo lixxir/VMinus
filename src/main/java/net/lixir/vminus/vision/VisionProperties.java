@@ -2,6 +2,7 @@ package net.lixir.vminus.vision;
 
 import net.lixir.vminus.resources.data.vision.codec.VisionCodecs;
 import net.lixir.vminus.vision.util.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -109,6 +110,7 @@ public class VisionProperties {
         public static final VisionProperty<Boolean> OCCLUDE = register(VisionTypes.BLOCK, VisionProperty.create("occlude", VisionCodecs.BOOLEAN));
         public static final VisionProperty<Boolean> REDSTONE_CONDUCTOR = register(VisionTypes.BLOCK, VisionProperty.create("redstone_conductor", VisionCodecs.BOOLEAN));
         public static final VisionProperty<Integer> LIGHT_LEVEL = register(VisionTypes.BLOCK, VisionProperty.create("light_level", VisionCodecs.INTEGER));
+        public static final VisionProperty<ResourceLocation> LOOT_TABLE = register(VisionTypes.BLOCK, VisionProperty.create("loot_table", VisionCodecs.RESOURCE_LOCATION));
         public static final VisionProperty<SoundType> SOUND = register(VisionTypes.BLOCK, VisionProperty.create("sound", VisionCodecs.SOUND_TYPE));
     }
 

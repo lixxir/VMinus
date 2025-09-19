@@ -1,6 +1,6 @@
 package net.lixir.vminus.events.entity.effect;
 
-import net.lixir.vminus.entity.effect.Effect;
+import net.lixir.vminus.world.entity.effect.Effect;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;

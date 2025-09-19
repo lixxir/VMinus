@@ -1,6 +1,5 @@
 package net.lixir.vminus.api.datagen.block.model.provider;
 
-import net.lixir.vminus.VMinus;
 import net.lixir.vminus.api.datagen.block.model.BlockModelType;
 import net.lixir.vminus.api.registry.VRegistry;
 import net.lixir.vminus.api.tint.TintType;
@@ -143,18 +142,7 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
         });
     }
 
-    public void stainedGlassPane(Block block) {
-        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
-        String path = resourceLocation.getPath();
-        String glassPath = path.substring(0, path.indexOf("_pane"));
-    }
-
-    public void allSidedCube(Block block, String renderType) {
-        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
-        simpleBlock(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(renderType));
-    }
-
-    public void tintedAllSidedCube(Block block, String renderType) {
+    public void leaves(Block block, String renderType) {
         ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
         simpleBlock(block, models().leaves(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(renderType));
     }
@@ -164,45 +152,9 @@ public abstract class VBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType(renderType));
     }
 
-    public void allSidedCubeWithItem(Block block, RegistryObject<Block> registryObject) {
-        simpleBlockWithItem(block, models().cubeAll(registryObject.getId().getPath(), modLoc("block/" + registryObject.getId().getPath())));
-    }
-
-    public void translucentCubeWithItem(Block block) {
-        ResourceLocation resourceLocation = ForgeRegistries.BLOCKS.getKey(block);
-        simpleBlockWithItem(block, models().cubeAll(resourceLocation.getPath(), modLoc("block/" + resourceLocation.getPath())).renderType("translucent"));
-    }
-
-    public void translucentCubeWithItem(Block block, RegistryObject<Block> registryObject) {
-        simpleBlockWithItem(block, models().cubeAll(registryObject.getId().getPath(), modLoc("block/" + registryObject.getId().getPath())));
-    }
-
-    public void translucentCubeWithItem(RegistryObject<Block> registryObject) {
-        translucentCubeWithItem(registryObject.get(), registryObject);
-    }
-
-    public void registerLeaves(Block block) {
-        simpleBlockWithItem(block,
-                models().singleTexture(Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath(), new ResourceLocation("minecraft:block/leaves"),
-                        "all", blockTexture(block)));
-    }
-
-    public void variedCross(Block block) {
-        String blockPath = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).getPath();
-
-        simpleBlock(block, models().withExistingParent(
-                blockPath,
-                new ResourceLocation("vminus", "block/varied_cross"))
-                .texture("cross", blockTexture(block)));
-    }
-
-    public void veinBlock(RegistryObject<Block> registryObject) {
-        veinBlock(registryObject.get());
-    }
-
     public void woodBlock(Block block, String modelTextureSuffix) {
         String name = BuiltInRegistries.BLOCK.getKey(block).getPath();
-        ResourceLocation texture = textureFromBlock(block, "_wood", modelTextureSuffix);
+        ResourceLocation texture = name.contains("_wood") ? textureFromBlock(block, "_wood", modelTextureSuffix) : textureFromBlock(block, "_hyphae", modelTextureSuffix);
         ModelFile model = models().cubeAll(name, texture);
 
         getVariantBuilder(block)

@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.client;
 
 import com.mojang.authlib.GameProfile;
 import net.lixir.vminus.cape.Cape;
-import net.lixir.vminus.item.IMaxDurationGetter;
+import net.lixir.vminus.world.item.IMaxDurationGetter;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;

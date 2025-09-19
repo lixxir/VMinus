@@ -41,6 +41,18 @@ public class VisionUtils {
         return vision.getValue(visionProperty, visionContext);
     }
 
+    public static <T> T tryOverride(T firstType, T otherType) {
+        if (otherType != null) {
+            return otherType;
+        }
+        return firstType;
+    }
+
+    public static <T> T tryOverride(T originalValue, VisionDuck visionDuck, VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
+        T value = getOverrideValue(visionDuck, visionProperty, visionContext);
+        return value != null ? value : originalValue;
+    }
+
     public static <T> T tryOverride(CallbackInfoReturnable<T> cir, VisionDuck visionDuck, VisionProperty<T> visionProperty, @Nullable VisionContext visionContext) {
         T value = getOverrideValue(visionDuck, visionProperty, visionContext);
         if (value != null) {

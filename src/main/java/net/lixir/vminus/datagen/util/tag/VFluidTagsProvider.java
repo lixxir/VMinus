@@ -1,6 +1,6 @@
 package net.lixir.vminus.datagen.util.tag;
 
-import net.lixir.vminus.registry.VRegistry;
+import net.lixir.vminus.api.registry.VRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;

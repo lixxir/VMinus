@@ -3,6 +3,7 @@ package net.lixir.vminus.api.registry.definition;
 import net.lixir.vminus.api.datagen.block.model.BlockModelType;
 import net.lixir.vminus.api.datagen.item.model.BuiltInItemModelTypes;
 import net.lixir.vminus.api.datagen.item.model.ItemModelType;
+import net.lixir.vminus.api.datagen.lang.LangKey;
 import net.lixir.vminus.api.registry.VRegistry;
 import net.lixir.vminus.api.registry.definition.duck.ItemDefinitionDuck;
 import net.lixir.vminus.api.tint.BuiltInTintTypes;
@@ -79,15 +80,7 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
      */
     public static @NotNull ItemDefinition of(@Nullable BlockDefinition blockDefinition) {
         ItemDefinition itemEntry = of();
-        if (blockDefinition != null) {
-            itemEntry.langKey = null;
-            itemEntry.tintType = blockDefinition.tintType;
-            BlockModelType blockModelType = blockDefinition.getModelType();
-            if (!blockModelType.isEmpty())
-                itemEntry.modelType = blockModelType.getItemModelType();
-            itemEntry.fromBlock = true;
-            itemEntry.merge(blockDefinition.itemDefinition);
-        }
+        itemEntry.merge(blockDefinition);
         return itemEntry;
     }
 
@@ -98,7 +91,8 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
      * @return a new definition
      */
     public static @NotNull ItemDefinition of(Block block) {
-        return of(BlockDefinition.of(block));
+        BlockDefinition definition = BlockDefinition.of(block);
+        return of(definition);
     }
 
     /**
@@ -117,7 +111,7 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
      */
     @Override
     public boolean isEmpty() {
-        return this == EMPTY;
+        return this.equals(EMPTY);
     }
 
     /**
@@ -128,7 +122,7 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
      */
     public ItemDefinition setDefault(@NotNull Item item) {
         ItemDefinition itemEntry = VRegistry.getDefaultItemDefinition(item);
-        merge(itemEntry);
+        this.merge(itemEntry);
         return this;
     }
 
@@ -173,8 +167,16 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
         return Collections.unmodifiableSet(tags);
     }
 
-    protected ItemDefinition setIsFromBlock(boolean isFromBlock) {
-        this.fromBlock = isFromBlock;
+    public @NotNull ItemDefinition merge(@Nullable BlockDefinition other) {
+        if (other == null)
+            return this;
+        this.langKey = this.langKey.isUnset() ? LangKey.NONE : this.langKey;
+        this.tintType = this.tintType.isUnset() ? other.tintType : this.tintType;
+        BlockModelType blockModelType = other.getModelType();
+        if (!blockModelType.isEmpty())
+            this.modelType = this.modelType.isUnset() ? blockModelType.getItemModelType() : this.modelType;
+        this.fromBlock = true;
+        this.merge(other.itemDefinition);
         return this;
     }
 
@@ -182,13 +184,17 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
     public @NotNull ItemDefinition merge(@Nullable ItemDefinition other) {
         if (other == null)
             return this;
-        tags.addAll(other.getTags());
-        if (this.modelType.isUnset())
-            this.modelType = other.modelType;
-        if (this.tintType.isUnset())
-            this.tintType = other.tintType;
+
+        this.tags.addAll(other.getTags());
+        this.modelType = this.modelType.isUnset() ? other.modelType : this.modelType;
+        this.tintType = this.tintType.isUnset() ? other.tintType : this.tintType;
+
+        if (!this.fromBlock)
+            this.fromBlock = other.fromBlock;
+
         return this;
     }
+
 
     public boolean isFromBlock() {
         return fromBlock;
@@ -204,5 +210,31 @@ public class ItemDefinition extends RegistryDefinition<ItemDefinition, Item> {
                 ", isDefaulted=" + isDefaulted +
                 ", langValue='" + langKey + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof ItemDefinition other))
+            return false;
+
+        return isDefaulted == other.isDefaulted &&
+                fromBlock == other.fromBlock &&
+                tags.equals(other.tags) &&
+                modelType.equals(other.modelType) &&
+                tintType.equals(other.tintType) &&
+                langKey.equals(other.langKey) &&
+                super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + tags.hashCode();
+        result = 31 * result + modelType.hashCode();
+        result = 31 * result + tintType.hashCode();
+        result = 31 * result + Boolean.hashCode(fromBlock);
+        return result;
     }
 }

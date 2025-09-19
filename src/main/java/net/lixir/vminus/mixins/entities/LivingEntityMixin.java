@@ -1,11 +1,11 @@
 package net.lixir.vminus.mixins.entities;
 
-import net.lixir.vminus.entity.attribute.VMinusAttributes;
-import net.lixir.vminus.item.IEquipmentItem;
+import net.lixir.vminus.world.entity.attribute.VMinusAttributes;
+import net.lixir.vminus.world.item.IEquipmentItem;
 import net.lixir.vminus.network.ServerboundJumpPacket;
 import net.lixir.vminus.network.VMinusNetwork;
 import net.lixir.vminus.resources.data.sight.SightManager;
-import net.lixir.vminus.entity.VariantEntity;
+import net.lixir.vminus.world.entity.VariantEntity;
 import net.lixir.vminus.util.SizeAttributeUtil;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionType;

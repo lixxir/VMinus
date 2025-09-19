@@ -26,9 +26,9 @@ public class VisionEntityVariantCodec extends VisionCodec<VisionEntityVariant> {
         JsonArray jsonArray = jsonObject.getAsJsonArray(key);
         for (JsonElement jsonArrayElement : jsonArray) {
             JsonObject arrayObject = jsonArrayElement.getAsJsonObject();
-            if (!arrayObject.has("name"))
-                throw new JsonParseException(key + " has no name.");
-            ResourceLocation variantName = parseResourceLocation("name", key, arrayObject);
+            if (!arrayObject.has("key"))
+                throw new JsonParseException(key + " has no key.");
+            ResourceLocation variantName = parseResourceLocation("key", key, arrayObject);
             Integer weight = arrayObject.has("weight") ? arrayObject.getAsJsonPrimitive("weight").getAsInt() : 1;
             if (!arrayObject.has("texture"))
                 throw new JsonParseException(key + " has no texture.");
@@ -46,7 +46,7 @@ public class VisionEntityVariantCodec extends VisionCodec<VisionEntityVariant> {
         JsonObject jsonObject = new JsonObject();
         if (value.name() == null || value.texture() == null)
             return null;
-        jsonObject.addProperty("name", value.name().toString());
+        jsonObject.addProperty("key", value.name().toString());
         jsonObject.addProperty("texture", value.texture().toString());
         jsonObject.addProperty("weight", value.weight());
         if (value.replace()) {

@@ -1,4 +1,14 @@
 {
-  "tag": "vminus:rarity/unobtainable",
-  "rarity": "unobtainable"
+  "item": "all",
+  "pick_up_sound": "detour:rarity.unobtainable.pick_up",
+  "drop_sound": "detour:rarity.unobtainable.drop",
+  "decorator": {
+    "texture": "detour:textures/decorator/rarity/unobtainable.png"
+  },
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "unobtainable"
+    }
+  ]
 }

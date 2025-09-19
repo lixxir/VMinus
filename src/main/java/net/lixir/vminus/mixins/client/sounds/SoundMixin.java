@@ -1,7 +1,6 @@
 package net.lixir.vminus.mixins.client.sounds;
 
-import net.lixir.vminus.VMinus;
-import net.lixir.vminus.audio.OpusAudioResources;
+import net.lixir.vminus.api.audio.opus.OpusAudioResources;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;

@@ -1,6 +1,6 @@
 package net.lixir.vminus.events.entity.player;
 
-import net.lixir.vminus.item.IEquipmentItem;
+import net.lixir.vminus.world.item.IEquipmentItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;

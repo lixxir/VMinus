@@ -3,7 +3,7 @@ package net.lixir.vminus.mixins.client.renderers.entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.lixir.vminus.resources.data.sight.SightManager;
 import net.lixir.vminus.util.SizeAttributeUtil;
-import net.lixir.vminus.entity.VariantEntity;
+import net.lixir.vminus.world.entity.VariantEntity;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;

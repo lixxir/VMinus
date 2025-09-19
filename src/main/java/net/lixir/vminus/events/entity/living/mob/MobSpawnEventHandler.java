@@ -1,7 +1,7 @@
 package net.lixir.vminus.events.entity.living.mob;
 
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.entity.VariantEntity;
+import net.lixir.vminus.world.entity.VariantEntity;
 import net.lixir.vminus.network.VMinusNetwork;
 import net.lixir.vminus.network.VariantSyncPacket;
 import net.lixir.vminus.resources.data.sight.SightManager;

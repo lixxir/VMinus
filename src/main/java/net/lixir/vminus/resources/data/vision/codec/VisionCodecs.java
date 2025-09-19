@@ -8,6 +8,7 @@ public class VisionCodecs {
     // Collection of static instances of VisionCodecs for parsing values from JSONs
     public static final VisionIntegerCodec INTEGER = new VisionIntegerCodec();
     public static final VisionFloatCodec FLOAT = new VisionFloatCodec();
+    public static final VisionResourceLocationCodec RESOURCE_LOCATION = new VisionResourceLocationCodec();
     public static final VisionDoubleCodec DOUBLE = new VisionDoubleCodec();
     public static final VisionIntegerNumberRangeCodec INTEGER_RANGE = new VisionIntegerNumberRangeCodec();
     public static final VisionCreativeOrderCodec CREATIVE_ORDER = new VisionCreativeOrderCodec();

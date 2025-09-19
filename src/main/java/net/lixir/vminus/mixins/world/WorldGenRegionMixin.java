@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.world;
 
-import net.lixir.vminus.block.VBlockExtensions;
+import net.lixir.vminus.api.block.extensions.VMinusBlockExtensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
@@ -20,8 +20,8 @@ public class WorldGenRegionMixin {
 
     @Inject(method = "setBlock", at = @At("TAIL"))
     private void vMinus$setBlock(BlockPos pos, @NotNull BlockState state, int flags, int recursionLimit, CallbackInfoReturnable<Boolean> cir) {
-        if (state.getBlock() instanceof VBlockExtensions VBlockExtensions) {
-            int tick = VBlockExtensions.getWorldGenScheduledTick(level, state, pos);
+        if (state.getBlock() instanceof VMinusBlockExtensions VMinusBlockExtensions) {
+            int tick = VMinusBlockExtensions.getWorldGenScheduledTick(level, state, pos);
             if (tick <= 0)
                 return;
             ((WorldGenLevel) this).scheduleTick(pos, state.getBlock(), tick);

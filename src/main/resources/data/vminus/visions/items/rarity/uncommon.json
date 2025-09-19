@@ -1,4 +1,14 @@
 {
-  "tag": "vminus:rarity/uncommon",
-  "rarity": "uncommon"
+  "item": "all",
+  "pick_up_sound": "detour:rarity.uncommon.pick_up",
+  "drop_sound": "detour:rarity.uncommon.drop",
+  "decorator": {
+    "texture": "detour:textures/decorator/rarity/uncommon.png"
+  },
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "uncommon"
+    }
+  ]
 }

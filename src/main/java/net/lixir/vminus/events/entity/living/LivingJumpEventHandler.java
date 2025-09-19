@@ -1,7 +1,7 @@
 package net.lixir.vminus.events.entity.living;
 
 
-import net.lixir.vminus.item.IEquipmentItem;
+import net.lixir.vminus.world.item.IEquipmentItem;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

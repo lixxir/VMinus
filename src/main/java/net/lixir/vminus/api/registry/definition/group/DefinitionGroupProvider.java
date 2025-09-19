@@ -4,7 +4,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -16,8 +19,8 @@ import java.util.function.Supplier;
  * for datagen, rendering, or other processing.
  */
 public abstract class DefinitionGroupProvider {
-    private static final Map<Class<?>, DefinitionGroup<?>> ASSIGNED_ENTRIES = new ConcurrentHashMap<>();
-    private static final Map<Supplier<Object>, DefinitionGroup<?>> ASSIGNED_SUPPLIERS = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, DefinitionGroup<?>> ASSIGNED_ENTRIES = new HashMap<>();
+    private static final Map<Supplier<Object>, DefinitionGroup<?>> ASSIGNED_SUPPLIERS = new HashMap<>();
 
     /** Runs the provider to assign groups as needed. */
     public abstract void run();
@@ -51,16 +54,16 @@ public abstract class DefinitionGroupProvider {
      * Returns the map of suppliers assigned to definition groups.
      */
     @Contract(pure = true)
-    public static @NotNull Map<Supplier<Object>, DefinitionGroup<?>> getAssignedSuppliers() {
-        return ASSIGNED_SUPPLIERS;
+    public static @NotNull @UnmodifiableView Map<Supplier<Object>, DefinitionGroup<?>> getAssignedSuppliers() {
+        return Collections.unmodifiableMap(ASSIGNED_SUPPLIERS);
     }
 
     /**
      * Returns the map of classes assigned to definition groups.
      */
     @Contract(pure = true)
-    public static @NotNull Map<Class<?>, DefinitionGroup<?>> getAssignedEntries() {
-        return ASSIGNED_ENTRIES;
+    public static @NotNull @UnmodifiableView Map<Class<?>, DefinitionGroup<?>> getAssignedEntries() {
+        return Collections.unmodifiableMap(ASSIGNED_ENTRIES);
     }
 
     /**

@@ -98,8 +98,8 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
             ResourceLocation id = registry.getKey(value);
             if (id == null)
                 continue;
-
-            ((VisionDuck) value).vMinus$setVisionId(id);
+            VisionDuck duck = ((VisionDuck) value);
+            duck.vMinus$setVisionId(id);
             VisionEntry<T> mergedEntry = buildMergedEntry(value, id.toString(), visionEntries);
 
             if (!mergedEntry.isEmpty()) {
@@ -107,6 +107,7 @@ public class VisionManager<T> extends SimpleJsonResourceReloadListener {
                 idToVisionMap.put(id, vision);
                 visionType.putVision(id, vision);
                 visionType.applyVision(value, id);
+                duck.vMinus$update();
             }
         }
     }

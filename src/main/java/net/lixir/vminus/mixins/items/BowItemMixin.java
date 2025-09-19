@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.item.IMaxDurationGetter;
+import net.lixir.vminus.world.item.IMaxDurationGetter;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.util.VisionUtils;

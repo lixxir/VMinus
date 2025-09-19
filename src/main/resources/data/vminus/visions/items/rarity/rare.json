@@ -1,4 +1,14 @@
 {
-  "tag": "vminus:rarity/rare",
-  "rarity": "rare"
+  "item": "all",
+  "pick_up_sound": "detour:rarity.rare.pick_up",
+  "drop_sound": "detour:rarity.rare.drop",
+  "decorator": {
+    "texture": "detour:textures/decorator/rarity/rare.png"
+  },
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "rare"
+    }
+  ]
 }

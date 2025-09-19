@@ -1,7 +1,7 @@
 package net.lixir.vminus.mixins.items;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.lixir.vminus.vision.*;
-import net.lixir.vminus.vision.util.ItemReplacement;
 import net.lixir.vminus.vision.util.VisionFoodProperties;
 import net.lixir.vminus.vision.util.VisionUtils;
 import net.lixir.vminus.vision.values.conditions.VisionContext;
@@ -11,13 +11,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.extensions.IForgeItemStack;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
@@ -38,83 +36,56 @@ public abstract class ItemStackMixin implements IForgeItemStack, VisionDuck {
         return ((VisionDuck) getItem()).vMinus$getVisionId();
     }
 
-    /*
-    @Inject(method = "getItem", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getItem(@NotNull CallbackInfoReturnable<Item> cir) {
-        Item originalItem = cir.getReturnValue();
-        ItemReplacement replacement = Vision.getValue(originalItem, VisionProperties.Items.REPLACE, new VisionContext(originalItem));
-        ItemStack replaced = ItemReplacement.resolve(replacement);
-
-        if (!replaced.isEmpty() && replaced.getItem() != originalItem) {
-            ItemStackAccessor accessor = (ItemStackAccessor) (Object) replaced;
-            cir.setReturnValue(accessor.getDelegate().get());
-        }
-    }
-
-     */
-
-    @Inject(method = "getBarWidth", at = @At("RETURN"), cancellable = true)
-    private void getBarWidth(CallbackInfoReturnable<Integer> cir) {
-        Integer maxDamage = VisionUtils.getOverrideValue(this, VisionProperties.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getBarWidth", at = @At("RETURN"))
+    private int getBarWidth(int original) {
+        Integer maxDamage = Vision.getValue(vMinus$self, VisionProperties.Items.MAX_DAMAGE);
         /* Patches out an issue with damage bars not scaling properly when a new durability is applied.
          Only do it with vision applied durability to prevent altering vanilla behavior.
          */
         if (vMinus$self.isDamageableItem() && maxDamage != null && maxDamage > 0) {
             float durabilityRatio = 1.0F - ((float) vMinus$self.getDamageValue() / vMinus$self.getMaxDamage());
             int barWidth = (int) Math.floor(13.0F * durabilityRatio);
-            cir.setReturnValue(Math.min(barWidth, 13));
+            return Math.min(barWidth, 13);
         }
+        return original;
     }
 
-    @Inject(method = "isBarVisible", at = @At("RETURN"), cancellable = true)
-    private void vMinus$isBarVisible(CallbackInfoReturnable<Boolean> cir) {
-        Integer maxDamage = VisionUtils.getOverrideValue(this, VisionProperties.Items.MAX_DAMAGE, new VisionContext(vMinus$self));
-        if (maxDamage != null && vMinus$self.isDamaged()) {
-            cir.setReturnValue(true);
-        }
+    @ModifyReturnValue(method = "isBarVisible", at = @At("RETURN"))
+    private boolean vMinus$isBarVisible(boolean original) {
+        Integer maxDamage = Vision.getValue(vMinus$self, VisionProperties.Items.MAX_DAMAGE);
+        if (maxDamage != null && vMinus$self.isDamaged())
+            return true;
+        return original;
     }
 
-
-    @Inject(method = "isEnchantable", at = @At("RETURN"), cancellable = true)
-    private void isEnchantable(CallbackInfoReturnable<Boolean> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Items.ENCHANTABLE, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "isEnchantable", at = @At("RETURN"))
+    private boolean vMinus$isEnchantable(boolean original) {
+       return Vision.getValue(vMinus$self, VisionProperties.Items.ENCHANTABLE, original);
     }
 
-    @Inject(method = "getDrinkingSound", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getDrinkingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        vMinus$trySetEatSound(cir);
+    @ModifyReturnValue(method = "getDrinkingSound", at = @At("RETURN"))
+    private SoundEvent vMinus$getDrinkingSound(SoundEvent original) {
+        return vMinus$trySetEatSound(original);
     }
 
-    @Inject(method = "getEatingSound", at = @At("RETURN"), cancellable = true)
-    private void vMinus$getEatingSound(CallbackInfoReturnable<SoundEvent> cir) {
-        vMinus$trySetEatSound(cir);
+    @ModifyReturnValue(method = "getEatingSound", at = @At("RETURN"))
+    private SoundEvent vMinus$getEatingSound(SoundEvent original) {
+        return vMinus$trySetEatSound(original);
     }
 
     @Unique
-    private void vMinus$trySetEatSound(CallbackInfoReturnable<SoundEvent> cir) {
-        VisionFoodProperties visionFoodProperties = VisionUtils.getOverrideValue(this, VisionProperties.Items.FOOD, new VisionContext(vMinus$self));
+    private SoundEvent vMinus$trySetEatSound(SoundEvent original) {
+        VisionFoodProperties visionFoodProperties = Vision.getValue(vMinus$self, VisionProperties.Items.FOOD);
         if (visionFoodProperties == null)
-            return;
+            return original;
         SoundEvent eatSound = visionFoodProperties.eatSound();
         if (eatSound != null)
-            cir.setReturnValue(eatSound);
+            return eatSound;
+        return original;
     }
 
-    @Inject(method = "getUseDuration", at = @At("RETURN"), cancellable = true)
-    private void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        VisionUtils.tryOverride(cir, this, VisionProperties.Items.USE_TICKS, new VisionContext(vMinus$self));
+    @ModifyReturnValue(method = "getUseDuration", at = @At("RETURN"))
+    private int getUseDuration(int original) {
+        return Vision.getValue(vMinus$self, VisionProperties.Items.USE_TICKS, original);
     }
-
-
-
-
-    /*
-    @Override
-    public boolean makesPiglinsNeutral(LivingEntity wearer) {
-        if (ItemTraits.hasTrait(vMinus$self, ItemTraits.PIGLIN_CHARM.get()))
-            return (ItemTraits.getTrait(vMinus$self, ItemTraits.PIGLIN_CHARM.get()));
-        return vMinus$self.getItem().makesPiglinsNeutral(vMinus$self, wearer);
-    }
-     */
-
 }

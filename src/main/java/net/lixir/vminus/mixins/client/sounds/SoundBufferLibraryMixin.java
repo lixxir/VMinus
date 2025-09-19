@@ -2,7 +2,7 @@ package net.lixir.vminus.mixins.client.sounds;
 
 import com.mojang.blaze3d.audio.SoundBuffer;
 import net.lixir.vminus.VMinus;
-import net.lixir.vminus.audio.OggOpusAudioStream;
+import net.lixir.vminus.api.audio.opus.OggOpusAudioStream;
 import net.minecraft.Util;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.LoopingAudioStream;

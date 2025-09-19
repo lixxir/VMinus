@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.level;
 
-import net.lixir.vminus.util.BlockStateUtils;
+import net.lixir.vminus.api.block.util.BlockStateUtils;
 import net.lixir.vminus.vision.Vision;
 import net.lixir.vminus.vision.VisionDuck;
 import net.lixir.vminus.vision.VisionProperties;

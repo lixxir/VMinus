@@ -1,11 +1,12 @@
 package net.lixir.vminus;
 
-import net.lixir.vminus.entity.attribute.VMinusAttributes;
-import net.lixir.vminus.block.VMinusBlocks;
-import net.lixir.vminus.fluid.VMinusFluids;
-import net.lixir.vminus.item.VMinusItems;
-import net.lixir.vminus.registry.VRegistry;
-import net.lixir.vminus.registry.VMinusRegistryEntryGroupsProvider;
+import net.lixir.vminus.api.registry.VRegistry;
+import net.lixir.vminus.world.block.blockentity.VMinusBlockEntityTypes;
+import net.lixir.vminus.world.entity.attribute.VMinusAttributes;
+import net.lixir.vminus.world.block.VMinusBlocks;
+import net.lixir.vminus.world.fluid.VMinusFluids;
+import net.lixir.vminus.world.item.VMinusItems;
+import net.lixir.vminus.api.registry.definition.group.BuiltInDefinitionGroupProvider;
 import net.lixir.vminus.registry.VMinusSounds;
 import net.lixir.vminus.vision.VisionProperties;
 import net.lixir.vminus.vision.VisionTypes;
@@ -13,7 +14,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class VMinus {
     public static final Logger LOGGER = LogManager.getLogger(VMinus.class);
     public static final String ID = "vminus";
-    public static final VRegistry REGISTRY = VRegistry.create(ID, new VMinusRegistryEntryGroupsProvider());
+    public static VRegistry REGISTRY = VRegistry.create(ID, new BuiltInDefinitionGroupProvider());
 
     private static final Collection<AbstractMap.SimpleEntry<Runnable, Integer>> workQueue = new ConcurrentLinkedQueue<>();
 
@@ -38,10 +38,15 @@ public class VMinus {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
+    public static void definitionInit() {
+        REGISTRY.runDefinitionGroups();
+    }
+
     public static void init() {
         VisionTypes.init();
         VisionProperties.init();
         VMinusBlocks.init();
+        VMinusBlockEntityTypes.init();
         VMinusItems.init();
         VMinusSounds.init();
         VMinusAttributes.init();

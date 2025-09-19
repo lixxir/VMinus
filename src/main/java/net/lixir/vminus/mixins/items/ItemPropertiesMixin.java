@@ -1,6 +1,6 @@
 package net.lixir.vminus.mixins.items;
 
-import net.lixir.vminus.item.IMaxDurationGetter;
+import net.lixir.vminus.world.item.IMaxDurationGetter;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;

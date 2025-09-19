@@ -1,4 +1,12 @@
 {
-  "tag": "vminus:rarity/legendary",
-  "rarity": "legendary"
+  "item": "all",
+  "pick_up_sound": "detour:rarity.legendary.pick_up",
+  "drop_sound": "detour:rarity.legendary.drop",
+  "decorator": "detour:textures/decorator/rarity/legendary.png",
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "legendary"
+    }
+  ]
 }

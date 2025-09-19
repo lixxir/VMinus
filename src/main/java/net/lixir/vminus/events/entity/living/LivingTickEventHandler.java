@@ -1,6 +1,6 @@
 package net.lixir.vminus.events.entity.living;
 
-import net.lixir.vminus.item.IEquipmentItem;
+import net.lixir.vminus.world.item.IEquipmentItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;

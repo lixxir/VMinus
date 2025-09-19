@@ -1,4 +1,12 @@
 {
-  "tag": "vminus:rarity/inverted",
-  "rarity": "inverted"
+  "item": "all",
+  "pick_up_sound": "detour:rarity.inverted.pick_up",
+  "drop_sound": "detour:rarity.inverted.drop",
+  "decorator": "detour:textures/decorator/rarity/inverted.png",
+  "conditions": [
+    {
+      "type": "rarity",
+      "value": "inverted"
+    }
+  ]
 }

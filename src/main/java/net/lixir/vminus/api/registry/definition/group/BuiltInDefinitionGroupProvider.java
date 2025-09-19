@@ -1,5 +1,6 @@
 package net.lixir.vminus.api.registry.definition.group;
 
+import net.lixir.vminus.VMinus;
 import net.lixir.vminus.api.block.wooden.*;
 
 import net.lixir.vminus.api.datagen.block.loottable.BuiltInBlockLootTableTypes;
@@ -111,21 +112,25 @@ public class BuiltInDefinitionGroupProvider extends DefinitionGroupProvider {
     );
     public static final DefinitionGroup<Block> WOODEN_DOOR = DefinitionGroup.of(
             BlockDefinition.of()
+                    .tags(BlockTags.WOODEN_DOORS)
                     .modelTextureSuffix("_planks")
     );
     public static final DefinitionGroup<Block> WOODEN_TRAPDOOR = DefinitionGroup.of(
             BlockDefinition.of()
+                    .tags(BlockTags.WOODEN_TRAPDOORS)
                     .modelTextureSuffix("_planks")
     );
     public static final DefinitionGroup<Block> TRAPDOOR = DefinitionGroup.of(
             BlockDefinition.of()
                     .modelType(BuiltInBlockModelTypes.TRAPDOOR)
+                    .tags(BlockTags.TRAPDOORS)
                     .itemDefinition(ItemDefinition.of().modelType(BuiltInItemModelTypes.BASIC))
                     .renderType(RenderTypeKey.SOLID)
     );
     public static final DefinitionGroup<Block> DOOR = DefinitionGroup.of(
             BlockDefinition.of()
                     .modelType(BuiltInBlockModelTypes.DOOR)
+                    .tags(BlockTags.DOORS)
                     .itemDefinition(ItemDefinition.of().modelType(BuiltInItemModelTypes.BASIC))
                     .renderType(RenderTypeKey.SOLID)
     );
@@ -261,7 +266,7 @@ public class BuiltInDefinitionGroupProvider extends DefinitionGroupProvider {
                     .tintType(BuiltInTintTypes.FOLIAGE)
                     .lootTableType(BuiltInBlockLootTableTypes.SHEARS)
                     .renderType(RenderTypeKey.CUTOUT_MIPPED)
-                    .modelType(BuiltInBlockModelTypes.TINTED_CUBE_ALL)
+                    .modelType(BuiltInBlockModelTypes.LEAVES)
                     .itemDefinition(ItemDefinition.of().tint(BuiltInTintTypes.FOLIAGE).tags(ItemTags.LEAVES))
     );
     public static final DefinitionGroup<Block> PLANKS = DefinitionGroup.of(
@@ -285,6 +290,7 @@ public class BuiltInDefinitionGroupProvider extends DefinitionGroupProvider {
 
     @Override
     public void run() {
+        VMinus.LOGGER.info("IM RUNNING BUILT IN DEFINITION GROUP PROCVIEDER");
         assign(WALL_HANGING_SIGN, WallHangingSignBlock.class);
         assign(HANGING_SIGN, CeilingHangingSignBlock.class);
         assign(WALL_SIGN, WallSignBlock.class);

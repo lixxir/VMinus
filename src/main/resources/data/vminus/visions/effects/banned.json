@@ -1,0 +1,7 @@
+{
+  "effects": [
+    "minecraft:absorption",
+    "minecraft:health_boost"
+  ],
+  "banned": true
+}

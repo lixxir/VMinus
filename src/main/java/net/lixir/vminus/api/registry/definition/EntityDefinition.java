@@ -5,6 +5,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -66,8 +67,11 @@ public class EntityDefinition extends RegistryDefinition<EntityDefinition, Entit
      * @return this definition (unchanged)
      */
     @Override
-    public @NotNull EntityDefinition merge(EntityDefinition other) {
-        return this;
+    public @NotNull EntityDefinition merge(@Nullable EntityDefinition other) {
+        if (other == null)
+            return this;
+        tags.addAll(other.tags);
+        return super.merge(other);
     }
 
     /**
@@ -75,6 +79,26 @@ public class EntityDefinition extends RegistryDefinition<EntityDefinition, Entit
      */
     @Override
     public boolean isEmpty() {
-        return this == EMPTY;
+        return this.equals(EMPTY);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof EntityDefinition other))
+            return false;
+
+        return isDefaulted == other.isDefaulted &&
+                tags.equals(other.tags) &&
+                super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + tags.hashCode();
+        result = 31 * result + Boolean.hashCode(isDefaulted);
+        return result;
     }
 }

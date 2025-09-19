@@ -37,8 +37,7 @@ public class ItemAttributeEventHandler {
                 Multimap<Attribute, AttributeModifier> originalModifiers = event.getOriginalModifiers();
                 for (Attribute a : originalModifiers.keySet()) {
                     for (AttributeModifier modifier : originalModifiers.get(a)) {
-                        String modifierId = BuiltInRegistries.ATTRIBUTE.getKey(a).toString();
-                        if (modifierId.equals(visionAttribute.id())) {
+                        if (a == visionAttribute.attribute()) {
                             event.removeModifier(a, modifier);
                         }
                     }
