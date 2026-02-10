@@ -1,0 +1,20 @@
+{
+  "attribute.vminus.name.blast_protection": "Blast Protection",
+  "attribute.vminus.name.blunt_protection": "Blunt Protection",
+  "attribute.vminus.name.fall_protection": "Fall Protection",
+  "attribute.vminus.name.fire_protection": "Fire Protection",
+  "attribute.vminus.name.magic_protection": "Magic Protection",
+  "attribute.vminus.name.mining_speed": "Mining Speed",
+  "attribute.vminus.name.protection": "General Protection",
+  "itemTrait.vminus.insulated": "Insulated",
+  "itemTrait.vminus.lightfooted": "Lightfooted",
+  "itemTrait.vminus.piglin_charm": "Piglin Charm",
+  "rarity.common": "Common",
+  "rarity.delicacy": "Delicacy",
+  "rarity.epic": "Epic",
+  "rarity.inverted": "Inverted",
+  "rarity.legendary": "Legendary",
+  "rarity.rare": "Rare",
+  "rarity.uncommon": "Uncommon",
+  "rarity.unobtainable": "Unobtainable"
+}
